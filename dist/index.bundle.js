@@ -1,0 +1,1823 @@
+const Navigation = (() => {
+  function getCurrentPage() {
+    try {
+      const path = window.location.pathname || '';
+      const file = path.split('/').pop() || 'index.html';
+      return file === '' ? 'index.html' : file;
+    } catch (error) {
+      console.error('Navigation.getCurrentPage error:', error);
+      return 'index.html';
+    }
+  }
+  function getSearchParams() {
+    try {
+      const url = new URL(window.location.href);
+      const servicio = (url.searchParams.get('servicio') || '').trim();
+      const ubicacion = (url.searchParams.get('ubicacion') || '').trim();
+      return {
+        servicio,
+        ubicacion
+      };
+    } catch (error) {
+      console.error('Navigation.getSearchParams error:', error);
+      return {
+        servicio: '',
+        ubicacion: ''
+      };
+    }
+  }
+  function goToSearch(servicio, ubicacion) {
+    try {
+      const s = (servicio || '').trim();
+      const u = (ubicacion || '').trim();
+      const params = new URLSearchParams();
+      if (s) params.set('servicio', s);
+      if (u) params.set('ubicacion', u);
+      window.location.href = `search.html?${params.toString()}`;
+    } catch (error) {
+      console.error('Navigation.goToSearch error:', error);
+    }
+  }
+  function goHome(sectionId) {
+    try {
+      if (!sectionId) {
+        window.location.href = 'index.html';
+        return;
+      }
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({
+          behavior: 'smooth'
+        });
+      } else {
+        window.location.href = `index.html#${sectionId}`;
+      }
+    } catch (error) {
+      console.error('Navigation.goHome error:', error);
+    }
+  }
+  function goToBusiness(businessId) {
+    try {
+      const id = encodeURIComponent(businessId);
+      window.location.href = `business.html?id=${id}`;
+    } catch (error) {
+      console.error('Navigation.goToBusiness error:', error);
+    }
+  }
+  return {
+    getCurrentPage,
+    getSearchParams,
+    goToSearch,
+    goHome,
+    goToBusiness
+  };
+})();
+const Format = (() => {
+  function formatPrecioCUP(value) {
+    try {
+      const n = Number(value);
+      if (Number.isNaN(n)) return '—';
+      return `${Math.round(n).toLocaleString('es-ES')} CUP`;
+    } catch (error) {
+      console.error('Format.formatPrecioCUP error:', error);
+      return '—';
+    }
+  }
+  function formatRangoPrecio(min, max) {
+    try {
+      if (min == null && max == null) return '—';
+      if (min != null && max != null) return `${Format.formatPrecioCUP(min)} – ${Format.formatPrecioCUP(max)}`;
+      return min != null ? Format.formatPrecioCUP(min) : Format.formatPrecioCUP(max);
+    } catch (error) {
+      console.error('Format.formatRangoPrecio error:', error);
+      return '—';
+    }
+  }
+  function clampText(text, max) {
+    try {
+      const t = String(text || '');
+      if (t.length <= max) return t;
+      return `${t.slice(0, max - 1)}…`;
+    } catch (error) {
+      console.error('Format.clampText error:', error);
+      return '';
+    }
+  }
+  return {
+    formatPrecioCUP,
+    formatRangoPrecio,
+    clampText
+  };
+})();
+const MockData = (() => {
+  const businesses = [{
+    id: 'roma-001',
+    nombre: 'Gordis Nails Boutique',
+    categoria: 'Uñas Acrílicas',
+    vip: true,
+    verificado: true,
+    topRoma: true,
+    masReservado: false,
+    negocioDelMes: true,
+    ubicacion: {
+      ciudad: 'La Habana',
+      zona: 'Vedado',
+      direccion: 'Calle 23, Vedado, Plaza'
+    },
+    coordenadas: {
+      lat: 23.1291,
+      lng: -82.3790
+    },
+    rangoPrecio: {
+      min: 800,
+      max: 3500
+    },
+    estrellas: 4.9,
+    totalReseñas: 212,
+    portadaUrl: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=80',
+    logoUrl: 'https://images.unsplash.com/photo-1520975958221-17f0d4a12a4a?auto=format&fit=crop&w=256&q=80',
+    fotos: ['https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=900&q=80', 'https://images.unsplash.com/photo-1610992015732-2449b0b2b8f5?auto=format&fit=crop&w=900&q=80', 'https://images.unsplash.com/photo-1605034313761-73ea4a8f35a1?auto=format&fit=crop&w=900&q=80', 'https://images.unsplash.com/photo-1605034313761-73ea4a8f35a1?auto=format&fit=crop&w=1200&q=70'],
+    whatsapp: '+5355550101',
+    descripcion: 'Boutique minimalista de uñas, diseño premium y protocolos higiénicos.',
+    categoriasCatalogo: [{
+      tipo: 'servicios',
+      titulo: 'Manos',
+      items: [{
+        nombre: 'Uñas acrílicas + diseño natural',
+        duracionMin: 90,
+        precio: 1800,
+        destacado: true
+      }, {
+        nombre: 'Relleno acrílico',
+        duracionMin: 60,
+        precio: 1400
+      }, {
+        nombre: 'Esmaltado semipermanente',
+        duracionMin: 45,
+        precio: 900
+      }]
+    }, {
+      tipo: 'servicios',
+      titulo: 'Pies',
+      items: [{
+        nombre: 'Pedicura spa',
+        duracionMin: 55,
+        precio: 1200
+      }, {
+        nombre: 'Reconstrucción de uña',
+        duracionMin: 30,
+        precio: 650
+      }]
+    }, {
+      tipo: 'productos',
+      titulo: 'Productos',
+      items: [{
+        nombre: 'Aceite de cutícula (15 ml)',
+        stock: 12,
+        precio: 350
+      }, {
+        nombre: 'Crema de manos premium',
+        stock: 6,
+        precio: 500
+      }]
+    }, {
+      tipo: 'cursos',
+      titulo: 'Cursos y Talleres',
+      items: [{
+        nombre: 'Taller: diseño minimalista',
+        fecha: '2026-05-04T10:00:00.000Z',
+        ubicacion: 'Vedado, La Habana',
+        precio: 4500
+      }, {
+        nombre: 'Curso completo: acrílico desde cero',
+        fecha: '2026-05-18T09:30:00.000Z',
+        ubicacion: 'Vedado, La Habana',
+        precio: 12000
+      }]
+    }],
+    reseñas: [{
+      id: 'r1',
+      nombre: 'Camila',
+      estrellas: 5,
+      verificada: true,
+      texto: 'Atención impecable y un acabado súper fino. Se nota el nivel.',
+      fecha: '2026-03-22'
+    }, {
+      id: 'r2',
+      nombre: 'Dayana',
+      estrellas: 5,
+      verificada: true,
+      texto: 'Higiene top y diseño minimalista tal cual lo quería.',
+      fecha: '2026-03-10'
+    }, {
+      id: 'r3',
+      nombre: 'Roxana',
+      estrellas: 4,
+      verificada: false,
+      texto: 'Muy buen servicio, solo esperé un poquito, pero valió la pena.',
+      fecha: '2026-02-18'
+    }]
+  }, {
+    id: 'roma-002',
+    nombre: 'Barbería Malecón',
+    categoria: 'Barbería',
+    vip: false,
+    verificado: true,
+    topRoma: false,
+    masReservado: true,
+    negocioDelMes: false,
+    ubicacion: {
+      ciudad: 'La Habana',
+      zona: 'Centro Habana',
+      direccion: 'San Lázaro, Centro Habana'
+    },
+    coordenadas: {
+      lat: 23.1375,
+      lng: -82.3701
+    },
+    rangoPrecio: {
+      min: 350,
+      max: 1500
+    },
+    estrellas: 4.7,
+    totalReseñas: 154,
+    portadaUrl: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=1600&q=80',
+    logoUrl: 'https://images.unsplash.com/photo-1520975732134-340aee8f36d4?auto=format&fit=crop&w=256&q=80',
+    fotos: ['https://images.unsplash.com/photo-1520975911267-56c7b0199c4f?auto=format&fit=crop&w=900&q=80', 'https://images.unsplash.com/photo-1520975682030-1a7d1b93e2a3?auto=format&fit=crop&w=900&q=80', 'https://images.unsplash.com/photo-1517832207067-4db24a2ae47c?auto=format&fit=crop&w=900&q=80'],
+    whatsapp: '+5355550202',
+    descripcion: 'Cortes clásicos y modernos, ritual de barba y ambiente limpio frente al mar.',
+    categoriasCatalogo: [{
+      tipo: 'servicios',
+      titulo: 'Cortes',
+      items: [{
+        nombre: 'Corte clásico',
+        duracionMin: 35,
+        precio: 500,
+        destacado: true
+      }, {
+        nombre: 'Fade premium',
+        duracionMin: 45,
+        precio: 700
+      }]
+    }, {
+      tipo: 'servicios',
+      titulo: 'Barba',
+      items: [{
+        nombre: 'Ritual de barba',
+        duracionMin: 30,
+        precio: 600
+      }, {
+        nombre: 'Perfilado',
+        duracionMin: 20,
+        precio: 350
+      }]
+    }],
+    reseñas: [{
+      id: 'r4',
+      nombre: 'Ernesto',
+      estrellas: 5,
+      verificada: true,
+      texto: 'Profesionales, rápidos y con un estilo bien moderno.',
+      fecha: '2026-03-05'
+    }, {
+      id: 'r5',
+      nombre: 'Luis',
+      estrellas: 4,
+      verificada: true,
+      texto: 'Buen trato. El fade quedó perfecto.',
+      fecha: '2026-02-14'
+    }]
+  }, {
+    id: 'roma-003',
+    nombre: 'Roma Skin Studio',
+    categoria: 'Estética Facial',
+    vip: true,
+    verificado: true,
+    topRoma: false,
+    masReservado: true,
+    negocioDelMes: false,
+    ubicacion: {
+      ciudad: 'La Habana',
+      zona: 'Miramar',
+      direccion: '5ta Avenida, Playa'
+    },
+    coordenadas: {
+      lat: 23.1100,
+      lng: -82.4370
+    },
+    rangoPrecio: {
+      min: 1200,
+      max: 7500
+    },
+    estrellas: 4.8,
+    totalReseñas: 98,
+    portadaUrl: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=1600&q=80',
+    logoUrl: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=256&q=60',
+    fotos: ['https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=900&q=80', 'https://images.unsplash.com/photo-1600334129128-685c5582fd35?auto=format&fit=crop&w=900&q=80', 'https://images.unsplash.com/photo-1556228579-0d85b1a4d571?auto=format&fit=crop&w=900&q=70'],
+    whatsapp: '+5355550303',
+    descripcion: 'Piel luminosa con protocolos clínicos y un espacio ultra-limpio.',
+    categoriasCatalogo: [{
+      tipo: 'servicios',
+      titulo: 'Facial',
+      items: [{
+        nombre: 'Limpieza profunda + hidratación',
+        duracionMin: 70,
+        precio: 2500,
+        destacado: true
+      }, {
+        nombre: 'Peeling suave',
+        duracionMin: 45,
+        precio: 1800
+      }]
+    }, {
+      tipo: 'productos',
+      titulo: 'Productos',
+      items: [{
+        nombre: 'Sérum iluminador',
+        stock: 4,
+        precio: 3200
+      }, {
+        nombre: 'Protector solar premium',
+        stock: 9,
+        precio: 2100
+      }]
+    }],
+    reseñas: [{
+      id: 'r6',
+      nombre: 'Melany',
+      estrellas: 5,
+      verificada: true,
+      texto: 'Me dejó la piel increíble y el espacio es súper limpio.',
+      fecha: '2026-03-29'
+    }, {
+      id: 'r7',
+      nombre: 'Ana',
+      estrellas: 4,
+      verificada: false,
+      texto: 'Muy buena atención, me gustó el protocolo paso a paso.',
+      fecha: '2026-03-12'
+    }]
+  }, {
+    id: 'roma-004',
+    nombre: 'Academia Roma Pro',
+    categoria: 'Cursos y Talleres',
+    vip: false,
+    verificado: false,
+    topRoma: false,
+    masReservado: false,
+    negocioDelMes: false,
+    ubicacion: {
+      ciudad: 'La Habana',
+      zona: 'Habana Vieja',
+      direccion: 'Obispo, Habana Vieja'
+    },
+    coordenadas: {
+      lat: 23.1400,
+      lng: -82.3500
+    },
+    rangoPrecio: {
+      min: 3000,
+      max: 15000
+    },
+    estrellas: 4.5,
+    totalReseñas: 41,
+    portadaUrl: 'https://images.unsplash.com/photo-1529390079861-591de354faf5?auto=format&fit=crop&w=1600&q=80',
+    logoUrl: 'https://images.unsplash.com/photo-1529390079861-591de354faf5?auto=format&fit=crop&w=256&q=60',
+    fotos: ['https://images.unsplash.com/photo-1529390079861-591de354faf5?auto=format&fit=crop&w=900&q=80', 'https://images.unsplash.com/photo-1584697964192-5f5f5b1cdb4b?auto=format&fit=crop&w=900&q=80', 'https://images.unsplash.com/photo-1529390079861-591de354faf5?auto=format&fit=crop&w=900&q=70'],
+    whatsapp: '+5355550404',
+    descripcion: 'Talleres para elevar tu técnica y convertir tu talento en un negocio.',
+    categoriasCatalogo: [{
+      tipo: 'cursos',
+      titulo: 'Cursos y Talleres',
+      items: [{
+        nombre: 'Taller: barbería moderna',
+        fecha: '2026-06-06T10:00:00.000Z',
+        ubicacion: 'Habana Vieja',
+        precio: 6000
+      }, {
+        nombre: 'Curso: manicure profesional',
+        fecha: '2026-06-20T09:00:00.000Z',
+        ubicacion: 'Habana Vieja',
+        precio: 11000
+      }]
+    }],
+    reseñas: [{
+      id: 'r8',
+      nombre: 'Yusniel',
+      estrellas: 5,
+      verificada: false,
+      texto: 'Muy buena explicación y práctica real.',
+      fecha: '2026-01-23'
+    }]
+  }];
+  function listBusinesses() {
+    return businesses.slice();
+  }
+  function listTopRated() {
+    return businesses.slice().filter(b => b.totalReseñas >= 40).sort((a, b) => b.estrellas - a.estrellas).slice(0, 8);
+  }
+  function getBusinessById(id) {
+    const found = businesses.find(b => b.id === id);
+    return found || null;
+  }
+  function normalizeText(value) {
+    return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+  function searchBusinesses(query) {
+    const q = query || {
+      servicio: '',
+      ubicacion: ''
+    };
+    const servicio = normalizeText(q.servicio);
+    const ubicacion = normalizeText(q.ubicacion);
+    return businesses.filter(b => {
+      const hayServicio = !servicio ? true : [b.nombre, b.categoria, b.descripcion].filter(Boolean).some(t => normalizeText(t).includes(servicio));
+      const hayUbicacion = !ubicacion ? true : [b.ubicacion?.ciudad, b.ubicacion?.zona, b.ubicacion?.direccion].filter(Boolean).some(t => normalizeText(t).includes(ubicacion));
+      return hayServicio && hayUbicacion;
+    });
+  }
+  return {
+    listBusinesses,
+    listTopRated,
+    searchBusinesses,
+    getBusinessById
+  };
+})();
+const ToastContext = React.createContext(null);
+function ToastProvider({
+  children
+}) {
+  try {
+    const [toasts, setToasts] = React.useState([]);
+    const push = React.useCallback(toast => {
+      try {
+        const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        const t = {
+          id,
+          type: toast?.type || 'info',
+          title: toast?.title || 'Listo',
+          message: toast?.message || ''
+        };
+        setToasts(prev => [t, ...prev].slice(0, 3));
+        window.setTimeout(() => {
+          setToasts(prev => prev.filter(x => x.id !== id));
+        }, 3200);
+      } catch (error) {
+        console.error('ToastProvider.push error:', error);
+      }
+    }, []);
+    const api = React.useMemo(() => ({
+      push
+    }), [push]);
+    return React.createElement(ToastContext.Provider, {
+      value: api,
+      "data-name": "toast-provider",
+      "data-file": "components/ToastProvider.js"
+    }, React.createElement("div", {
+      "data-name": "toast-provider-inner",
+      "data-file": "components/ToastProvider.js"
+    }, children, React.createElement("div", {
+      className: "fixed top-4 right-4 z-[70] space-y-2 w-[320px] max-w-[calc(100vw-32px)]",
+      "data-name": "toast-stack",
+      "data-file": "components/ToastProvider.js"
+    }, toasts.map(t => React.createElement("div", {
+      key: t.id,
+      className: "card-rr px-4 py-3",
+      "data-name": "toast",
+      "data-file": "components/ToastProvider.js"
+    }, React.createElement("div", {
+      className: "flex items-start gap-3",
+      "data-name": "toast-row",
+      "data-file": "components/ToastProvider.js"
+    }, React.createElement("div", {
+      className: "w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--secondary-color)] shrink-0",
+      "data-name": "toast-icon-wrap",
+      "data-file": "components/ToastProvider.js"
+    }, React.createElement("div", {
+      className: "icon-info text-xl text-[var(--primary-color)]",
+      "data-name": "toast-icon",
+      "data-file": "components/ToastProvider.js"
+    })), React.createElement("div", {
+      className: "min-w-0",
+      "data-name": "toast-content",
+      "data-file": "components/ToastProvider.js"
+    }, React.createElement("p", {
+      className: "text-sm font-medium",
+      "data-name": "toast-title",
+      "data-file": "components/ToastProvider.js"
+    }, t.title), t.message ? React.createElement("p", {
+      className: "text-xs text-[var(--text-muted)] mt-1 leading-relaxed",
+      "data-name": "toast-message",
+      "data-file": "components/ToastProvider.js"
+    }, t.message) : null), React.createElement("button", {
+      className: "ml-auto text-[var(--text-muted)] hover:text-[var(--primary-color)] transition-colors",
+      onClick: () => setToasts(prev => prev.filter(x => x.id !== t.id)),
+      "data-name": "toast-close",
+      "data-file": "components/ToastProvider.js",
+      "aria-label": "Cerrar"
+    }, React.createElement("div", {
+      className: "icon-x text-lg",
+      "data-name": "toast-close-icon",
+      "data-file": "components/ToastProvider.js"
+    }))))))));
+  } catch (error) {
+    console.error('ToastProvider component error:', error);
+    return children || null;
+  }
+}
+function useToast() {
+  try {
+    const ctx = React.useContext(ToastContext);
+    return ctx;
+  } catch (error) {
+    console.error('useToast error:', error);
+    return null;
+  }
+}
+function Header({
+  currentParams
+}) {
+  try {
+    const page = Navigation.getCurrentPage();
+    const [open, setOpen] = React.useState(false);
+    const onGoHome = () => {
+      try {
+        Navigation.goHome();
+      } catch (error) {
+        console.error('Header.onGoHome error:', error);
+      }
+    };
+    const onGoSearch = () => {
+      try {
+        const q = currentParams || Navigation.getSearchParams();
+        Navigation.goToSearch(q?.servicio || '', q?.ubicacion || '');
+      } catch (error) {
+        console.error('Header.onGoSearch error:', error);
+      }
+    };
+    return React.createElement("header", {
+      className: "sticky top-0 z-[60] bg-white/90 backdrop-blur border-b border-[var(--border)]",
+      "data-name": "header",
+      "data-file": "components/Header.js"
+    }, React.createElement("div", {
+      className: "container-rr py-4",
+      "data-name": "header-inner",
+      "data-file": "components/Header.js"
+    }, React.createElement("div", {
+      className: "flex items-center gap-3",
+      "data-name": "header-row",
+      "data-file": "components/Header.js"
+    }, React.createElement("button", {
+      className: "flex items-center gap-3",
+      onClick: onGoHome,
+      "data-name": "brand",
+      "data-file": "components/Header.js"
+    }, React.createElement("div", {
+      className: "w-10 h-10 rounded-2xl overflow-hidden border border-[rgba(216,27,96,0.25)] bg-gradient-to-r from-[#D81B60] to-[#F48FB1] flex items-center justify-center",
+      "data-name": "brand-mark",
+      "data-file": "components/Header.js"
+    }, React.createElement("img", {
+      src: "https://app.trickle.so/storage/public/images/usr_1dec1efb58008001/55d88a3b-fbdf-46a8-bc34-5c6dac55ec46.png",
+      alt: "Logo de Rservas.Roma",
+      className: "w-full h-full object-cover",
+      "data-name": "brand-mark-img",
+      "data-file": "components/Header.js"
+    })), React.createElement("div", {
+      className: "leading-tight",
+      "data-name": "brand-text",
+      "data-file": "components/Header.js"
+    }, React.createElement("p", {
+      className: "text-sm font-semibold tracking-tight text-[#1F2937]",
+      "data-name": "brand-title",
+      "data-file": "components/Header.js"
+    }, "Rservas.Roma"), React.createElement("p", {
+      className: "text-xs text-[var(--text-muted)]",
+      "data-name": "brand-sub",
+      "data-file": "components/Header.js"
+    }, "Marketplace"))), React.createElement("div", {
+      className: "hidden md:flex items-center gap-2 ml-auto",
+      "data-name": "header-actions-desktop",
+      "data-file": "components/Header.js"
+    }, React.createElement("button", {
+      className: `btn-rr ${page === 'index.html' ? 'btn-primary-rr' : 'btn-ghost-rr'}`,
+      onClick: onGoHome,
+      "data-name": "nav-home",
+      "data-file": "components/Header.js"
+    }, "Inicio"), React.createElement("button", {
+      className: `btn-rr ${page === 'search.html' ? 'btn-primary-rr' : 'btn-ghost-rr'}`,
+      onClick: onGoSearch,
+      "data-name": "nav-search",
+      "data-file": "components/Header.js"
+    }, "Explorar"), React.createElement("a", {
+      className: "btn-rr btn-ghost-rr",
+      href: "business.html?id=roma-001",
+      "data-name": "nav-demo",
+      "data-file": "components/Header.js"
+    }, "Ver demo")), React.createElement("button", {
+      className: "ml-auto md:hidden w-11 h-11 rounded-2xl border border-[var(--border)] bg-white flex items-center justify-center",
+      onClick: () => setOpen(v => !v),
+      "data-name": "nav-toggle",
+      "data-file": "components/Header.js",
+      "aria-label": "Abrir men\xFA"
+    }, React.createElement("div", {
+      className: "icon-menu text-xl text-[var(--primary-color)]",
+      "data-name": "nav-toggle-icon",
+      "data-file": "components/Header.js"
+    }))), open ? React.createElement("div", {
+      className: "md:hidden pt-3",
+      "data-name": "header-mobile",
+      "data-file": "components/Header.js"
+    }, React.createElement("div", {
+      className: "surface-rr p-3",
+      "data-name": "header-mobile-panel",
+      "data-file": "components/Header.js"
+    }, React.createElement("div", {
+      className: "grid grid-cols-1 gap-2",
+      "data-name": "header-mobile-actions",
+      "data-file": "components/Header.js"
+    }, React.createElement("button", {
+      className: "btn-rr btn-ghost-rr w-full flex items-center justify-between",
+      onClick: onGoHome,
+      "data-name": "m-home",
+      "data-file": "components/Header.js"
+    }, React.createElement("span", {
+      "data-name": "m-home-text",
+      "data-file": "components/Header.js"
+    }, "Inicio"), React.createElement("div", {
+      className: "icon-arrow-right text-xl text-[var(--primary-color)]",
+      "data-name": "m-home-icon",
+      "data-file": "components/Header.js"
+    })), React.createElement("button", {
+      className: "btn-rr btn-primary-rr w-full flex items-center justify-between",
+      onClick: onGoSearch,
+      "data-name": "m-search",
+      "data-file": "components/Header.js"
+    }, React.createElement("span", {
+      "data-name": "m-search-text",
+      "data-file": "components/Header.js"
+    }, "Explorar"), React.createElement("div", {
+      className: "icon-arrow-right text-xl text-white",
+      "data-name": "m-search-icon",
+      "data-file": "components/Header.js"
+    })), React.createElement("a", {
+      className: "btn-rr btn-ghost-rr w-full flex items-center justify-between",
+      href: "business.html?id=roma-001",
+      "data-name": "m-demo",
+      "data-file": "components/Header.js"
+    }, React.createElement("span", {
+      "data-name": "m-demo-text",
+      "data-file": "components/Header.js"
+    }, "Ver demo"), React.createElement("div", {
+      className: "icon-external-link text-xl text-[var(--primary-color)]",
+      "data-name": "m-demo-icon",
+      "data-file": "components/Header.js"
+    }))))) : null));
+  } catch (error) {
+    console.error('Header component error:', error);
+    return null;
+  }
+}
+function Footer() {
+  try {
+    const year = 2026;
+    return React.createElement("footer", {
+      className: "border-t border-[var(--border)] bg-white",
+      "data-name": "footer",
+      "data-file": "components/Footer.js"
+    }, React.createElement("div", {
+      className: "container-rr py-10",
+      "data-name": "footer-inner",
+      "data-file": "components/Footer.js"
+    }, React.createElement("div", {
+      className: "flex flex-col md:flex-row md:items-center gap-4 justify-between",
+      "data-name": "footer-row",
+      "data-file": "components/Footer.js"
+    }, React.createElement("div", {
+      className: "space-y-2",
+      "data-name": "footer-brand",
+      "data-file": "components/Footer.js"
+    }, React.createElement("p", {
+      className: "text-sm font-semibold",
+      "data-name": "footer-title",
+      "data-file": "components/Footer.js"
+    }, "Rservas.Roma Marketplace"), React.createElement("p", {
+      className: "text-xs text-[var(--text-muted)] leading-relaxed",
+      "data-name": "footer-sub",
+      "data-file": "components/Footer.js"
+    }, "Belleza y servicios en Cuba. Reserva por WhatsApp y descubre negocios VIP con rese\xF1as verificadas.")), React.createElement("div", {
+      className: "flex items-center gap-2",
+      "data-name": "footer-legal",
+      "data-file": "components/Footer.js"
+    }, React.createElement("span", {
+      className: "text-xs text-[var(--text-muted)]",
+      "data-name": "footer-copy",
+      "data-file": "components/Footer.js"
+    }, "\xA9 ", year, " Rservas.Roma"), React.createElement("span", {
+      className: "text-xs text-[var(--text-muted)]",
+      "data-name": "footer-dot",
+      "data-file": "components/Footer.js"
+    }, "\u2022"), React.createElement("a", {
+      className: "text-xs text-[var(--text-muted)] hover:text-[var(--primary-color)] transition-colors",
+      href: "index.html#muro",
+      "data-name": "footer-muro",
+      "data-file": "components/Footer.js"
+    }, "Muro de la Intriga")))));
+  } catch (error) {
+    console.error('Footer component error:', error);
+    return null;
+  }
+}
+function Badge({
+  type,
+  text
+}) {
+  try {
+    const styles = (() => {
+      if (type === 'vip') return {
+        bg: 'bg-[#1F2937]',
+        fg: 'text-white',
+        icon: 'icon-crown',
+        iconColor: 'text-[#F59E0B]'
+      };
+      if (type === 'top') return {
+        bg: 'bg-white',
+        fg: 'text-[#1F2937]',
+        icon: 'icon-star',
+        iconColor: 'text-[#F59E0B]'
+      };
+      if (type === 'reservado') return {
+        bg: 'bg-white',
+        fg: 'text-[#1F2937]',
+        icon: 'icon-flame',
+        iconColor: 'text-[var(--primary-color)]'
+      };
+      if (type === 'mes') return {
+        bg: 'bg-white',
+        fg: 'text-[#1F2937]',
+        icon: 'icon-award',
+        iconColor: 'text-[var(--primary-color)]'
+      };
+      return {
+        bg: 'bg-white',
+        fg: 'text-[#1F2937]',
+        icon: 'icon-info',
+        iconColor: 'text-[var(--primary-color)]'
+      };
+    })();
+    return React.createElement("span", {
+      className: `inline-flex items-center gap-2 px-3 py-1.5 chip-rr ${styles.bg} ${styles.fg}`,
+      "data-name": "badge",
+      "data-file": "components/Badge.js"
+    }, React.createElement("span", {
+      className: "inline-flex items-center justify-center w-5 h-5 rounded-full bg-[rgba(255,255,255,0.14)]",
+      "data-name": "badge-ic-wrap",
+      "data-file": "components/Badge.js"
+    }, React.createElement("div", {
+      className: `${styles.icon} text-sm ${styles.iconColor || 'text-[var(--primary-color)]'}`,
+      "data-name": "badge-ic",
+      "data-file": "components/Badge.js"
+    })), React.createElement("span", {
+      className: "text-xs font-medium",
+      "data-name": "badge-text",
+      "data-file": "components/Badge.js"
+    }, text));
+  } catch (error) {
+    console.error('Badge component error:', error);
+    return null;
+  }
+}
+function StarRating({
+  value,
+  total,
+  verified
+}) {
+  try {
+    const stars = Math.round(Number(value || 0) * 10) / 10;
+    const t = Number(total || 0);
+    return React.createElement("div", {
+      className: "flex items-center gap-2",
+      "data-name": "star-rating",
+      "data-file": "components/StarRating.js"
+    }, React.createElement("div", {
+      className: "flex items-center gap-1",
+      "data-name": "stars",
+      "data-file": "components/StarRating.js"
+    }, React.createElement("div", {
+      className: "icon-star text-base text-[#F59E0B]",
+      "data-name": "star-icon",
+      "data-file": "components/StarRating.js"
+    }), React.createElement("span", {
+      className: "text-sm font-semibold",
+      "data-name": "star-value",
+      "data-file": "components/StarRating.js"
+    }, stars.toFixed(1)), React.createElement("span", {
+      className: "text-xs text-[var(--text-muted)]",
+      "data-name": "star-total",
+      "data-file": "components/StarRating.js"
+    }, "(", t, ")")), verified ? React.createElement("span", {
+      className: "inline-flex items-center gap-1 px-2 py-1 rounded-full bg-[rgba(11,18,32,0.04)] border border-[var(--border)]",
+      "data-name": "verified-pill",
+      "data-file": "components/StarRating.js"
+    }, React.createElement("div", {
+      className: "icon-circle-check text-sm text-[var(--primary-color)]",
+      "data-name": "verified-icon",
+      "data-file": "components/StarRating.js"
+    }), React.createElement("span", {
+      className: "text-[11px] text-[var(--text-muted)]",
+      "data-name": "verified-text",
+      "data-file": "components/StarRating.js"
+    }, "Rese\xF1as verificadas")) : null);
+  } catch (error) {
+    console.error('StarRating component error:', error);
+    return null;
+  }
+}
+function SearchBar({
+  initialServicio,
+  initialUbicacion,
+  compact
+}) {
+  try {
+    const toast = useToast();
+    const [servicio, setServicio] = React.useState(initialServicio || '');
+    const [ubicacion, setUbicacion] = React.useState(initialUbicacion || '');
+    const [focus, setFocus] = React.useState(false);
+    React.useEffect(() => {
+      try {
+        setServicio(initialServicio || '');
+        setUbicacion(initialUbicacion || '');
+      } catch (error) {
+        console.error('SearchBar sync error:', error);
+      }
+    }, [initialServicio, initialUbicacion]);
+    const sugerenciasServicio = ['Uñas Acrílicas', 'Barbería', 'Estética Facial', 'Peinados', 'Maquillaje', 'Cursos y Talleres'];
+    const sugerenciasUbicacion = ['La Habana', 'Vedado', 'Miramar', 'Habana Vieja', 'Centro Habana'];
+    const ejecutarBusqueda = () => {
+      try {
+        if (!servicio && !ubicacion) {
+          toast?.push({
+            title: 'Escribe algo',
+            message: 'Puedes buscar por “Uñas Acrílicas” o por una zona, por ejemplo “Vedado”.'
+          });
+          return;
+        }
+        Navigation.goToSearch(servicio, ubicacion);
+      } catch (error) {
+        console.error('SearchBar.ejecutarBusqueda error:', error);
+      }
+    };
+    const suggestionChips = (items, onPick) => React.createElement("div", {
+      className: "flex flex-wrap gap-2 mt-3",
+      "data-name": "suggestions",
+      "data-file": "components/SearchBar.js"
+    }, items.map(s => React.createElement("button", {
+      key: s,
+      className: "chip-rr px-3 py-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--primary-color)] hover:bg-[rgba(11,18,32,0.05)] transition-colors",
+      onClick: () => onPick(s),
+      "data-name": "suggestion-chip",
+      "data-file": "components/SearchBar.js"
+    }, s)));
+    return React.createElement("div", {
+      className: `${compact ? 'w-full' : 'w-full max-w-[820px] mx-auto'}`,
+      "data-name": "searchbar",
+      "data-file": "components/SearchBar.js"
+    }, React.createElement("div", {
+      className: `surface-rr p-3 md:p-4 ${focus ? 'subtle-glow-rr' : ''} transition-shadow`,
+      "data-name": "searchbar-surface",
+      "data-file": "components/SearchBar.js"
+    }, React.createElement("div", {
+      className: "grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-center",
+      "data-name": "searchbar-grid",
+      "data-file": "components/SearchBar.js"
+    }, React.createElement("div", {
+      className: "flex items-center gap-3",
+      "data-name": "field-servicio",
+      "data-file": "components/SearchBar.js"
+    }, React.createElement("div", {
+      className: "w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
+      "data-name": "field-servicio-icon",
+      "data-file": "components/SearchBar.js"
+    }, React.createElement("div", {
+      className: "icon-search text-xl text-[var(--primary-color)]",
+      "data-name": "field-servicio-icon-i",
+      "data-file": "components/SearchBar.js"
+    })), React.createElement("div", {
+      className: "min-w-0 flex-1",
+      "data-name": "field-servicio-input",
+      "data-file": "components/SearchBar.js"
+    }, React.createElement("label", {
+      className: "block text-[11px] text-[var(--text-muted)] mb-1",
+      "data-name": "label-servicio",
+      "data-file": "components/SearchBar.js"
+    }, "Servicio o curso"), React.createElement("input", {
+      className: "w-full text-sm bg-transparent outline-none",
+      value: servicio,
+      onChange: e => setServicio(e.target.value),
+      placeholder: "Ej: U\xF1as Acr\xEDlicas, Barber\xEDa",
+      onFocus: () => setFocus(true),
+      onBlur: () => setFocus(false),
+      "data-name": "input-servicio",
+      "data-file": "components/SearchBar.js"
+    }))), React.createElement("div", {
+      className: "flex items-center gap-3",
+      "data-name": "field-ubicacion",
+      "data-file": "components/SearchBar.js"
+    }, React.createElement("div", {
+      className: "w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
+      "data-name": "field-ubicacion-icon",
+      "data-file": "components/SearchBar.js"
+    }, React.createElement("div", {
+      className: "icon-map-pin text-xl text-[var(--primary-color)]",
+      "data-name": "field-ubicacion-icon-i",
+      "data-file": "components/SearchBar.js"
+    })), React.createElement("div", {
+      className: "min-w-0 flex-1",
+      "data-name": "field-ubicacion-input",
+      "data-file": "components/SearchBar.js"
+    }, React.createElement("label", {
+      className: "block text-[11px] text-[var(--text-muted)] mb-1",
+      "data-name": "label-ubicacion",
+      "data-file": "components/SearchBar.js"
+    }, "Ubicaci\xF3n"), React.createElement("input", {
+      className: "w-full text-sm bg-transparent outline-none",
+      value: ubicacion,
+      onChange: e => setUbicacion(e.target.value),
+      placeholder: "Ej: Vedado, La Habana",
+      onFocus: () => setFocus(true),
+      onBlur: () => setFocus(false),
+      "data-name": "input-ubicacion",
+      "data-file": "components/SearchBar.js"
+    }))), React.createElement("button", {
+      className: "btn-rr btn-primary-rr w-full md:w-auto flex items-center justify-center gap-2",
+      onClick: ejecutarBusqueda,
+      "data-name": "btn-buscar",
+      "data-file": "components/SearchBar.js"
+    }, React.createElement("span", {
+      "data-name": "btn-buscar-text",
+      "data-file": "components/SearchBar.js"
+    }, "Buscar"), React.createElement("div", {
+      className: "icon-arrow-right text-xl text-white",
+      "data-name": "btn-buscar-icon",
+      "data-file": "components/SearchBar.js"
+    }))), !compact ? React.createElement("div", {
+      className: "mt-4",
+      "data-name": "searchbar-suggestions",
+      "data-file": "components/SearchBar.js"
+    }, React.createElement("p", {
+      className: "text-xs text-[var(--text-muted)]",
+      "data-name": "suggestions-title",
+      "data-file": "components/SearchBar.js"
+    }, "Ideas r\xE1pidas para empezar"), suggestionChips(sugerenciasServicio, s => setServicio(s)), suggestionChips(sugerenciasUbicacion, s => setUbicacion(s))) : null));
+  } catch (error) {
+    console.error('SearchBar component error:', error);
+    return null;
+  }
+}
+function BusinessLogoCard({
+  business,
+  onOpen
+}) {
+  try {
+    const b = business;
+    const tier = b.vip ? 'VIP' : 'Free';
+    return React.createElement("button", {
+      className: "group surface-rr p-5 text-left transition-transform duration-300 hover:-translate-y-1 hover:bg-[#FDF2F8] hover:shadow-[0_18px_55px_rgba(216,27,96,0.12)] focus:outline-none",
+      onClick: () => onOpen?.(b),
+      "data-name": "business-logo-card",
+      "data-file": "components/BusinessLogoCard.js"
+    }, React.createElement("div", {
+      className: "flex items-start justify-between gap-4",
+      "data-name": "logo-card-top",
+      "data-file": "components/BusinessLogoCard.js"
+    }, React.createElement("div", {
+      className: "w-12 h-12 rounded-2xl border border-[var(--border)] bg-white overflow-hidden",
+      "data-name": "logo",
+      "data-file": "components/BusinessLogoCard.js"
+    }, React.createElement("img", {
+      src: b.logoUrl,
+      alt: `Logo de ${b.nombre}`,
+      className: "w-full h-full object-cover",
+      "data-name": "logo-img",
+      "data-file": "components/BusinessLogoCard.js"
+    })), React.createElement("div", {
+      className: `chip-rr px-3 py-1.5 text-xs ${b.vip ? 'bg-black text-white border-black/30' : 'bg-white text-[var(--text-muted)]'}`,
+      "data-name": "tier",
+      "data-file": "components/BusinessLogoCard.js"
+    }, tier)), React.createElement("div", {
+      className: "mt-4",
+      "data-name": "logo-card-body",
+      "data-file": "components/BusinessLogoCard.js"
+    }, React.createElement("p", {
+      className: "text-sm font-semibold leading-snug",
+      "data-name": "name",
+      "data-file": "components/BusinessLogoCard.js"
+    }, b.nombre), React.createElement("p", {
+      className: "text-xs text-[var(--text-muted)] mt-1",
+      "data-name": "category",
+      "data-file": "components/BusinessLogoCard.js"
+    }, b.categoria, " \xB7 ", b.ubicacion?.zona), React.createElement("div", {
+      className: "mt-4 flex items-center justify-between gap-3",
+      "data-name": "logo-card-bottom",
+      "data-file": "components/BusinessLogoCard.js"
+    }, React.createElement("div", {
+      className: "flex items-center gap-2",
+      "data-name": "rating",
+      "data-file": "components/BusinessLogoCard.js"
+    }, React.createElement("div", {
+      className: "icon-star text-base text-[var(--primary-color)]",
+      "data-name": "rating-icon",
+      "data-file": "components/BusinessLogoCard.js"
+    }), React.createElement("span", {
+      className: "text-xs font-semibold",
+      "data-name": "rating-val",
+      "data-file": "components/BusinessLogoCard.js"
+    }, Number(b.estrellas).toFixed(1)), React.createElement("span", {
+      className: "text-xs text-[var(--text-muted)]",
+      "data-name": "rating-total",
+      "data-file": "components/BusinessLogoCard.js"
+    }, "(", b.totalReseñas, ")")), React.createElement("div", {
+      className: "flex items-center gap-1 text-xs text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity",
+      "data-name": "peek",
+      "data-file": "components/BusinessLogoCard.js"
+    }, React.createElement("span", {
+      "data-name": "peek-text",
+      "data-file": "components/BusinessLogoCard.js"
+    }, "Ver detalles"), React.createElement("div", {
+      className: "icon-arrow-right text-base text-[var(--primary-color)]",
+      "data-name": "peek-icon",
+      "data-file": "components/BusinessLogoCard.js"
+    })))));
+  } catch (error) {
+    console.error('BusinessLogoCard component error:', error);
+    return null;
+  }
+}
+function TopRatedCarousel({
+  items
+}) {
+  try {
+    const list = items || [];
+    const ref = React.useRef(null);
+    const scrollBy = dir => {
+      try {
+        const el = ref.current;
+        if (!el) return;
+        const amount = Math.round(el.clientWidth * 0.85) * dir;
+        el.scrollBy({
+          left: amount,
+          behavior: 'smooth'
+        });
+      } catch (error) {
+        console.error('TopRatedCarousel.scrollBy error:', error);
+      }
+    };
+    return React.createElement("section", {
+      className: "mt-10",
+      "data-name": "top-rated",
+      "data-file": "components/TopRatedCarousel.js",
+      id: "mejor-calificados"
+    }, React.createElement("div", {
+      className: "container-rr",
+      "data-name": "top-rated-inner",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("div", {
+      className: "flex items-end justify-between gap-4 mb-5",
+      "data-name": "top-rated-head",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("div", {
+      "data-name": "top-rated-titlewrap",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("h2", {
+      className: "text-xl md:text-2xl font-semibold tracking-tight text-balance",
+      "data-name": "top-rated-title",
+      "data-file": "components/TopRatedCarousel.js"
+    }, "Mejor calificados"), React.createElement("p", {
+      className: "text-sm text-[var(--text-muted)] mt-1",
+      "data-name": "top-rated-sub",
+      "data-file": "components/TopRatedCarousel.js"
+    }, "Negocios con rese\xF1as consistentes y estilo boutique.")), React.createElement("div", {
+      className: "hidden md:flex items-center gap-2",
+      "data-name": "top-rated-controls",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("button", {
+      className: "w-11 h-11 rounded-2xl border border-[var(--border)] bg-white flex items-center justify-center hover:bg-[rgba(11,18,32,0.04)] transition-colors",
+      onClick: () => scrollBy(-1),
+      "data-name": "prev",
+      "data-file": "components/TopRatedCarousel.js",
+      "aria-label": "Anterior"
+    }, React.createElement("div", {
+      className: "icon-chevron-left text-xl text-[var(--primary-color)]",
+      "data-name": "prev-i",
+      "data-file": "components/TopRatedCarousel.js"
+    })), React.createElement("button", {
+      className: "w-11 h-11 rounded-2xl border border-[var(--border)] bg-white flex items-center justify-center hover:bg-[rgba(11,18,32,0.04)] transition-colors",
+      onClick: () => scrollBy(1),
+      "data-name": "next",
+      "data-file": "components/TopRatedCarousel.js",
+      "aria-label": "Siguiente"
+    }, React.createElement("div", {
+      className: "icon-chevron-right text-xl text-[var(--primary-color)]",
+      "data-name": "next-i",
+      "data-file": "components/TopRatedCarousel.js"
+    })))), React.createElement("div", {
+      ref: ref,
+      className: "flex gap-4 overflow-x-auto no-scrollbar pb-2",
+      "data-name": "top-rated-track",
+      "data-file": "components/TopRatedCarousel.js"
+    }, list.map(b => React.createElement("div", {
+      key: b.id,
+      className: "min-w-[260px] md:min-w-[320px]",
+      "data-name": "top-rated-item",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("button", {
+      className: "card-rr w-full overflow-hidden text-left hover:shadow-[0_22px_70px_rgba(11,18,32,0.12)] transition-shadow",
+      onClick: () => Navigation.goToBusiness(b.id),
+      "data-name": "top-rated-card",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("div", {
+      className: "relative h-[170px] bg-[#F9FAFB]",
+      "data-name": "top-rated-photo",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("img", {
+      src: b.fotos?.[0],
+      alt: `Foto de ${b.nombre}`,
+      className: "w-full h-full object-cover",
+      "data-name": "top-rated-img",
+      "data-file": "components/TopRatedCarousel.js"
+    }), React.createElement("div", {
+      className: "absolute top-3 left-3 flex flex-wrap gap-2",
+      "data-name": "top-rated-badges",
+      "data-file": "components/TopRatedCarousel.js"
+    }, b.topRoma ? React.createElement(Badge, {
+      type: "top",
+      text: "\uD83C\uDF1F Top Roma",
+      "data-name": "badge-top",
+      "data-file": "components/TopRatedCarousel.js"
+    }) : null, b.negocioDelMes ? React.createElement(Badge, {
+      type: "mes",
+      text: "Negocio del Mes",
+      "data-name": "badge-mes",
+      "data-file": "components/TopRatedCarousel.js"
+    }) : null), b.vip ? React.createElement("div", {
+      className: "absolute top-3 right-3",
+      "data-name": "vip-pin",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("span", {
+      className: "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black text-white text-xs border border-black/30",
+      "data-name": "vip",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("div", {
+      className: "icon-crown text-base text-white",
+      "data-name": "vip-i",
+      "data-file": "components/TopRatedCarousel.js"
+    }), "VIP")) : null), React.createElement("div", {
+      className: "p-4",
+      "data-name": "top-rated-body",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("p", {
+      className: "text-sm font-semibold",
+      "data-name": "top-rated-name",
+      "data-file": "components/TopRatedCarousel.js"
+    }, b.nombre), React.createElement("p", {
+      className: "text-xs text-[var(--text-muted)] mt-1",
+      "data-name": "top-rated-meta",
+      "data-file": "components/TopRatedCarousel.js"
+    }, b.categoria, " \xB7 ", b.ubicacion?.zona), React.createElement("div", {
+      className: "mt-3 flex items-center justify-between gap-3",
+      "data-name": "top-rated-bottom",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("div", {
+      className: "flex items-center gap-2",
+      "data-name": "top-rated-rating",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("div", {
+      className: "icon-star text-base text-[#F59E0B]",
+      "data-name": "star",
+      "data-file": "components/TopRatedCarousel.js"
+    }), React.createElement("span", {
+      className: "text-sm font-semibold",
+      "data-name": "val",
+      "data-file": "components/TopRatedCarousel.js"
+    }, Number(b.estrellas).toFixed(1)), React.createElement("span", {
+      className: "text-xs text-[var(--text-muted)]",
+      "data-name": "count",
+      "data-file": "components/TopRatedCarousel.js"
+    }, "(", b.totalReseñas, ")")), React.createElement("span", {
+      className: "text-xs text-[var(--text-muted)]",
+      "data-name": "price",
+      "data-file": "components/TopRatedCarousel.js"
+    }, Format.formatRangoPrecio(b.rangoPrecio?.min, b.rangoPrecio?.max)))))))), React.createElement("div", {
+      className: "md:hidden flex items-center gap-2 mt-4",
+      "data-name": "top-rated-controls-mobile",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("button", {
+      className: "btn-rr btn-ghost-rr w-full flex items-center justify-center gap-2",
+      onClick: () => scrollBy(-1),
+      "data-name": "prev-m",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("div", {
+      className: "icon-chevron-left text-xl text-[var(--primary-color)]",
+      "data-name": "prev-mi",
+      "data-file": "components/TopRatedCarousel.js"
+    }), React.createElement("span", {
+      "data-name": "prev-mt",
+      "data-file": "components/TopRatedCarousel.js"
+    }, "Anterior")), React.createElement("button", {
+      className: "btn-rr btn-ghost-rr w-full flex items-center justify-center gap-2",
+      onClick: () => scrollBy(1),
+      "data-name": "next-m",
+      "data-file": "components/TopRatedCarousel.js"
+    }, React.createElement("span", {
+      "data-name": "next-mt",
+      "data-file": "components/TopRatedCarousel.js"
+    }, "Siguiente"), React.createElement("div", {
+      className: "icon-chevron-right text-xl text-[var(--primary-color)]",
+      "data-name": "next-mi",
+      "data-file": "components/TopRatedCarousel.js"
+    })))));
+  } catch (error) {
+    console.error('TopRatedCarousel component error:', error);
+    return null;
+  }
+}
+function HomeHero({
+  initialParams
+}) {
+  try {
+    return React.createElement("section", {
+      className: "pt-10 md:pt-16",
+      "data-name": "home-hero",
+      "data-file": "pages/home/HomeHero.js"
+    }, React.createElement("div", {
+      className: "container-rr",
+      "data-name": "home-hero-inner",
+      "data-file": "pages/home/HomeHero.js"
+    }, React.createElement("div", {
+      className: "max-w-[920px] mx-auto text-center",
+      "data-name": "home-hero-content",
+      "data-file": "pages/home/HomeHero.js"
+    }, React.createElement("div", {
+      className: "inline-flex items-center gap-2 px-3 py-1.5 chip-rr text-xs text-[var(--text-muted)] bg-[#FDF2F8]",
+      "data-name": "hero-chip",
+      "data-file": "pages/home/HomeHero.js"
+    }, React.createElement("div", {
+      className: "icon-shield text-base text-[var(--primary-color)]",
+      "data-name": "hero-chip-icon",
+      "data-file": "pages/home/HomeHero.js"
+    }), React.createElement("span", {
+      "data-name": "hero-chip-text",
+      "data-file": "pages/home/HomeHero.js"
+    }, "Rese\xF1as verificadas y negocios destacados en Cuba")), React.createElement("h1", {
+      className: "mt-6 text-3xl md:text-5xl font-semibold tracking-tight text-balance",
+      "data-name": "hero-title",
+      "data-file": "pages/home/HomeHero.js"
+    }, "Tu pr\xF3xima cita se siente ", React.createElement("span", {
+      className: "italic",
+      "data-name": "hero-italic",
+      "data-file": "pages/home/HomeHero.js"
+    }, "premium"), "."), React.createElement("p", {
+      className: "mt-4 text-sm md:text-base text-[var(--text-muted)] leading-relaxed max-w-[740px] mx-auto",
+      "data-name": "hero-sub",
+      "data-file": "pages/home/HomeHero.js"
+    }, "Busca un servicio, una academia o un estudio en tu zona. Explora con calma: el Muro de la Intriga est\xE1 dise\xF1ado para que descubras lo mejor sin ruido."), React.createElement("div", {
+      className: "mt-8",
+      "data-name": "hero-search",
+      "data-file": "pages/home/HomeHero.js"
+    }, React.createElement(SearchBar, {
+      initialServicio: initialParams?.servicio || '',
+      initialUbicacion: initialParams?.ubicacion || '',
+      compact: false,
+      "data-name": "hero-searchbar",
+      "data-file": "pages/home/HomeHero.js"
+    })), React.createElement("div", {
+      className: "mt-6 flex flex-wrap items-center justify-center gap-2 text-xs text-[var(--text-muted)]",
+      "data-name": "hero-meta",
+      "data-file": "pages/home/HomeHero.js"
+    }, React.createElement("span", {
+      className: "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(11,18,32,0.03)] border border-[var(--border)]",
+      "data-name": "meta-1",
+      "data-file": "pages/home/HomeHero.js"
+    }, React.createElement("div", {
+      className: "icon-clock text-base text-[var(--primary-color)]",
+      "data-name": "meta-1-i",
+      "data-file": "pages/home/HomeHero.js"
+    }), "Respuesta r\xE1pida por WhatsApp"), React.createElement("span", {
+      className: "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(11,18,32,0.03)] border border-[var(--border)]",
+      "data-name": "meta-2",
+      "data-file": "pages/home/HomeHero.js"
+    }, React.createElement("div", {
+      className: "icon-sparkles text-base text-[var(--primary-color)]",
+      "data-name": "meta-2-i",
+      "data-file": "pages/home/HomeHero.js"
+    }), "VIP: experiencia boutique"), React.createElement("span", {
+      className: "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(11,18,32,0.03)] border border-[var(--border)]",
+      "data-name": "meta-3",
+      "data-file": "pages/home/HomeHero.js"
+    }, React.createElement("div", {
+      className: "icon-circle-check text-base text-[var(--primary-color)]",
+      "data-name": "meta-3-i",
+      "data-file": "pages/home/HomeHero.js"
+    }), "\u201CRese\xF1a verificada\u201D de clientes reales")))));
+  } catch (error) {
+    console.error('HomeHero component error:', error);
+    return null;
+  }
+}
+function IntrigueWall() {
+  try {
+    const all = MockData.listBusinesses();
+    const [active, setActive] = React.useState(null);
+    const [open, setOpen] = React.useState(false);
+    const openCard = b => {
+      try {
+        setActive(b);
+        setOpen(true);
+      } catch (error) {
+        console.error('IntrigueWall.openCard error:', error);
+      }
+    };
+    const closeCard = () => {
+      try {
+        setOpen(false);
+        window.setTimeout(() => setActive(null), 220);
+      } catch (error) {
+        console.error('IntrigueWall.closeCard error:', error);
+      }
+    };
+    React.useEffect(() => {
+      try {
+        const onKey = e => {
+          if (e.key === 'Escape') closeCard();
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      } catch (error) {
+        console.error('IntrigueWall useEffect error:', error);
+      }
+    }, []);
+    const DetailPanel = ({
+      business
+    }) => {
+      try {
+        if (!business) return null;
+        return React.createElement("div", {
+          className: `fixed inset-0 z-[80] ${open ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`,
+          "data-name": "intrigue-overlay",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("div", {
+          className: "absolute inset-0 bg-black/20",
+          onClick: closeCard,
+          "data-name": "intrigue-backdrop",
+          "data-file": "pages/home/IntrigueWall.js"
+        }), React.createElement("div", {
+          className: "absolute inset-x-0 bottom-0 md:inset-0 md:flex md:items-center md:justify-center p-4",
+          "data-name": "intrigue-modal-wrap",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("div", {
+          className: `card-rr w-full md:max-w-[980px] overflow-hidden transform ${open ? 'translate-y-0 md:scale-100' : 'translate-y-4 md:scale-[0.98]'} transition-transform duration-300`,
+          "data-name": "intrigue-modal",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("div", {
+          className: "grid grid-cols-1 md:grid-cols-[1.2fr_1fr]",
+          "data-name": "intrigue-grid",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("div", {
+          className: "relative h-[260px] md:h-full bg-[#F9FAFB]",
+          "data-name": "intrigue-photo",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("img", {
+          src: business.portadaUrl,
+          alt: `Portada de ${business.nombre}`,
+          className: "w-full h-full object-cover",
+          "data-name": "intrigue-photo-img",
+          "data-file": "pages/home/IntrigueWall.js"
+        }), React.createElement("div", {
+          className: "absolute top-4 left-4 flex flex-wrap gap-2",
+          "data-name": "intrigue-badges",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, business.topRoma ? React.createElement(Badge, {
+          type: "top",
+          text: "\uD83C\uDF1F Top Roma",
+          "data-name": "badge-top",
+          "data-file": "pages/home/IntrigueWall.js"
+        }) : null, business.masReservado ? React.createElement(Badge, {
+          type: "reservado",
+          text: "M\xE1s reservado",
+          "data-name": "badge-reservado",
+          "data-file": "pages/home/IntrigueWall.js"
+        }) : null, business.negocioDelMes ? React.createElement(Badge, {
+          type: "mes",
+          text: "Negocio del Mes",
+          "data-name": "badge-mes",
+          "data-file": "pages/home/IntrigueWall.js"
+        }) : null), React.createElement("button", {
+          className: "absolute top-4 right-4 w-11 h-11 rounded-2xl bg-white/90 backdrop-blur border border-[var(--border)] flex items-center justify-center hover:bg-white transition-colors",
+          onClick: closeCard,
+          "data-name": "intrigue-close",
+          "data-file": "pages/home/IntrigueWall.js",
+          "aria-label": "Cerrar"
+        }, React.createElement("div", {
+          className: "icon-x text-xl text-[var(--primary-color)]",
+          "data-name": "intrigue-close-icon",
+          "data-file": "pages/home/IntrigueWall.js"
+        }))), React.createElement("div", {
+          className: "p-5 md:p-7",
+          "data-name": "intrigue-body",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("div", {
+          className: "flex items-start gap-4",
+          "data-name": "intrigue-head",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("div", {
+          className: "w-14 h-14 rounded-3xl border border-[var(--border)] bg-white overflow-hidden shrink-0",
+          "data-name": "intrigue-logo",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("img", {
+          src: business.logoUrl,
+          alt: `Logo de ${business.nombre}`,
+          className: "w-full h-full object-cover",
+          "data-name": "intrigue-logo-img",
+          "data-file": "pages/home/IntrigueWall.js"
+        })), React.createElement("div", {
+          className: "min-w-0",
+          "data-name": "intrigue-titlewrap",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("p", {
+          className: "text-lg md:text-xl font-semibold leading-tight",
+          "data-name": "intrigue-name",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, business.nombre), React.createElement("p", {
+          className: "text-sm text-[var(--text-muted)] mt-1",
+          "data-name": "intrigue-meta",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, business.categoria, " \xB7 ", business.ubicacion?.zona, " \xB7 ", business.ubicacion?.ciudad)), business.vip ? React.createElement("span", {
+          className: "ml-auto inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black text-white text-xs border border-black/30",
+          "data-name": "intrigue-vip",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("div", {
+          className: "icon-crown text-base text-white",
+          "data-name": "intrigue-vip-i",
+          "data-file": "pages/home/IntrigueWall.js"
+        }), "VIP") : null), React.createElement("div", {
+          className: "mt-4",
+          "data-name": "intrigue-rating",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement(StarRating, {
+          value: business.estrellas,
+          total: business.totalReseñas,
+          verified: business.verificado,
+          "data-name": "intrigue-stars",
+          "data-file": "pages/home/IntrigueWall.js"
+        })), React.createElement("p", {
+          className: "mt-4 text-sm text-[var(--text-muted)] leading-relaxed",
+          "data-name": "intrigue-desc",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, business.descripcion), React.createElement("div", {
+          className: "mt-5 surface-rr p-4",
+          "data-name": "intrigue-mini",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("div", {
+          className: "flex items-start gap-3",
+          "data-name": "intrigue-loc",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("div", {
+          className: "w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
+          "data-name": "intrigue-loc-iw",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("div", {
+          className: "icon-map-pin text-xl text-[var(--primary-color)]",
+          "data-name": "intrigue-loc-i",
+          "data-file": "pages/home/IntrigueWall.js"
+        })), React.createElement("div", {
+          className: "min-w-0",
+          "data-name": "intrigue-loc-t",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("p", {
+          className: "text-xs text-[var(--text-muted)]",
+          "data-name": "intrigue-loc-l",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, "Ubicaci\xF3n"), React.createElement("p", {
+          className: "text-sm font-medium leading-snug",
+          "data-name": "intrigue-loc-v",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, business.ubicacion?.direccion))), React.createElement("div", {
+          className: "divider-rr my-4",
+          "data-name": "intrigue-div",
+          "data-file": "pages/home/IntrigueWall.js"
+        }), React.createElement("div", {
+          className: "flex items-center justify-between gap-3",
+          "data-name": "intrigue-price",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("span", {
+          className: "text-xs text-[var(--text-muted)]",
+          "data-name": "intrigue-price-l",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, "Rango de precio"), React.createElement("span", {
+          className: "text-sm font-semibold",
+          "data-name": "intrigue-price-v",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, Format.formatRangoPrecio(business.rangoPrecio?.min, business.rangoPrecio?.max)))), React.createElement("div", {
+          className: "mt-6 flex flex-col sm:flex-row gap-2",
+          "data-name": "intrigue-ctas",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("button", {
+          className: "btn-rr btn-primary-rr w-full flex items-center justify-center gap-2",
+          onClick: () => Navigation.goToBusiness(business.id),
+          "data-name": "intrigue-open",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("span", {
+          "data-name": "intrigue-open-t",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, "Ver perfil"), React.createElement("div", {
+          className: "icon-arrow-right text-xl text-white",
+          "data-name": "intrigue-open-i",
+          "data-file": "pages/home/IntrigueWall.js"
+        })), React.createElement("button", {
+          className: "btn-rr btn-ghost-rr w-full flex items-center justify-center gap-2",
+          onClick: () => Navigation.goToSearch(business.categoria, business.ubicacion?.zona || business.ubicacion?.ciudad || ''),
+          "data-name": "intrigue-related",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, React.createElement("div", {
+          className: "icon-search text-xl text-[var(--primary-color)]",
+          "data-name": "intrigue-related-i",
+          "data-file": "pages/home/IntrigueWall.js"
+        }), React.createElement("span", {
+          "data-name": "intrigue-related-t",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, "Buscar similares"))), React.createElement("p", {
+          className: "mt-4 text-xs text-[var(--text-muted)]",
+          "data-name": "intrigue-note",
+          "data-file": "pages/home/IntrigueWall.js"
+        }, "Tip: toca \u201CEsc\u201D para cerrar. Transiciones suaves por dise\xF1o."))))));
+      } catch (error) {
+        console.error('IntrigueWall.DetailPanel error:', error);
+        return null;
+      }
+    };
+    return React.createElement("section", {
+      className: "mt-12",
+      id: "muro",
+      "data-name": "intrigue-wall",
+      "data-file": "pages/home/IntrigueWall.js"
+    }, React.createElement("div", {
+      className: "container-rr",
+      "data-name": "intrigue-wall-inner",
+      "data-file": "pages/home/IntrigueWall.js"
+    }, React.createElement("div", {
+      className: "flex flex-col md:flex-row md:items-end justify-between gap-4",
+      "data-name": "intrigue-wall-head",
+      "data-file": "pages/home/IntrigueWall.js"
+    }, React.createElement("div", {
+      "data-name": "intrigue-wall-titlewrap",
+      "data-file": "pages/home/IntrigueWall.js"
+    }, React.createElement("h2", {
+      className: "text-xl md:text-2xl font-semibold tracking-tight",
+      "data-name": "intrigue-wall-title",
+      "data-file": "pages/home/IntrigueWall.js"
+    }, "El Muro de la Intriga"), React.createElement("p", {
+      className: "text-sm text-[var(--text-muted)] mt-1 max-w-[700px]",
+      "data-name": "intrigue-wall-sub",
+      "data-file": "pages/home/IntrigueWall.js"
+    }, "Un grid de logos con pistas sutiles. Pasa el cursor, mira lo justo, y abre cuando sientas curiosidad.")), React.createElement("a", {
+      className: "btn-rr btn-ghost-rr inline-flex items-center justify-center gap-2 w-full md:w-auto",
+      href: "search.html",
+      "data-name": "intrigue-wall-cta",
+      "data-file": "pages/home/IntrigueWall.js"
+    }, React.createElement("span", {
+      "data-name": "intrigue-wall-cta-t",
+      "data-file": "pages/home/IntrigueWall.js"
+    }, "Ver resultados"), React.createElement("div", {
+      className: "icon-arrow-right text-xl text-[var(--primary-color)]",
+      "data-name": "intrigue-wall-cta-i",
+      "data-file": "pages/home/IntrigueWall.js"
+    }))), React.createElement("div", {
+      className: "mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4",
+      "data-name": "intrigue-grid",
+      "data-file": "pages/home/IntrigueWall.js"
+    }, all.map(b => React.createElement(BusinessLogoCard, {
+      key: b.id,
+      business: b,
+      onOpen: openCard,
+      "data-name": "intrigue-item",
+      "data-file": "pages/home/IntrigueWall.js"
+    })))), React.createElement(DetailPanel, {
+      business: active,
+      "data-name": "intrigue-panel",
+      "data-file": "pages/home/IntrigueWall.js"
+    }));
+  } catch (error) {
+    console.error('IntrigueWall component error:', error);
+    return null;
+  }
+}
+function HomePage({
+  initialParams
+}) {
+  try {
+    const top = MockData.listTopRated();
+    return React.createElement("div", {
+      "data-name": "home-page",
+      "data-file": "pages/home/HomePage.js"
+    }, React.createElement(HomeHero, {
+      initialParams: initialParams,
+      "data-name": "home-hero",
+      "data-file": "pages/home/HomePage.js"
+    }), React.createElement(IntrigueWall, {
+      "data-name": "intrigue-wall",
+      "data-file": "pages/home/HomePage.js"
+    }), React.createElement(TopRatedCarousel, {
+      items: top,
+      "data-name": "top-rated",
+      "data-file": "pages/home/HomePage.js"
+    }), React.createElement("section", {
+      className: "mt-12",
+      "data-name": "home-trust",
+      "data-file": "pages/home/HomePage.js"
+    }, React.createElement("div", {
+      className: "container-rr",
+      "data-name": "home-trust-inner",
+      "data-file": "pages/home/HomePage.js"
+    }, React.createElement("div", {
+      className: "grid grid-cols-1 md:grid-cols-3 gap-4",
+      "data-name": "trust-grid",
+      "data-file": "pages/home/HomePage.js"
+    }, React.createElement("div", {
+      className: "surface-rr p-5",
+      "data-name": "trust-1",
+      "data-file": "pages/home/HomePage.js"
+    }, React.createElement("div", {
+      className: "w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
+      "data-name": "trust-1-iw",
+      "data-file": "pages/home/HomePage.js"
+    }, React.createElement("div", {
+      className: "icon-circle-check text-xl text-[var(--primary-color)]",
+      "data-name": "trust-1-i",
+      "data-file": "pages/home/HomePage.js"
+    })), React.createElement("p", {
+      className: "mt-4 text-sm font-semibold",
+      "data-name": "trust-1-t",
+      "data-file": "pages/home/HomePage.js"
+    }, "Rese\xF1a verificada"), React.createElement("p", {
+      className: "mt-1 text-sm text-[var(--text-muted)] leading-relaxed",
+      "data-name": "trust-1-d",
+      "data-file": "pages/home/HomePage.js"
+    }, "Cuando ves \u201CRese\xF1a verificada\u201D, significa que el cliente confirm\xF3 su cita.")), React.createElement("div", {
+      className: "surface-rr p-5",
+      "data-name": "trust-2",
+      "data-file": "pages/home/HomePage.js"
+    }, React.createElement("div", {
+      className: "w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
+      "data-name": "trust-2-iw",
+      "data-file": "pages/home/HomePage.js"
+    }, React.createElement("div", {
+      className: "icon-crown text-xl text-[var(--primary-color)]",
+      "data-name": "trust-2-i",
+      "data-file": "pages/home/HomePage.js"
+    })), React.createElement("p", {
+      className: "mt-4 text-sm font-semibold",
+      "data-name": "trust-2-t",
+      "data-file": "pages/home/HomePage.js"
+    }, "Distinci\xF3n VIP"), React.createElement("p", {
+      className: "mt-1 text-sm text-[var(--text-muted)] leading-relaxed",
+      "data-name": "trust-2-d",
+      "data-file": "pages/home/HomePage.js"
+    }, "Negocios VIP destacan con fotos premium, mejor posicionamiento y respuesta m\xE1s r\xE1pida.")), React.createElement("div", {
+      className: "surface-rr p-5",
+      "data-name": "trust-3",
+      "data-file": "pages/home/HomePage.js"
+    }, React.createElement("div", {
+      className: "w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
+      "data-name": "trust-3-iw",
+      "data-file": "pages/home/HomePage.js"
+    }, React.createElement("div", {
+      className: "icon-award text-xl text-[var(--primary-color)]",
+      "data-name": "trust-3-i",
+      "data-file": "pages/home/HomePage.js"
+    })), React.createElement("p", {
+      className: "mt-4 text-sm font-semibold",
+      "data-name": "trust-3-t",
+      "data-file": "pages/home/HomePage.js"
+    }, "Negocio del Mes"), React.createElement("p", {
+      className: "mt-1 text-sm text-[var(--text-muted)] leading-relaxed",
+      "data-name": "trust-3-d",
+      "data-file": "pages/home/HomePage.js"
+    }, "Un badge con presencia: para negocios con calidad y consistencia."))))));
+  } catch (error) {
+    console.error('HomePage component error:', error);
+    return null;
+  }
+}
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null
+    };
+  }
+  static getDerivedStateFromError(error) {
+    return {
+      hasError: true,
+      error
+    };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error('ErrorBoundary caught an error:', error, errorInfo.componentStack);
+  }
+  render() {
+    if (this.state.hasError) {
+      return React.createElement("div", {
+        className: "min-h-screen flex items-center justify-center bg-[#F9FAFB]",
+        "data-name": "error-state",
+        "data-file": "app.js"
+      }, React.createElement("div", {
+        className: "text-center max-w-md mx-auto px-6",
+        "data-name": "error-state-inner",
+        "data-file": "app.js"
+      }, React.createElement("div", {
+        className: "mx-auto w-14 h-14 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)] mb-5",
+        "data-name": "error-icon",
+        "data-file": "app.js"
+      }, React.createElement("div", {
+        className: "icon-triangle-alert text-2xl text-[var(--primary-color)]",
+        "data-name": "error-icon-i",
+        "data-file": "app.js"
+      })), React.createElement("h1", {
+        className: "text-2xl font-semibold text-[var(--text)] mb-2",
+        "data-name": "error-title",
+        "data-file": "app.js"
+      }, "Algo sali\xF3 mal"), React.createElement("p", {
+        className: "text-sm text-[var(--text-muted)] mb-6",
+        "data-name": "error-desc",
+        "data-file": "app.js"
+      }, "Lo sentimos, ocurri\xF3 un error inesperado. Puedes recargar la p\xE1gina."), React.createElement("button", {
+        onClick: () => window.location.reload(),
+        className: "btn-rr btn-primary-rr",
+        "data-name": "error-reload",
+        "data-file": "app.js"
+      }, "Recargar")));
+    }
+    return this.props.children;
+  }
+}
+function App() {
+  try {
+    const [params, setParams] = React.useState(() => {
+      try {
+        return Navigation.getSearchParams();
+      } catch (e) {
+        return {
+          servicio: '',
+          ubicacion: ''
+        };
+      }
+    });
+    React.useEffect(() => {
+      try {
+        const onHashOrPop = () => {
+          try {
+            setParams(Navigation.getSearchParams());
+          } catch (error) {
+            console.error('Error al leer parámetros:', error);
+          }
+        };
+        window.addEventListener('popstate', onHashOrPop);
+        window.addEventListener('hashchange', onHashOrPop);
+        return () => {
+          window.removeEventListener('popstate', onHashOrPop);
+          window.removeEventListener('hashchange', onHashOrPop);
+        };
+      } catch (error) {
+        console.error('App useEffect error:', error);
+      }
+    }, []);
+    return React.createElement("div", {
+      className: "min-h-screen bg-[var(--bg)]",
+      "data-name": "app",
+      "data-file": "app.js"
+    }, React.createElement(ToastProvider, {
+      "data-name": "toast-provider",
+      "data-file": "app.js"
+    }, React.createElement(Header, {
+      currentParams: params,
+      "data-name": "header-wrap",
+      "data-file": "app.js"
+    }), React.createElement("main", {
+      className: "pt-6 pb-16",
+      "data-name": "main",
+      "data-file": "app.js"
+    }, React.createElement(HomePage, {
+      initialParams: params,
+      "data-name": "home-page",
+      "data-file": "app.js"
+    })), React.createElement(Footer, {
+      "data-name": "footer",
+      "data-file": "app.js"
+    })));
+  } catch (error) {
+    console.error('App component error:', error);
+    return null;
+  }
+}
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(ErrorBoundary, null, React.createElement(App, null)));
