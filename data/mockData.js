@@ -196,9 +196,10 @@ const MockData = (() => {
     }
   ];
 
-  let businesses = fallbackBusinesses.slice();
+  let businesses = [];
   let loadPromise = null;
   let loadedFromSupabase = false;
+  let loadError = null;
 
   const defaultCoverUrl = 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=80';
   const defaultLogoUrl = 'https://app.trickle.so/storage/public/images/usr_1dec1efb58008001/55d88a3b-fbdf-46a8-bc34-5c6dac55ec46.png';
@@ -376,8 +377,9 @@ const MockData = (() => {
     loadPromise = (async () => {
       const config = getSupabaseConfig();
       if (!config) {
-        console.warn('Supabase no configurado: usando datos mock. Define window.SUPABASE_URL y window.SUPABASE_ANON_KEY antes del bundle.');
-        return businesses.slice();
+        businesses = [];
+        loadError = 'Falta configurar SUPABASE_URL y SUPABASE_ANON_KEY.';
+        throw new Error(loadError);
       }
 
       try {
@@ -402,11 +404,14 @@ const MockData = (() => {
           .map((row) => normalizeBusiness(row, relations))
           .filter((business) => business.id);
         loadedFromSupabase = true;
+        loadError = null;
         console.log(`✅ Marketplace cargó ${businesses.length} negocios desde Supabase`);
         return businesses.slice();
       } catch (error) {
-        console.error('No se pudieron cargar negocios desde Supabase. Usando mock.', error);
-        return businesses.slice();
+        businesses = [];
+        loadError = 'No se pudieron cargar negocios desde Supabase.';
+        console.error(loadError, error);
+        throw error;
       }
     })();
 
@@ -415,6 +420,10 @@ const MockData = (() => {
 
   function listBusinesses() {
     return businesses.slice();
+  }
+
+  function getLoadError() {
+    return loadError;
   }
 
   function listTopRated() {
@@ -459,5 +468,5 @@ const MockData = (() => {
     });
   }
 
-  return { listBusinesses, listTopRated, searchBusinesses, getBusinessById, loadBusinesses };
+  return { listBusinesses, listTopRated, searchBusinesses, getBusinessById, loadBusinesses, getLoadError };
 })();

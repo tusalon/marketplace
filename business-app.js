@@ -43,6 +43,7 @@ class ErrorBoundary extends React.Component {
 function BusinessApp() {
   try {
     const [dataReady, setDataReady] = React.useState(false);
+    const [dataError, setDataError] = React.useState('');
     const businessId = (() => {
       try {
         const url = new URL(window.location.href);
@@ -56,7 +57,10 @@ function BusinessApp() {
     React.useEffect(() => {
       let mounted = true;
       MockData.loadBusinesses()
-        .catch((error) => console.error('BusinessApp.loadBusinesses error:', error))
+        .catch((error) => {
+          console.error('BusinessApp.loadBusinesses error:', error);
+          if (mounted) setDataError(MockData.getLoadError() || error.message);
+        })
         .finally(() => {
           if (mounted) setDataReady(true);
         });
@@ -72,7 +76,9 @@ function BusinessApp() {
         <ToastProvider data-name="toast-provider" data-file="business-app.js">
           <Header currentParams={null} data-name="header-wrap" data-file="business-app.js" />
           <main className="pt-0 pb-24" data-name="main" data-file="business-app.js">
-            {!dataReady ? (
+            {dataError ? (
+              <DataSourceError message={dataError} data-name="data-source-error" data-file="business-app.js" />
+            ) : !dataReady ? (
               <div className="container-rr py-16 text-center text-sm text-[var(--text-muted)]" data-name="loading" data-file="business-app.js">Cargando negocio...</div>
             ) : business ? (
               <BusinessPage business={business} data-name="business-page" data-file="business-app.js" />
@@ -86,6 +92,28 @@ function BusinessApp() {
     );
   } catch (error) {
     console.error('BusinessApp component error:', error);
+    return null;
+  }
+}
+
+function DataSourceError({ message }) {
+  try {
+    return (
+      <div className="container-rr py-16" data-name="data-source-error" data-file="business-app.js">
+        <div className="surface-rr max-w-[680px] mx-auto p-6 md:p-8 text-center" data-name="data-source-error-card" data-file="business-app.js">
+          <div className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)] mb-5" data-name="data-source-error-icon" data-file="business-app.js">
+            <div className="icon-database-zap text-2xl text-[var(--primary-color)]" data-name="data-source-error-icon-i" data-file="business-app.js"></div>
+          </div>
+          <h1 className="text-2xl font-semibold text-[var(--text)]" data-name="data-source-error-title" data-file="business-app.js">Base de datos no conectada</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-2 leading-relaxed" data-name="data-source-error-desc" data-file="business-app.js">{message}</p>
+          <p className="text-xs text-[var(--text-muted)] mt-4" data-name="data-source-error-help" data-file="business-app.js">
+            Configura window.SUPABASE_URL y window.SUPABASE_ANON_KEY en utils/supabase-config.js.
+          </p>
+        </div>
+      </div>
+    );
+  } catch (error) {
+    console.error('DataSourceError component error:', error);
     return null;
   }
 }

@@ -410,9 +410,10 @@ const MockData = (() => {
       fecha: '2026-01-23'
     }]
   }];
-  let businesses = fallbackBusinesses.slice();
+  let businesses = [];
   let loadPromise = null;
   let loadedFromSupabase = false;
+  let loadError = null;
   const defaultCoverUrl = 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=80';
   const defaultLogoUrl = 'https://app.trickle.so/storage/public/images/usr_1dec1efb58008001/55d88a3b-fbdf-46a8-bc34-5c6dac55ec46.png';
   function getSupabaseConfig() {
@@ -581,8 +582,9 @@ const MockData = (() => {
     loadPromise = (async () => {
       const config = getSupabaseConfig();
       if (!config) {
-        console.warn('Supabase no configurado: usando datos mock. Define window.SUPABASE_URL y window.SUPABASE_ANON_KEY antes del bundle.');
-        return businesses.slice();
+        businesses = [];
+        loadError = 'Falta configurar SUPABASE_URL y SUPABASE_ANON_KEY.';
+        throw new Error(loadError);
       }
       try {
         const rows = await supabaseFetch('negocios?select=*');
@@ -596,17 +598,23 @@ const MockData = (() => {
         };
         businesses = (rows || []).map(row => normalizeBusiness(row, relations)).filter(business => business.id);
         loadedFromSupabase = true;
+        loadError = null;
         console.log(`✅ Marketplace cargó ${businesses.length} negocios desde Supabase`);
         return businesses.slice();
       } catch (error) {
-        console.error('No se pudieron cargar negocios desde Supabase. Usando mock.', error);
-        return businesses.slice();
+        businesses = [];
+        loadError = 'No se pudieron cargar negocios desde Supabase.';
+        console.error(loadError, error);
+        throw error;
       }
     })();
     return loadPromise;
   }
   function listBusinesses() {
     return businesses.slice();
+  }
+  function getLoadError() {
+    return loadError;
   }
   function listTopRated() {
     return businesses.slice().filter(b => b.totalReseñas >= 40).sort((a, b) => b.estrellas - a.estrellas).slice(0, 8);
@@ -636,7 +644,8 @@ const MockData = (() => {
     listTopRated,
     searchBusinesses,
     getBusinessById,
-    loadBusinesses
+    loadBusinesses,
+    getLoadError
   };
 })();
 const ToastContext = React.createContext(null);
@@ -1949,6 +1958,7 @@ class ErrorBoundary extends React.Component {
 function BusinessApp() {
   try {
     const [dataReady, setDataReady] = React.useState(false);
+    const [dataError, setDataError] = React.useState('');
     const businessId = (() => {
       try {
         const url = new URL(window.location.href);
@@ -1960,7 +1970,10 @@ function BusinessApp() {
     })();
     React.useEffect(() => {
       let mounted = true;
-      MockData.loadBusinesses().catch(error => console.error('BusinessApp.loadBusinesses error:', error)).finally(() => {
+      MockData.loadBusinesses().catch(error => {
+        console.error('BusinessApp.loadBusinesses error:', error);
+        if (mounted) setDataError(MockData.getLoadError() || error.message);
+      }).finally(() => {
         if (mounted) setDataReady(true);
       });
       return () => {
@@ -1983,7 +1996,11 @@ function BusinessApp() {
       className: "pt-0 pb-24",
       "data-name": "main",
       "data-file": "business-app.js"
-    }, !dataReady ? React.createElement("div", {
+    }, dataError ? React.createElement(DataSourceError, {
+      message: dataError,
+      "data-name": "data-source-error",
+      "data-file": "business-app.js"
+    }) : !dataReady ? React.createElement("div", {
       className: "container-rr py-16 text-center text-sm text-[var(--text-muted)]",
       "data-name": "loading",
       "data-file": "business-app.js"
@@ -2001,6 +2018,44 @@ function BusinessApp() {
     })));
   } catch (error) {
     console.error('BusinessApp component error:', error);
+    return null;
+  }
+}
+function DataSourceError({
+  message
+}) {
+  try {
+    return React.createElement("div", {
+      className: "container-rr py-16",
+      "data-name": "data-source-error",
+      "data-file": "business-app.js"
+    }, React.createElement("div", {
+      className: "surface-rr max-w-[680px] mx-auto p-6 md:p-8 text-center",
+      "data-name": "data-source-error-card",
+      "data-file": "business-app.js"
+    }, React.createElement("div", {
+      className: "mx-auto w-14 h-14 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)] mb-5",
+      "data-name": "data-source-error-icon",
+      "data-file": "business-app.js"
+    }, React.createElement("div", {
+      className: "icon-database-zap text-2xl text-[var(--primary-color)]",
+      "data-name": "data-source-error-icon-i",
+      "data-file": "business-app.js"
+    })), React.createElement("h1", {
+      className: "text-2xl font-semibold text-[var(--text)]",
+      "data-name": "data-source-error-title",
+      "data-file": "business-app.js"
+    }, "Base de datos no conectada"), React.createElement("p", {
+      className: "text-sm text-[var(--text-muted)] mt-2 leading-relaxed",
+      "data-name": "data-source-error-desc",
+      "data-file": "business-app.js"
+    }, message), React.createElement("p", {
+      className: "text-xs text-[var(--text-muted)] mt-4",
+      "data-name": "data-source-error-help",
+      "data-file": "business-app.js"
+    }, "Configura window.SUPABASE_URL y window.SUPABASE_ANON_KEY en utils/supabase-config.js.")));
+  } catch (error) {
+    console.error('DataSourceError component error:', error);
     return null;
   }
 }

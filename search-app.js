@@ -43,6 +43,7 @@ class ErrorBoundary extends React.Component {
 function SearchApp() {
   try {
     const [dataReady, setDataReady] = React.useState(false);
+    const [dataError, setDataError] = React.useState('');
     const [query, setQuery] = React.useState(() => {
       try {
         return Navigation.getSearchParams();
@@ -54,7 +55,10 @@ function SearchApp() {
     React.useEffect(() => {
       let mounted = true;
       MockData.loadBusinesses()
-        .catch((error) => console.error('SearchApp.loadBusinesses error:', error))
+        .catch((error) => {
+          console.error('SearchApp.loadBusinesses error:', error);
+          if (mounted) setDataError(MockData.getLoadError() || error.message);
+        })
         .finally(() => {
           if (mounted) setDataReady(true);
         });
@@ -84,7 +88,9 @@ function SearchApp() {
         <ToastProvider data-name="toast-provider" data-file="search-app.js">
           <Header currentParams={query} data-name="header-wrap" data-file="search-app.js" />
           <main className="pt-4 pb-16" data-name="main" data-file="search-app.js">
-            {dataReady ? (
+            {dataError ? (
+              <DataSourceError message={dataError} data-name="data-source-error" data-file="search-app.js" />
+            ) : dataReady ? (
               <SearchPage query={query} onQueryChange={setQuery} data-name="search-page" data-file="search-app.js" />
             ) : (
               <div className="container-rr py-16 text-center text-sm text-[var(--text-muted)]" data-name="loading" data-file="search-app.js">Cargando negocios...</div>
@@ -96,6 +102,28 @@ function SearchApp() {
     );
   } catch (error) {
     console.error('SearchApp component error:', error);
+    return null;
+  }
+}
+
+function DataSourceError({ message }) {
+  try {
+    return (
+      <div className="container-rr py-16" data-name="data-source-error" data-file="search-app.js">
+        <div className="surface-rr max-w-[680px] mx-auto p-6 md:p-8 text-center" data-name="data-source-error-card" data-file="search-app.js">
+          <div className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)] mb-5" data-name="data-source-error-icon" data-file="search-app.js">
+            <div className="icon-database-zap text-2xl text-[var(--primary-color)]" data-name="data-source-error-icon-i" data-file="search-app.js"></div>
+          </div>
+          <h1 className="text-2xl font-semibold text-[var(--text)]" data-name="data-source-error-title" data-file="search-app.js">Base de datos no conectada</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-2 leading-relaxed" data-name="data-source-error-desc" data-file="search-app.js">{message}</p>
+          <p className="text-xs text-[var(--text-muted)] mt-4" data-name="data-source-error-help" data-file="search-app.js">
+            Configura window.SUPABASE_URL y window.SUPABASE_ANON_KEY en utils/supabase-config.js.
+          </p>
+        </div>
+      </div>
+    );
+  } catch (error) {
+    console.error('DataSourceError component error:', error);
     return null;
   }
 }
