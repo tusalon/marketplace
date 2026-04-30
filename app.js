@@ -56,7 +56,8 @@ function App() {
       let mounted = true;
       MockData.loadBusinesses()
         .catch((error) => {
-          console.error('App.loadBusinesses error:', error);
+          const message = MockData.getLoadError() || error.message;
+          if (!message.includes('SUPABASE_URL')) console.error('App.loadBusinesses error:', error);
           if (mounted) setDataError(MockData.getLoadError() || error.message);
         })
         .finally(() => {

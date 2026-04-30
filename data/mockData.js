@@ -383,21 +383,14 @@ const MockData = (() => {
       }
 
       try {
-        const rows = await supabaseFetch('negocios?select=*');
-        const ids = (rows || []).map((row) => String(row.id || row.negocio_id || row.uuid || '')).filter(Boolean);
-        const [serviciosRows, productosRows, cursosRows, resenasRows, resenasAltRows] = await Promise.all([
-          fetchOptionalTable('servicios', ids),
-          fetchOptionalTable('productos', ids),
-          fetchOptionalTable('cursos', ids),
-          fetchOptionalTable('resenas', ids),
-          fetchOptionalTable('reseñas', ids)
-        ]);
+        const rows = await supabaseFetch('negocios?select=id,nombre,telefono,especialidad,slug,logo_url,imagen_fondo_url,mensaje_bienvenida,instagram,facebook,sitio_web,direccion,horario_atencion,configurado,plan');
+        const serviciosRows = await supabaseFetch('servicios?activo=eq.true&select=id,negocio_id,nombre,duracion,precio,descripcion,activo,imagen,categoria');
 
         const relations = {
           servicios: groupByBusiness(serviciosRows),
-          productos: groupByBusiness(productosRows),
-          cursos: groupByBusiness(cursosRows),
-          resenas: groupByBusiness([...(resenasRows || []), ...(resenasAltRows || [])])
+          productos: {},
+          cursos: {},
+          resenas: {}
         };
 
         businesses = (rows || [])
