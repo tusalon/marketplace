@@ -42,6 +42,7 @@ class ErrorBoundary extends React.Component {
 
 function BusinessApp() {
   try {
+    const [dataReady, setDataReady] = React.useState(false);
     const businessId = (() => {
       try {
         const url = new URL(window.location.href);
@@ -52,6 +53,18 @@ function BusinessApp() {
       }
     })();
 
+    React.useEffect(() => {
+      let mounted = true;
+      MockData.loadBusinesses()
+        .catch((error) => console.error('BusinessApp.loadBusinesses error:', error))
+        .finally(() => {
+          if (mounted) setDataReady(true);
+        });
+      return () => {
+        mounted = false;
+      };
+    }, []);
+
     const business = MockData.getBusinessById(businessId);
 
     return (
@@ -59,7 +72,9 @@ function BusinessApp() {
         <ToastProvider data-name="toast-provider" data-file="business-app.js">
           <Header currentParams={null} data-name="header-wrap" data-file="business-app.js" />
           <main className="pt-0 pb-24" data-name="main" data-file="business-app.js">
-            {business ? (
+            {!dataReady ? (
+              <div className="container-rr py-16 text-center text-sm text-[var(--text-muted)]" data-name="loading" data-file="business-app.js">Cargando negocio...</div>
+            ) : business ? (
               <BusinessPage business={business} data-name="business-page" data-file="business-app.js" />
             ) : (
               <BusinessNotFound businessId={businessId} data-name="business-not-found" data-file="business-app.js" />

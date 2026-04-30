@@ -42,6 +42,7 @@ class ErrorBoundary extends React.Component {
 
 function App() {
   try {
+    const [dataReady, setDataReady] = React.useState(false);
     const [params, setParams] = React.useState(() => {
       try {
         return Navigation.getSearchParams();
@@ -49,6 +50,18 @@ function App() {
         return { servicio: '', ubicacion: '' };
       }
     });
+
+    React.useEffect(() => {
+      let mounted = true;
+      MockData.loadBusinesses()
+        .catch((error) => console.error('App.loadBusinesses error:', error))
+        .finally(() => {
+          if (mounted) setDataReady(true);
+        });
+      return () => {
+        mounted = false;
+      };
+    }, []);
 
     React.useEffect(() => {
       try {
@@ -75,7 +88,11 @@ function App() {
         <ToastProvider data-name="toast-provider" data-file="app.js">
           <Header currentParams={params} data-name="header-wrap" data-file="app.js" />
           <main className="pt-6 pb-16" data-name="main" data-file="app.js">
-            <HomePage initialParams={params} data-name="home-page" data-file="app.js" />
+            {dataReady ? (
+              <HomePage initialParams={params} data-name="home-page" data-file="app.js" />
+            ) : (
+              <div className="container-rr py-16 text-center text-sm text-[var(--text-muted)]" data-name="loading" data-file="app.js">Cargando negocios...</div>
+            )}
           </main>
           <Footer data-name="footer" data-file="app.js" />
         </ToastProvider>

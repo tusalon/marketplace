@@ -110,7 +110,7 @@ const Format = (() => {
   };
 })();
 const MockData = (() => {
-  const businesses = [{
+  const fallbackBusinesses = [{
     id: 'roma-001',
     nombre: 'Gordis Nails Boutique',
     categoria: 'Uñas Acrílicas',
@@ -410,6 +410,201 @@ const MockData = (() => {
       fecha: '2026-01-23'
     }]
   }];
+  let businesses = fallbackBusinesses.slice();
+  let loadPromise = null;
+  let loadedFromSupabase = false;
+  const defaultCoverUrl = 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=80';
+  const defaultLogoUrl = 'https://app.trickle.so/storage/public/images/usr_1dec1efb58008001/55d88a3b-fbdf-46a8-bc34-5c6dac55ec46.png';
+  function getSupabaseConfig() {
+    const url = window.SUPABASE_URL || window.supabaseUrl || '';
+    const key = window.SUPABASE_ANON_KEY || window.supabaseAnonKey || '';
+    if (!url || !key) return null;
+    return {
+      url: String(url).replace(/\/$/, ''),
+      key
+    };
+  }
+  async function supabaseFetch(path) {
+    const config = getSupabaseConfig();
+    if (!config) throw new Error('Supabase no configurado');
+    const response = await fetch(`${config.url}/rest/v1/${path}`, {
+      headers: {
+        apikey: config.key,
+        Authorization: `Bearer ${config.key}`,
+        'Cache-Control': 'no-cache'
+      },
+      cache: 'no-store'
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Supabase ${path}: ${response.status} ${errorText}`);
+    }
+    return response.json();
+  }
+  async function fetchOptionalTable(table, ids) {
+    try {
+      if (!ids.length) return [];
+      const encodedIds = ids.map(encodeURIComponent).join(',');
+      return await supabaseFetch(`${table}?negocio_id=in.(${encodedIds})&select=*`);
+    } catch (error) {
+      console.warn(`Tabla opcional no disponible: ${table}`, error);
+      return [];
+    }
+  }
+  function valueFrom(row, keys, fallback = '') {
+    for (const key of keys) {
+      if (row?.[key] != null && row[key] !== '') return row[key];
+    }
+    return fallback;
+  }
+  function boolFrom(row, keys, fallback = false) {
+    const value = valueFrom(row, keys, fallback);
+    return value === true || value === 'true' || value === 1 || value === '1';
+  }
+  function numberFrom(row, keys, fallback = 0) {
+    const value = Number(valueFrom(row, keys, fallback));
+    return Number.isFinite(value) ? value : fallback;
+  }
+  function groupByBusiness(rows) {
+    return (rows || []).reduce((acc, row) => {
+      const id = row.negocio_id || row.negocioId || row.business_id;
+      if (!id) return acc;
+      if (!acc[id]) acc[id] = [];
+      acc[id].push(row);
+      return acc;
+    }, {});
+  }
+  function buildCatalogSections({
+    servicios,
+    productos,
+    cursos
+  }) {
+    const sections = [];
+    if (servicios?.length) {
+      sections.push({
+        tipo: 'servicios',
+        titulo: 'Servicios',
+        items: servicios.map(item => ({
+          nombre: valueFrom(item, ['nombre', 'titulo', 'servicio'], 'Servicio'),
+          duracionMin: numberFrom(item, ['duracion_min', 'duracionMin', 'duracion', 'minutos'], 60),
+          precio: numberFrom(item, ['precio', 'precio_cup', 'monto'], 0),
+          destacado: boolFrom(item, ['destacado', 'recomendado'], false)
+        }))
+      });
+    }
+    if (productos?.length) {
+      sections.push({
+        tipo: 'productos',
+        titulo: 'Productos',
+        items: productos.map(item => ({
+          nombre: valueFrom(item, ['nombre', 'titulo', 'producto'], 'Producto'),
+          stock: numberFrom(item, ['stock', 'cantidad'], 0),
+          precio: numberFrom(item, ['precio', 'precio_cup', 'monto'], 0)
+        }))
+      });
+    }
+    if (cursos?.length) {
+      sections.push({
+        tipo: 'cursos',
+        titulo: 'Cursos y Talleres',
+        items: cursos.map(item => ({
+          nombre: valueFrom(item, ['nombre', 'titulo', 'curso'], 'Curso'),
+          fecha: valueFrom(item, ['fecha', 'fecha_inicio', 'created_at'], new Date().toISOString()),
+          ubicacion: valueFrom(item, ['ubicacion', 'direccion', 'lugar'], ''),
+          precio: numberFrom(item, ['precio', 'precio_cup', 'monto'], 0)
+        }))
+      });
+    }
+    return sections;
+  }
+  function normalizeBusiness(row, relations) {
+    const id = String(row.id || row.negocio_id || row.uuid || '');
+    const ciudad = valueFrom(row, ['ciudad', 'municipio', 'provincia'], 'La Habana');
+    const zona = valueFrom(row, ['zona', 'barrio', 'municipio'], ciudad);
+    const direccion = valueFrom(row, ['direccion', 'ubicacion', 'address'], zona);
+    const lat = numberFrom(row, ['lat', 'latitud', 'latitude'], 23.1136);
+    const lng = numberFrom(row, ['lng', 'longitud', 'lon', 'longitude'], -82.3666);
+    const telefono = valueFrom(row, ['whatsapp', 'telefono', 'phone'], '');
+    const fotos = [valueFrom(row, ['portada_url', 'cover_url', 'foto_portada', 'imagen_url'], ''), valueFrom(row, ['logo_url', 'logo', 'avatar_url'], '')].filter(Boolean);
+    const servicios = relations.servicios[id] || [];
+    const productos = relations.productos[id] || [];
+    const cursos = relations.cursos[id] || [];
+    const resenas = relations.resenas[id] || [];
+    const precios = [...servicios, ...productos, ...cursos].map(item => numberFrom(item, ['precio', 'precio_cup', 'monto'], null)).filter(value => value != null && Number.isFinite(value) && value > 0);
+    return {
+      id,
+      nombre: valueFrom(row, ['nombre', 'name', 'titulo'], 'Negocio sin nombre'),
+      categoria: valueFrom(row, ['categoria', 'tipo_negocio', 'rubro', 'especialidad'], 'Belleza'),
+      vip: boolFrom(row, ['vip', 'es_vip', 'premium'], false),
+      verificado: boolFrom(row, ['verificado', 'verificada', 'configurado'], false),
+      topRoma: boolFrom(row, ['top_roma', 'topRoma', 'destacado'], false),
+      masReservado: boolFrom(row, ['mas_reservado', 'masReservado'], false),
+      negocioDelMes: boolFrom(row, ['negocio_del_mes', 'negocioDelMes'], false),
+      ubicacion: {
+        ciudad,
+        zona,
+        direccion
+      },
+      coordenadas: {
+        lat,
+        lng
+      },
+      rangoPrecio: {
+        min: precios.length ? Math.min(...precios) : numberFrom(row, ['precio_min', 'precio_desde'], 0),
+        max: precios.length ? Math.max(...precios) : numberFrom(row, ['precio_max', 'precio_hasta'], 0)
+      },
+      estrellas: numberFrom(row, ['estrellas', 'rating', 'calificacion'], resenas.length ? 4.8 : 0),
+      totalReseñas: numberFrom(row, ['total_resenas', 'totalResenas', 'reviews_count'], resenas.length),
+      portadaUrl: valueFrom(row, ['portada_url', 'cover_url', 'foto_portada', 'imagen_url'], defaultCoverUrl),
+      logoUrl: valueFrom(row, ['logo_url', 'logo', 'avatar_url'], defaultLogoUrl),
+      fotos: fotos.length ? fotos : [defaultCoverUrl],
+      whatsapp: telefono ? String(telefono).replace(/[^\d+]/g, '') : '',
+      descripcion: valueFrom(row, ['descripcion', 'description', 'mensaje_bienvenida'], 'Negocio disponible para reservas.'),
+      categoriasCatalogo: buildCatalogSections({
+        servicios,
+        productos,
+        cursos
+      }),
+      reseñas: resenas.map((item, index) => ({
+        id: String(item.id || `${id}-resena-${index}`),
+        nombre: valueFrom(item, ['nombre', 'cliente_nombre', 'cliente'], 'Cliente'),
+        estrellas: numberFrom(item, ['estrellas', 'rating', 'calificacion'], 5),
+        verificada: boolFrom(item, ['verificada', 'verificado'], false),
+        texto: valueFrom(item, ['texto', 'comentario', 'review'], ''),
+        fecha: valueFrom(item, ['fecha', 'created_at'], new Date().toISOString())
+      }))
+    };
+  }
+  async function loadBusinesses(forceRefresh = false) {
+    if (loadedFromSupabase && !forceRefresh) return businesses.slice();
+    if (loadPromise && !forceRefresh) return loadPromise;
+    loadPromise = (async () => {
+      const config = getSupabaseConfig();
+      if (!config) {
+        console.warn('Supabase no configurado: usando datos mock. Define window.SUPABASE_URL y window.SUPABASE_ANON_KEY antes del bundle.');
+        return businesses.slice();
+      }
+      try {
+        const rows = await supabaseFetch('negocios?select=*');
+        const ids = (rows || []).map(row => String(row.id || row.negocio_id || row.uuid || '')).filter(Boolean);
+        const [serviciosRows, productosRows, cursosRows, resenasRows, resenasAltRows] = await Promise.all([fetchOptionalTable('servicios', ids), fetchOptionalTable('productos', ids), fetchOptionalTable('cursos', ids), fetchOptionalTable('resenas', ids), fetchOptionalTable('reseñas', ids)]);
+        const relations = {
+          servicios: groupByBusiness(serviciosRows),
+          productos: groupByBusiness(productosRows),
+          cursos: groupByBusiness(cursosRows),
+          resenas: groupByBusiness([...(resenasRows || []), ...(resenasAltRows || [])])
+        };
+        businesses = (rows || []).map(row => normalizeBusiness(row, relations)).filter(business => business.id);
+        loadedFromSupabase = true;
+        console.log(`✅ Marketplace cargó ${businesses.length} negocios desde Supabase`);
+        return businesses.slice();
+      } catch (error) {
+        console.error('No se pudieron cargar negocios desde Supabase. Usando mock.', error);
+        return businesses.slice();
+      }
+    })();
+    return loadPromise;
+  }
   function listBusinesses() {
     return businesses.slice();
   }
@@ -440,7 +635,8 @@ const MockData = (() => {
     listBusinesses,
     listTopRated,
     searchBusinesses,
-    getBusinessById
+    getBusinessById,
+    loadBusinesses
   };
 })();
 const ToastContext = React.createContext(null);
@@ -1762,6 +1958,7 @@ class ErrorBoundary extends React.Component {
 }
 function App() {
   try {
+    const [dataReady, setDataReady] = React.useState(false);
     const [params, setParams] = React.useState(() => {
       try {
         return Navigation.getSearchParams();
@@ -1772,6 +1969,15 @@ function App() {
         };
       }
     });
+    React.useEffect(() => {
+      let mounted = true;
+      MockData.loadBusinesses().catch(error => console.error('App.loadBusinesses error:', error)).finally(() => {
+        if (mounted) setDataReady(true);
+      });
+      return () => {
+        mounted = false;
+      };
+    }, []);
     React.useEffect(() => {
       try {
         const onHashOrPop = () => {
@@ -1806,11 +2012,15 @@ function App() {
       className: "pt-6 pb-16",
       "data-name": "main",
       "data-file": "app.js"
-    }, React.createElement(HomePage, {
+    }, dataReady ? React.createElement(HomePage, {
       initialParams: params,
       "data-name": "home-page",
       "data-file": "app.js"
-    })), React.createElement(Footer, {
+    }) : React.createElement("div", {
+      className: "container-rr py-16 text-center text-sm text-[var(--text-muted)]",
+      "data-name": "loading",
+      "data-file": "app.js"
+    }, "Cargando negocios...")), React.createElement(Footer, {
       "data-name": "footer",
       "data-file": "app.js"
     })));

@@ -42,6 +42,7 @@ class ErrorBoundary extends React.Component {
 
 function SearchApp() {
   try {
+    const [dataReady, setDataReady] = React.useState(false);
     const [query, setQuery] = React.useState(() => {
       try {
         return Navigation.getSearchParams();
@@ -49,6 +50,18 @@ function SearchApp() {
         return { servicio: '', ubicacion: '' };
       }
     });
+
+    React.useEffect(() => {
+      let mounted = true;
+      MockData.loadBusinesses()
+        .catch((error) => console.error('SearchApp.loadBusinesses error:', error))
+        .finally(() => {
+          if (mounted) setDataReady(true);
+        });
+      return () => {
+        mounted = false;
+      };
+    }, []);
 
     React.useEffect(() => {
       try {
@@ -71,7 +84,11 @@ function SearchApp() {
         <ToastProvider data-name="toast-provider" data-file="search-app.js">
           <Header currentParams={query} data-name="header-wrap" data-file="search-app.js" />
           <main className="pt-4 pb-16" data-name="main" data-file="search-app.js">
-            <SearchPage query={query} onQueryChange={setQuery} data-name="search-page" data-file="search-app.js" />
+            {dataReady ? (
+              <SearchPage query={query} onQueryChange={setQuery} data-name="search-page" data-file="search-app.js" />
+            ) : (
+              <div className="container-rr py-16 text-center text-sm text-[var(--text-muted)]" data-name="loading" data-file="search-app.js">Cargando negocios...</div>
+            )}
           </main>
           <Footer data-name="footer" data-file="search-app.js" />
         </ToastProvider>
