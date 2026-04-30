@@ -6,7 +6,7 @@ function Header({ currentParams }) {
 
     const onGoHome = () => {
       try {
-        Navigation.goHome('muro');
+        Navigation.goHome();
       } catch (error) {
         console.error('Header.onGoHome error:', error);
       }

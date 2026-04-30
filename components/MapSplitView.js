@@ -13,7 +13,7 @@ function MapSplitView({ businesses, activeId, onSelect }) {
         return (
           <button
             className={`absolute ${size} ${ring} rounded-2xl bg-white flex items-center justify-center shadow-[0_18px_55px_rgba(11,18,32,0.16)] transform ${scale} transition-transform`}
-            style={{ left: `${b._mapX}%`, top: `${b._mapY}%` }}
+            style={{ left: `${b._mapX}%`, top: `${b._mapY}%`, translate: '-50% -50%' }}
             onClick={() => onSelect?.(b)}
             data-name="map-pin"
             data-file="components/MapSplitView.js"

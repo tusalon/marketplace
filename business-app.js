@@ -59,7 +59,11 @@ function BusinessApp() {
         <ToastProvider data-name="toast-provider" data-file="business-app.js">
           <Header currentParams={null} data-name="header-wrap" data-file="business-app.js" />
           <main className="pt-0 pb-24" data-name="main" data-file="business-app.js">
-            <BusinessPage business={business} data-name="business-page" data-file="business-app.js" />
+            {business ? (
+              <BusinessPage business={business} data-name="business-page" data-file="business-app.js" />
+            ) : (
+              <BusinessNotFound businessId={businessId} data-name="business-not-found" data-file="business-app.js" />
+            )}
           </main>
           <Footer data-name="footer" data-file="business-app.js" />
         </ToastProvider>
@@ -67,6 +71,46 @@ function BusinessApp() {
     );
   } catch (error) {
     console.error('BusinessApp component error:', error);
+    return null;
+  }
+}
+
+function BusinessNotFound({ businessId }) {
+  try {
+    return (
+      <div className="container-rr pt-14 md:pt-20" data-name="business-not-found" data-file="business-app.js">
+        <div className="surface-rr max-w-[620px] mx-auto p-6 md:p-8 text-center" data-name="business-not-found-card" data-file="business-app.js">
+          <div className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)] mb-5" data-name="business-not-found-icon" data-file="business-app.js">
+            <div className="icon-search-x text-2xl text-[var(--primary-color)]" data-name="business-not-found-icon-i" data-file="business-app.js"></div>
+          </div>
+          <h1 className="text-2xl font-semibold text-[var(--text)]" data-name="business-not-found-title" data-file="business-app.js">Negocio no encontrado</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-2 leading-relaxed" data-name="business-not-found-desc" data-file="business-app.js">
+            No encontramos un perfil publicado para el ID {businessId ? `"${businessId}"` : 'solicitado'}. Puede que el enlace haya cambiado o que el negocio ya no este disponible.
+          </p>
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3" data-name="business-not-found-actions" data-file="business-app.js">
+            <button
+              className="btn-rr btn-primary-rr w-full sm:w-auto flex items-center justify-center gap-2"
+              onClick={() => Navigation.goToSearch('', '')}
+              data-name="business-not-found-search"
+              data-file="business-app.js"
+            >
+              Explorar negocios
+              <div className="icon-arrow-right text-xl text-white" data-name="business-not-found-search-i" data-file="business-app.js"></div>
+            </button>
+            <button
+              className="btn-rr btn-ghost-rr w-full sm:w-auto"
+              onClick={() => Navigation.goHome()}
+              data-name="business-not-found-home"
+              data-file="business-app.js"
+            >
+              Volver al inicio
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  } catch (error) {
+    console.error('BusinessNotFound component error:', error);
     return null;
   }
 }

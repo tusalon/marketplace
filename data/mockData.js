@@ -210,26 +210,33 @@ const MockData = (() => {
 
   function getBusinessById(id) {
     const found = businesses.find((b) => b.id === id);
-    return found || businesses[0];
+    return found || null;
+  }
+
+  function normalizeText(value) {
+    return String(value || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
   }
 
   function searchBusinesses(query) {
     const q = query || { servicio: '', ubicacion: '' };
-    const servicio = String(q.servicio || '').toLowerCase();
-    const ubicacion = String(q.ubicacion || '').toLowerCase();
+    const servicio = normalizeText(q.servicio);
+    const ubicacion = normalizeText(q.ubicacion);
 
     return businesses.filter((b) => {
       const hayServicio = !servicio
         ? true
         : [b.nombre, b.categoria, b.descripcion]
           .filter(Boolean)
-          .some((t) => String(t).toLowerCase().includes(servicio));
+          .some((t) => normalizeText(t).includes(servicio));
 
       const hayUbicacion = !ubicacion
         ? true
         : [b.ubicacion?.ciudad, b.ubicacion?.zona, b.ubicacion?.direccion]
           .filter(Boolean)
-          .some((t) => String(t).toLowerCase().includes(ubicacion));
+          .some((t) => normalizeText(t).includes(ubicacion));
 
       return hayServicio && hayUbicacion;
     });

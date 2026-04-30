@@ -4,14 +4,33 @@ function SearchPage({ query, onQueryChange }) {
     const [activeId, setActiveId] = React.useState(null);
     const [mobileMap, setMobileMap] = React.useState(false);
 
+    const mapBounds = {
+      north: 23.1550,
+      south: 23.0950,
+      east: -82.3300,
+      west: -82.4550
+    };
+
+    const toMapPosition = (coordenadas) => {
+      try {
+        const lat = Number(coordenadas?.lat);
+        const lng = Number(coordenadas?.lng);
+        if (Number.isNaN(lat) || Number.isNaN(lng)) return { _mapX: 50, _mapY: 50 };
+
+        const rawX = ((lng - mapBounds.west) / (mapBounds.east - mapBounds.west)) * 100;
+        const rawY = ((mapBounds.north - lat) / (mapBounds.north - mapBounds.south)) * 100;
+        const clamp = (value) => Math.max(8, Math.min(92, value));
+        return { _mapX: clamp(rawX), _mapY: clamp(rawY) };
+      } catch (error) {
+        console.error('SearchPage.toMapPosition error:', error);
+        return { _mapX: 50, _mapY: 50 };
+      }
+    };
+
     const results = React.useMemo(() => {
       try {
         const list = MockData.searchBusinesses(query);
-        const withPos = list.map((b, idx) => {
-          const baseX = 16 + (idx * 19) % 70;
-          const baseY = 18 + (idx * 23) % 64;
-          return { ...b, _mapX: baseX, _mapY: baseY };
-        });
+        const withPos = list.map((b) => ({ ...b, ...toMapPosition(b.coordenadas) }));
         return withPos;
       } catch (e) {
         return [];
