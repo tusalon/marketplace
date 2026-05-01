@@ -14,27 +14,13 @@ function SearchBar({ initialServicio, initialUbicacion, compact }) {
       }
     }, [initialServicio, initialUbicacion]);
 
-    const sugerenciasServicio = [
-      'Uñas Acrílicas',
-      'Barbería',
-      'Estética Facial',
-      'Peinados',
-      'Maquillaje',
-      'Cursos y Talleres'
-    ];
-
-    const sugerenciasUbicacion = [
-      'La Habana',
-      'Vedado',
-      'Miramar',
-      'Habana Vieja',
-      'Centro Habana'
-    ];
+    const sugerenciasServicio = ['Unas', 'Barberia', 'Cejas y pestanas', 'Peinados', 'Maquillaje', 'Masajes'];
+    const sugerenciasUbicacion = ['La Habana', 'Vedado', 'Miramar', 'Habana Vieja', 'Centro Habana'];
 
     const ejecutarBusqueda = () => {
       try {
         if (!servicio && !ubicacion) {
-          toast?.push({ title: 'Escribe algo', message: 'Puedes buscar por “Uñas Acrílicas” o por una zona, por ejemplo “Vedado”.' });
+          toast?.push({ title: 'Escribe algo', message: 'Busca por servicio o por una zona, por ejemplo Vedado.' });
           return;
         }
         Navigation.goToSearch(servicio, ubicacion);
@@ -48,7 +34,7 @@ function SearchBar({ initialServicio, initialUbicacion, compact }) {
         {items.map((s) => (
           <button
             key={s}
-            className="chip-rr px-3 py-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--primary-color)] hover:bg-[rgba(11,18,32,0.05)] transition-colors"
+            className="px-3 py-1.5 rounded-full border border-[var(--border)] bg-white text-xs text-[var(--text-muted)] hover:text-[var(--primary-color)] hover:border-[rgba(216,27,96,0.35)] transition-colors"
             onClick={() => onPick(s)}
             data-name="suggestion-chip"
             data-file="components/SearchBar.js"
@@ -60,41 +46,47 @@ function SearchBar({ initialServicio, initialUbicacion, compact }) {
     );
 
     return (
-      <div className={`${compact ? 'w-full' : 'w-full max-w-[820px] mx-auto'}`} data-name="searchbar" data-file="components/SearchBar.js">
-        <div className={`surface-rr p-3 md:p-4 ${focus ? 'subtle-glow-rr' : ''} transition-shadow`} data-name="searchbar-surface" data-file="components/SearchBar.js">
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-center" data-name="searchbar-grid" data-file="components/SearchBar.js">
-            <div className="flex items-center gap-3" data-name="field-servicio" data-file="components/SearchBar.js">
-              <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]" data-name="field-servicio-icon" data-file="components/SearchBar.js">
+      <div className={`${compact ? 'w-full' : 'w-full max-w-[900px] mx-auto'}`} data-name="searchbar" data-file="components/SearchBar.js">
+        <div className={`surface-rr bg-white p-2 md:p-2 ${focus ? 'subtle-glow-rr' : ''} transition-shadow`} data-name="searchbar-surface" data-file="components/SearchBar.js">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-0 md:gap-2 items-stretch" data-name="searchbar-grid" data-file="components/SearchBar.js">
+            <div className="flex items-center gap-3 px-3 py-3 md:border-r border-[var(--border)]" data-name="field-servicio" data-file="components/SearchBar.js">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[rgba(11,18,32,0.04)]" data-name="field-servicio-icon" data-file="components/SearchBar.js">
                 <div className="icon-search text-xl text-[var(--primary-color)]" data-name="field-servicio-icon-i" data-file="components/SearchBar.js"></div>
               </div>
               <div className="min-w-0 flex-1" data-name="field-servicio-input" data-file="components/SearchBar.js">
-                <label className="block text-[11px] text-[var(--text-muted)] mb-1" data-name="label-servicio" data-file="components/SearchBar.js">Servicio o curso</label>
+                <label className="block text-[11px] text-[var(--text-muted)] mb-1" data-name="label-servicio" data-file="components/SearchBar.js">Servicio</label>
                 <input
                   className="w-full text-sm bg-transparent outline-none"
                   value={servicio}
                   onChange={(e) => setServicio(e.target.value)}
-                  placeholder="Ej: Uñas Acrílicas, Barbería"
+                  placeholder="Unas, barberia, maquillaje"
                   onFocus={() => setFocus(true)}
                   onBlur={() => setFocus(false)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') ejecutarBusqueda();
+                  }}
                   data-name="input-servicio"
                   data-file="components/SearchBar.js"
                 />
               </div>
             </div>
 
-            <div className="flex items-center gap-3" data-name="field-ubicacion" data-file="components/SearchBar.js">
-              <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]" data-name="field-ubicacion-icon" data-file="components/SearchBar.js">
+            <div className="flex items-center gap-3 px-3 py-3" data-name="field-ubicacion" data-file="components/SearchBar.js">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[rgba(11,18,32,0.04)]" data-name="field-ubicacion-icon" data-file="components/SearchBar.js">
                 <div className="icon-map-pin text-xl text-[var(--primary-color)]" data-name="field-ubicacion-icon-i" data-file="components/SearchBar.js"></div>
               </div>
               <div className="min-w-0 flex-1" data-name="field-ubicacion-input" data-file="components/SearchBar.js">
-                <label className="block text-[11px] text-[var(--text-muted)] mb-1" data-name="label-ubicacion" data-file="components/SearchBar.js">Ubicación</label>
+                <label className="block text-[11px] text-[var(--text-muted)] mb-1" data-name="label-ubicacion" data-file="components/SearchBar.js">Ubicacion</label>
                 <input
                   className="w-full text-sm bg-transparent outline-none"
                   value={ubicacion}
                   onChange={(e) => setUbicacion(e.target.value)}
-                  placeholder="Ej: Vedado, La Habana"
+                  placeholder="Vedado, La Habana"
                   onFocus={() => setFocus(true)}
                   onBlur={() => setFocus(false)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') ejecutarBusqueda();
+                  }}
                   data-name="input-ubicacion"
                   data-file="components/SearchBar.js"
                 />
@@ -102,7 +94,7 @@ function SearchBar({ initialServicio, initialUbicacion, compact }) {
             </div>
 
             <button
-              className="btn-rr btn-primary-rr w-full md:w-auto flex items-center justify-center gap-2"
+              className="btn-rr btn-primary-rr w-full md:w-auto flex items-center justify-center gap-2 md:px-7"
               onClick={ejecutarBusqueda}
               data-name="btn-buscar"
               data-file="components/SearchBar.js"
@@ -113,9 +105,9 @@ function SearchBar({ initialServicio, initialUbicacion, compact }) {
           </div>
 
           {!compact ? (
-            <div className="mt-4" data-name="searchbar-suggestions" data-file="components/SearchBar.js">
+            <div className="mt-4 px-1" data-name="searchbar-suggestions" data-file="components/SearchBar.js">
               <p className="text-xs text-[var(--text-muted)]" data-name="suggestions-title" data-file="components/SearchBar.js">
-                Ideas rápidas para empezar
+                Populares ahora
               </p>
               {suggestionChips(sugerenciasServicio, (s) => setServicio(s))}
               {suggestionChips(sugerenciasUbicacion, (s) => setUbicacion(s))}

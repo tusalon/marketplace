@@ -760,11 +760,11 @@ function Header({
       }
     };
     return React.createElement("header", {
-      className: "sticky top-0 z-[60] bg-white/90 backdrop-blur border-b border-[var(--border)]",
+      className: "sticky top-0 z-[60] bg-white/95 backdrop-blur border-b border-[var(--border)]",
       "data-name": "header",
       "data-file": "components/Header.js"
     }, React.createElement("div", {
-      className: "container-rr py-4",
+      className: "container-rr py-3",
       "data-name": "header-inner",
       "data-file": "components/Header.js"
     }, React.createElement("div", {
@@ -777,7 +777,7 @@ function Header({
       "data-name": "brand",
       "data-file": "components/Header.js"
     }, React.createElement("div", {
-      className: "w-10 h-10 rounded-2xl overflow-hidden border border-[rgba(216,27,96,0.25)] bg-gradient-to-r from-[#D81B60] to-[#F48FB1] flex items-center justify-center",
+      className: "w-10 h-10 rounded-lg overflow-hidden border border-[rgba(216,27,96,0.18)] bg-white flex items-center justify-center",
       "data-name": "brand-mark",
       "data-file": "components/Header.js"
     }, React.createElement("img", {
@@ -814,11 +814,11 @@ function Header({
       "data-file": "components/Header.js"
     }, "Explorar"), React.createElement("a", {
       className: "btn-rr btn-ghost-rr",
-      href: "business.html?id=roma-001",
+      href: "search.html",
       "data-name": "nav-demo",
       "data-file": "components/Header.js"
-    }, "Ver demo")), React.createElement("button", {
-      className: "ml-auto md:hidden w-11 h-11 rounded-2xl border border-[var(--border)] bg-white flex items-center justify-center",
+    }, "Negocios")), React.createElement("button", {
+      className: "ml-auto md:hidden w-11 h-11 rounded-lg border border-[var(--border)] bg-white flex items-center justify-center",
       onClick: () => setOpen(v => !v),
       "data-name": "nav-toggle",
       "data-file": "components/Header.js",
@@ -865,13 +865,13 @@ function Header({
       "data-file": "components/Header.js"
     })), React.createElement("a", {
       className: "btn-rr btn-ghost-rr w-full flex items-center justify-between",
-      href: "business.html?id=roma-001",
+      href: "search.html",
       "data-name": "m-demo",
       "data-file": "components/Header.js"
     }, React.createElement("span", {
       "data-name": "m-demo-text",
       "data-file": "components/Header.js"
-    }, "Ver demo"), React.createElement("div", {
+    }, "Negocios"), React.createElement("div", {
       className: "icon-external-link text-xl text-[var(--primary-color)]",
       "data-name": "m-demo-icon",
       "data-file": "components/Header.js"
@@ -1054,14 +1054,14 @@ function SearchBar({
         console.error('SearchBar sync error:', error);
       }
     }, [initialServicio, initialUbicacion]);
-    const sugerenciasServicio = ['Uñas Acrílicas', 'Barbería', 'Estética Facial', 'Peinados', 'Maquillaje', 'Cursos y Talleres'];
+    const sugerenciasServicio = ['Unas', 'Barberia', 'Cejas y pestanas', 'Peinados', 'Maquillaje', 'Masajes'];
     const sugerenciasUbicacion = ['La Habana', 'Vedado', 'Miramar', 'Habana Vieja', 'Centro Habana'];
     const ejecutarBusqueda = () => {
       try {
         if (!servicio && !ubicacion) {
           toast?.push({
             title: 'Escribe algo',
-            message: 'Puedes buscar por “Uñas Acrílicas” o por una zona, por ejemplo “Vedado”.'
+            message: 'Busca por servicio o por una zona, por ejemplo Vedado.'
           });
           return;
         }
@@ -1076,29 +1076,29 @@ function SearchBar({
       "data-file": "components/SearchBar.js"
     }, items.map(s => React.createElement("button", {
       key: s,
-      className: "chip-rr px-3 py-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--primary-color)] hover:bg-[rgba(11,18,32,0.05)] transition-colors",
+      className: "px-3 py-1.5 rounded-full border border-[var(--border)] bg-white text-xs text-[var(--text-muted)] hover:text-[var(--primary-color)] hover:border-[rgba(216,27,96,0.35)] transition-colors",
       onClick: () => onPick(s),
       "data-name": "suggestion-chip",
       "data-file": "components/SearchBar.js"
     }, s)));
     return React.createElement("div", {
-      className: `${compact ? 'w-full' : 'w-full max-w-[820px] mx-auto'}`,
+      className: `${compact ? 'w-full' : 'w-full max-w-[900px] mx-auto'}`,
       "data-name": "searchbar",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
-      className: `surface-rr p-3 md:p-4 ${focus ? 'subtle-glow-rr' : ''} transition-shadow`,
+      className: `surface-rr bg-white p-2 md:p-2 ${focus ? 'subtle-glow-rr' : ''} transition-shadow`,
       "data-name": "searchbar-surface",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
-      className: "grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-center",
+      className: "grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-0 md:gap-2 items-stretch",
       "data-name": "searchbar-grid",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
-      className: "flex items-center gap-3",
+      className: "flex items-center gap-3 px-3 py-3 md:border-r border-[var(--border)]",
       "data-name": "field-servicio",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
-      className: "w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
+      className: "w-10 h-10 rounded-lg flex items-center justify-center bg-[rgba(11,18,32,0.04)]",
       "data-name": "field-servicio-icon",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
@@ -1113,21 +1113,24 @@ function SearchBar({
       className: "block text-[11px] text-[var(--text-muted)] mb-1",
       "data-name": "label-servicio",
       "data-file": "components/SearchBar.js"
-    }, "Servicio o curso"), React.createElement("input", {
+    }, "Servicio"), React.createElement("input", {
       className: "w-full text-sm bg-transparent outline-none",
       value: servicio,
       onChange: e => setServicio(e.target.value),
-      placeholder: "Ej: U\xF1as Acr\xEDlicas, Barber\xEDa",
+      placeholder: "Unas, barberia, maquillaje",
       onFocus: () => setFocus(true),
       onBlur: () => setFocus(false),
+      onKeyDown: e => {
+        if (e.key === 'Enter') ejecutarBusqueda();
+      },
       "data-name": "input-servicio",
       "data-file": "components/SearchBar.js"
     }))), React.createElement("div", {
-      className: "flex items-center gap-3",
+      className: "flex items-center gap-3 px-3 py-3",
       "data-name": "field-ubicacion",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
-      className: "w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
+      className: "w-10 h-10 rounded-lg flex items-center justify-center bg-[rgba(11,18,32,0.04)]",
       "data-name": "field-ubicacion-icon",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
@@ -1142,17 +1145,20 @@ function SearchBar({
       className: "block text-[11px] text-[var(--text-muted)] mb-1",
       "data-name": "label-ubicacion",
       "data-file": "components/SearchBar.js"
-    }, "Ubicaci\xF3n"), React.createElement("input", {
+    }, "Ubicacion"), React.createElement("input", {
       className: "w-full text-sm bg-transparent outline-none",
       value: ubicacion,
       onChange: e => setUbicacion(e.target.value),
-      placeholder: "Ej: Vedado, La Habana",
+      placeholder: "Vedado, La Habana",
       onFocus: () => setFocus(true),
       onBlur: () => setFocus(false),
+      onKeyDown: e => {
+        if (e.key === 'Enter') ejecutarBusqueda();
+      },
       "data-name": "input-ubicacion",
       "data-file": "components/SearchBar.js"
     }))), React.createElement("button", {
-      className: "btn-rr btn-primary-rr w-full md:w-auto flex items-center justify-center gap-2",
+      className: "btn-rr btn-primary-rr w-full md:w-auto flex items-center justify-center gap-2 md:px-7",
       onClick: ejecutarBusqueda,
       "data-name": "btn-buscar",
       "data-file": "components/SearchBar.js"
@@ -1164,14 +1170,14 @@ function SearchBar({
       "data-name": "btn-buscar-icon",
       "data-file": "components/SearchBar.js"
     }))), !compact ? React.createElement("div", {
-      className: "mt-4",
+      className: "mt-4 px-1",
       "data-name": "searchbar-suggestions",
       "data-file": "components/SearchBar.js"
     }, React.createElement("p", {
       className: "text-xs text-[var(--text-muted)]",
       "data-name": "suggestions-title",
       "data-file": "components/SearchBar.js"
-    }, "Ideas r\xE1pidas para empezar"), suggestionChips(sugerenciasServicio, s => setServicio(s)), suggestionChips(sugerenciasUbicacion, s => setUbicacion(s))) : null));
+    }, "Populares ahora"), suggestionChips(sugerenciasServicio, s => setServicio(s)), suggestionChips(sugerenciasUbicacion, s => setUbicacion(s))) : null));
   } catch (error) {
     console.error('SearchBar component error:', error);
     return null;
@@ -1184,7 +1190,8 @@ function BusinessCard({
 }) {
   try {
     const b = business;
-    const border = active ? 'border-[rgba(216,27,96,0.35)] shadow-[0_18px_60px_rgba(216,27,96,0.10)]' : '';
+    const border = active ? 'border-[rgba(216,27,96,0.35)] shadow-[0_16px_40px_rgba(216,27,96,0.10)]' : '';
+    const serviceCount = (b.categoriasCatalogo || []).reduce((sum, section) => sum + (section.items?.length || 0), 0);
     const onOpen = () => {
       try {
         Navigation.goToBusiness(b.id);
@@ -1196,7 +1203,7 @@ function BusinessCard({
       try {
         e?.preventDefault?.();
         e?.stopPropagation?.();
-        const msg = encodeURIComponent(`Hola, quiero reservar en ${b.nombre}. ¿Tienen disponibilidad?`);
+        const msg = encodeURIComponent(`Hola, quiero reservar en ${b.nombre}. Tienen disponibilidad?`);
         const wa = (b.whatsapp || '').replace(/\s+/g, '');
         const url = `https://wa.me/${wa.replace('+', '')}?text=${msg}`;
         window.open(url, '_blank', 'noopener,noreferrer');
@@ -1215,7 +1222,7 @@ function BusinessCard({
       }
     };
     return React.createElement("div", {
-      className: `surface-rr w-full text-left overflow-hidden transition-shadow hover:shadow-[0_18px_60px_rgba(216,27,96,0.10)] ${border} cursor-pointer`,
+      className: `surface-rr w-full text-left overflow-hidden transition-shadow hover:shadow-[0_14px_34px_rgba(11,18,32,0.10)] ${border} cursor-pointer`,
       onMouseEnter: () => onHover?.(b),
       onFocus: () => onHover?.(b),
       onClick: onOpen,
@@ -1226,11 +1233,11 @@ function BusinessCard({
       "data-file": "components/BusinessCard.js",
       "aria-label": `Abrir perfil de ${b.nombre}`
     }, React.createElement("div", {
-      className: "grid grid-cols-[96px_1fr] gap-4 p-4",
+      className: "grid grid-cols-[112px_1fr] gap-4 p-3",
       "data-name": "business-card-inner",
       "data-file": "components/BusinessCard.js"
     }, React.createElement("div", {
-      className: "relative w-24 h-24 rounded-2xl overflow-hidden bg-[#F9FAFB] border border-[var(--border)]",
+      className: "relative w-28 h-28 rounded-lg overflow-hidden bg-[#F9FAFB] border border-[var(--border)]",
       "data-name": "photo",
       "data-file": "components/BusinessCard.js"
     }, React.createElement("img", {
@@ -1264,7 +1271,7 @@ function BusinessCard({
       "data-name": "title",
       "data-file": "components/BusinessCard.js"
     }, React.createElement("p", {
-      className: "text-sm font-semibold leading-snug truncate",
+      className: "text-base font-semibold leading-snug truncate",
       "data-name": "name",
       "data-file": "components/BusinessCard.js"
     }, b.nombre), React.createElement("p", {
@@ -1295,14 +1302,18 @@ function BusinessCard({
       className: "mt-3 flex flex-wrap gap-2",
       "data-name": "badges",
       "data-file": "components/BusinessCard.js"
-    }, b.topRoma ? React.createElement(Badge, {
+    }, serviceCount ? React.createElement("span", {
+      className: "chip-rr px-2.5 py-1 text-[11px] text-[var(--text-muted)]",
+      "data-name": "services-count",
+      "data-file": "components/BusinessCard.js"
+    }, serviceCount, " servicios") : null, b.topRoma ? React.createElement(Badge, {
       type: "top",
-      text: "\uD83C\uDF1F Top Roma",
+      text: "Top Roma",
       "data-name": "badge-top",
       "data-file": "components/BusinessCard.js"
     }) : null, b.masReservado ? React.createElement(Badge, {
       type: "reservado",
-      text: "M\xE1s reservado",
+      text: "Mas reservado",
       "data-name": "badge-reservado",
       "data-file": "components/BusinessCard.js"
     }) : null, b.negocioDelMes ? React.createElement(Badge, {
@@ -1320,7 +1331,7 @@ function BusinessCard({
       "data-file": "components/BusinessCard.js"
     }, Format.formatRangoPrecio(b.rangoPrecio?.min, b.rangoPrecio?.max)), React.createElement("button", {
       type: "button",
-      className: "btn-rr btn-primary-rr py-2 px-3 text-xs flex items-center gap-2 shadow-md",
+      className: "btn-rr btn-primary-rr py-2 px-4 text-xs flex items-center gap-2 shadow-md",
       onClick: onContact,
       "data-name": "contact",
       "data-file": "components/BusinessCard.js",
@@ -1329,7 +1340,7 @@ function BusinessCard({
       className: "icon-message-circle text-base text-white",
       "data-name": "contact-i",
       "data-file": "components/BusinessCard.js"
-    }), "Contactar por WhatsApp")))));
+    }), "Reservar")))));
   } catch (error) {
     console.error('BusinessCard component error:', error);
     return null;

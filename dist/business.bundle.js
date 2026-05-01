@@ -760,11 +760,11 @@ function Header({
       }
     };
     return React.createElement("header", {
-      className: "sticky top-0 z-[60] bg-white/90 backdrop-blur border-b border-[var(--border)]",
+      className: "sticky top-0 z-[60] bg-white/95 backdrop-blur border-b border-[var(--border)]",
       "data-name": "header",
       "data-file": "components/Header.js"
     }, React.createElement("div", {
-      className: "container-rr py-4",
+      className: "container-rr py-3",
       "data-name": "header-inner",
       "data-file": "components/Header.js"
     }, React.createElement("div", {
@@ -777,7 +777,7 @@ function Header({
       "data-name": "brand",
       "data-file": "components/Header.js"
     }, React.createElement("div", {
-      className: "w-10 h-10 rounded-2xl overflow-hidden border border-[rgba(216,27,96,0.25)] bg-gradient-to-r from-[#D81B60] to-[#F48FB1] flex items-center justify-center",
+      className: "w-10 h-10 rounded-lg overflow-hidden border border-[rgba(216,27,96,0.18)] bg-white flex items-center justify-center",
       "data-name": "brand-mark",
       "data-file": "components/Header.js"
     }, React.createElement("img", {
@@ -814,11 +814,11 @@ function Header({
       "data-file": "components/Header.js"
     }, "Explorar"), React.createElement("a", {
       className: "btn-rr btn-ghost-rr",
-      href: "business.html?id=roma-001",
+      href: "search.html",
       "data-name": "nav-demo",
       "data-file": "components/Header.js"
-    }, "Ver demo")), React.createElement("button", {
-      className: "ml-auto md:hidden w-11 h-11 rounded-2xl border border-[var(--border)] bg-white flex items-center justify-center",
+    }, "Negocios")), React.createElement("button", {
+      className: "ml-auto md:hidden w-11 h-11 rounded-lg border border-[var(--border)] bg-white flex items-center justify-center",
       onClick: () => setOpen(v => !v),
       "data-name": "nav-toggle",
       "data-file": "components/Header.js",
@@ -865,13 +865,13 @@ function Header({
       "data-file": "components/Header.js"
     })), React.createElement("a", {
       className: "btn-rr btn-ghost-rr w-full flex items-center justify-between",
-      href: "business.html?id=roma-001",
+      href: "search.html",
       "data-name": "m-demo",
       "data-file": "components/Header.js"
     }, React.createElement("span", {
       "data-name": "m-demo-text",
       "data-file": "components/Header.js"
-    }, "Ver demo"), React.createElement("div", {
+    }, "Negocios"), React.createElement("div", {
       className: "icon-external-link text-xl text-[var(--primary-color)]",
       "data-name": "m-demo-icon",
       "data-file": "components/Header.js"

@@ -760,11 +760,11 @@ function Header({
       }
     };
     return React.createElement("header", {
-      className: "sticky top-0 z-[60] bg-white/90 backdrop-blur border-b border-[var(--border)]",
+      className: "sticky top-0 z-[60] bg-white/95 backdrop-blur border-b border-[var(--border)]",
       "data-name": "header",
       "data-file": "components/Header.js"
     }, React.createElement("div", {
-      className: "container-rr py-4",
+      className: "container-rr py-3",
       "data-name": "header-inner",
       "data-file": "components/Header.js"
     }, React.createElement("div", {
@@ -777,7 +777,7 @@ function Header({
       "data-name": "brand",
       "data-file": "components/Header.js"
     }, React.createElement("div", {
-      className: "w-10 h-10 rounded-2xl overflow-hidden border border-[rgba(216,27,96,0.25)] bg-gradient-to-r from-[#D81B60] to-[#F48FB1] flex items-center justify-center",
+      className: "w-10 h-10 rounded-lg overflow-hidden border border-[rgba(216,27,96,0.18)] bg-white flex items-center justify-center",
       "data-name": "brand-mark",
       "data-file": "components/Header.js"
     }, React.createElement("img", {
@@ -814,11 +814,11 @@ function Header({
       "data-file": "components/Header.js"
     }, "Explorar"), React.createElement("a", {
       className: "btn-rr btn-ghost-rr",
-      href: "business.html?id=roma-001",
+      href: "search.html",
       "data-name": "nav-demo",
       "data-file": "components/Header.js"
-    }, "Ver demo")), React.createElement("button", {
-      className: "ml-auto md:hidden w-11 h-11 rounded-2xl border border-[var(--border)] bg-white flex items-center justify-center",
+    }, "Negocios")), React.createElement("button", {
+      className: "ml-auto md:hidden w-11 h-11 rounded-lg border border-[var(--border)] bg-white flex items-center justify-center",
       onClick: () => setOpen(v => !v),
       "data-name": "nav-toggle",
       "data-file": "components/Header.js",
@@ -865,13 +865,13 @@ function Header({
       "data-file": "components/Header.js"
     })), React.createElement("a", {
       className: "btn-rr btn-ghost-rr w-full flex items-center justify-between",
-      href: "business.html?id=roma-001",
+      href: "search.html",
       "data-name": "m-demo",
       "data-file": "components/Header.js"
     }, React.createElement("span", {
       "data-name": "m-demo-text",
       "data-file": "components/Header.js"
-    }, "Ver demo"), React.createElement("div", {
+    }, "Negocios"), React.createElement("div", {
       className: "icon-external-link text-xl text-[var(--primary-color)]",
       "data-name": "m-demo-icon",
       "data-file": "components/Header.js"
@@ -1054,14 +1054,14 @@ function SearchBar({
         console.error('SearchBar sync error:', error);
       }
     }, [initialServicio, initialUbicacion]);
-    const sugerenciasServicio = ['Uñas Acrílicas', 'Barbería', 'Estética Facial', 'Peinados', 'Maquillaje', 'Cursos y Talleres'];
+    const sugerenciasServicio = ['Unas', 'Barberia', 'Cejas y pestanas', 'Peinados', 'Maquillaje', 'Masajes'];
     const sugerenciasUbicacion = ['La Habana', 'Vedado', 'Miramar', 'Habana Vieja', 'Centro Habana'];
     const ejecutarBusqueda = () => {
       try {
         if (!servicio && !ubicacion) {
           toast?.push({
             title: 'Escribe algo',
-            message: 'Puedes buscar por “Uñas Acrílicas” o por una zona, por ejemplo “Vedado”.'
+            message: 'Busca por servicio o por una zona, por ejemplo Vedado.'
           });
           return;
         }
@@ -1076,29 +1076,29 @@ function SearchBar({
       "data-file": "components/SearchBar.js"
     }, items.map(s => React.createElement("button", {
       key: s,
-      className: "chip-rr px-3 py-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--primary-color)] hover:bg-[rgba(11,18,32,0.05)] transition-colors",
+      className: "px-3 py-1.5 rounded-full border border-[var(--border)] bg-white text-xs text-[var(--text-muted)] hover:text-[var(--primary-color)] hover:border-[rgba(216,27,96,0.35)] transition-colors",
       onClick: () => onPick(s),
       "data-name": "suggestion-chip",
       "data-file": "components/SearchBar.js"
     }, s)));
     return React.createElement("div", {
-      className: `${compact ? 'w-full' : 'w-full max-w-[820px] mx-auto'}`,
+      className: `${compact ? 'w-full' : 'w-full max-w-[900px] mx-auto'}`,
       "data-name": "searchbar",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
-      className: `surface-rr p-3 md:p-4 ${focus ? 'subtle-glow-rr' : ''} transition-shadow`,
+      className: `surface-rr bg-white p-2 md:p-2 ${focus ? 'subtle-glow-rr' : ''} transition-shadow`,
       "data-name": "searchbar-surface",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
-      className: "grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-center",
+      className: "grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-0 md:gap-2 items-stretch",
       "data-name": "searchbar-grid",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
-      className: "flex items-center gap-3",
+      className: "flex items-center gap-3 px-3 py-3 md:border-r border-[var(--border)]",
       "data-name": "field-servicio",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
-      className: "w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
+      className: "w-10 h-10 rounded-lg flex items-center justify-center bg-[rgba(11,18,32,0.04)]",
       "data-name": "field-servicio-icon",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
@@ -1113,21 +1113,24 @@ function SearchBar({
       className: "block text-[11px] text-[var(--text-muted)] mb-1",
       "data-name": "label-servicio",
       "data-file": "components/SearchBar.js"
-    }, "Servicio o curso"), React.createElement("input", {
+    }, "Servicio"), React.createElement("input", {
       className: "w-full text-sm bg-transparent outline-none",
       value: servicio,
       onChange: e => setServicio(e.target.value),
-      placeholder: "Ej: U\xF1as Acr\xEDlicas, Barber\xEDa",
+      placeholder: "Unas, barberia, maquillaje",
       onFocus: () => setFocus(true),
       onBlur: () => setFocus(false),
+      onKeyDown: e => {
+        if (e.key === 'Enter') ejecutarBusqueda();
+      },
       "data-name": "input-servicio",
       "data-file": "components/SearchBar.js"
     }))), React.createElement("div", {
-      className: "flex items-center gap-3",
+      className: "flex items-center gap-3 px-3 py-3",
       "data-name": "field-ubicacion",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
-      className: "w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
+      className: "w-10 h-10 rounded-lg flex items-center justify-center bg-[rgba(11,18,32,0.04)]",
       "data-name": "field-ubicacion-icon",
       "data-file": "components/SearchBar.js"
     }, React.createElement("div", {
@@ -1142,17 +1145,20 @@ function SearchBar({
       className: "block text-[11px] text-[var(--text-muted)] mb-1",
       "data-name": "label-ubicacion",
       "data-file": "components/SearchBar.js"
-    }, "Ubicaci\xF3n"), React.createElement("input", {
+    }, "Ubicacion"), React.createElement("input", {
       className: "w-full text-sm bg-transparent outline-none",
       value: ubicacion,
       onChange: e => setUbicacion(e.target.value),
-      placeholder: "Ej: Vedado, La Habana",
+      placeholder: "Vedado, La Habana",
       onFocus: () => setFocus(true),
       onBlur: () => setFocus(false),
+      onKeyDown: e => {
+        if (e.key === 'Enter') ejecutarBusqueda();
+      },
       "data-name": "input-ubicacion",
       "data-file": "components/SearchBar.js"
     }))), React.createElement("button", {
-      className: "btn-rr btn-primary-rr w-full md:w-auto flex items-center justify-center gap-2",
+      className: "btn-rr btn-primary-rr w-full md:w-auto flex items-center justify-center gap-2 md:px-7",
       onClick: ejecutarBusqueda,
       "data-name": "btn-buscar",
       "data-file": "components/SearchBar.js"
@@ -1164,14 +1170,14 @@ function SearchBar({
       "data-name": "btn-buscar-icon",
       "data-file": "components/SearchBar.js"
     }))), !compact ? React.createElement("div", {
-      className: "mt-4",
+      className: "mt-4 px-1",
       "data-name": "searchbar-suggestions",
       "data-file": "components/SearchBar.js"
     }, React.createElement("p", {
       className: "text-xs text-[var(--text-muted)]",
       "data-name": "suggestions-title",
       "data-file": "components/SearchBar.js"
-    }, "Ideas r\xE1pidas para empezar"), suggestionChips(sugerenciasServicio, s => setServicio(s)), suggestionChips(sugerenciasUbicacion, s => setUbicacion(s))) : null));
+    }, "Populares ahora"), suggestionChips(sugerenciasServicio, s => setServicio(s)), suggestionChips(sugerenciasUbicacion, s => setUbicacion(s))) : null));
   } catch (error) {
     console.error('SearchBar component error:', error);
     return null;
@@ -1448,8 +1454,15 @@ function HomeHero({
   initialParams
 }) {
   try {
+    const businesses = MockData.listBusinesses();
+    const totalBusinesses = businesses.length;
+    const totalServices = businesses.reduce((sum, business) => {
+      const count = (business.categoriasCatalogo || []).reduce((innerSum, section) => innerSum + (section.items?.length || 0), 0);
+      return sum + count;
+    }, 0);
+    const categories = Array.from(new Set(businesses.map(business => business.categoria).filter(Boolean))).slice(0, 7);
     return React.createElement("section", {
-      className: "pt-10 md:pt-16",
+      className: "pt-8 md:pt-14",
       "data-name": "home-hero",
       "data-file": "pages/home/HomeHero.js"
     }, React.createElement("div", {
@@ -1457,33 +1470,22 @@ function HomeHero({
       "data-name": "home-hero-inner",
       "data-file": "pages/home/HomeHero.js"
     }, React.createElement("div", {
-      className: "max-w-[920px] mx-auto text-center",
+      className: "max-w-[980px] mx-auto text-center",
       "data-name": "home-hero-content",
       "data-file": "pages/home/HomeHero.js"
-    }, React.createElement("div", {
-      className: "inline-flex items-center gap-2 px-3 py-1.5 chip-rr text-xs text-[var(--text-muted)] bg-[#FDF2F8]",
-      "data-name": "hero-chip",
+    }, React.createElement("p", {
+      className: "text-xs md:text-sm font-semibold uppercase tracking-[0.18em] text-[var(--primary-color)]",
+      "data-name": "hero-kicker",
       "data-file": "pages/home/HomeHero.js"
-    }, React.createElement("div", {
-      className: "icon-shield text-base text-[var(--primary-color)]",
-      "data-name": "hero-chip-icon",
-      "data-file": "pages/home/HomeHero.js"
-    }), React.createElement("span", {
-      "data-name": "hero-chip-text",
-      "data-file": "pages/home/HomeHero.js"
-    }, "Rese\xF1as verificadas y negocios destacados en Cuba")), React.createElement("h1", {
-      className: "mt-6 text-3xl md:text-5xl font-semibold tracking-tight text-balance",
+    }, "Marketplace de belleza en Cuba"), React.createElement("h1", {
+      className: "mt-4 text-4xl md:text-6xl font-semibold tracking-tight text-balance leading-[1.02]",
       "data-name": "hero-title",
       "data-file": "pages/home/HomeHero.js"
-    }, "Tu pr\xF3xima cita se siente ", React.createElement("span", {
-      className: "italic",
-      "data-name": "hero-italic",
-      "data-file": "pages/home/HomeHero.js"
-    }, "premium"), "."), React.createElement("p", {
-      className: "mt-4 text-sm md:text-base text-[var(--text-muted)] leading-relaxed max-w-[740px] mx-auto",
+    }, "Reserva servicios de belleza cerca de ti"), React.createElement("p", {
+      className: "mt-4 text-base md:text-lg text-[var(--text-muted)] leading-relaxed max-w-[720px] mx-auto",
       "data-name": "hero-sub",
       "data-file": "pages/home/HomeHero.js"
-    }, "Busca un servicio, una academia o un estudio en tu zona. Explora con calma: el Muro de la Intriga est\xE1 dise\xF1ado para que descubras lo mejor sin ruido."), React.createElement("div", {
+    }, "Encuentra salones, manicuristas, barberos y especialistas disponibles. Compara servicios, precios y contacta por WhatsApp en segundos."), React.createElement("div", {
       className: "mt-8",
       "data-name": "hero-search",
       "data-file": "pages/home/HomeHero.js"
@@ -1494,34 +1496,56 @@ function HomeHero({
       "data-name": "hero-searchbar",
       "data-file": "pages/home/HomeHero.js"
     })), React.createElement("div", {
-      className: "mt-6 flex flex-wrap items-center justify-center gap-2 text-xs text-[var(--text-muted)]",
-      "data-name": "hero-meta",
-      "data-file": "pages/home/HomeHero.js"
-    }, React.createElement("span", {
-      className: "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(11,18,32,0.03)] border border-[var(--border)]",
-      "data-name": "meta-1",
+      className: "mt-7 grid grid-cols-3 max-w-[560px] mx-auto border border-[var(--border)] rounded-lg overflow-hidden bg-white",
+      "data-name": "hero-stats",
       "data-file": "pages/home/HomeHero.js"
     }, React.createElement("div", {
-      className: "icon-clock text-base text-[var(--primary-color)]",
-      "data-name": "meta-1-i",
+      className: "p-4 border-r border-[var(--border)]",
+      "data-name": "stat-businesses",
       "data-file": "pages/home/HomeHero.js"
-    }), "Respuesta r\xE1pida por WhatsApp"), React.createElement("span", {
-      className: "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(11,18,32,0.03)] border border-[var(--border)]",
-      "data-name": "meta-2",
+    }, React.createElement("p", {
+      className: "text-xl md:text-2xl font-semibold",
+      "data-name": "stat-businesses-value",
       "data-file": "pages/home/HomeHero.js"
-    }, React.createElement("div", {
-      className: "icon-sparkles text-base text-[var(--primary-color)]",
-      "data-name": "meta-2-i",
+    }, totalBusinesses), React.createElement("p", {
+      className: "text-[11px] text-[var(--text-muted)] mt-1",
+      "data-name": "stat-businesses-label",
       "data-file": "pages/home/HomeHero.js"
-    }), "VIP: experiencia boutique"), React.createElement("span", {
-      className: "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(11,18,32,0.03)] border border-[var(--border)]",
-      "data-name": "meta-3",
+    }, "negocios")), React.createElement("div", {
+      className: "p-4 border-r border-[var(--border)]",
+      "data-name": "stat-services",
       "data-file": "pages/home/HomeHero.js"
-    }, React.createElement("div", {
-      className: "icon-circle-check text-base text-[var(--primary-color)]",
-      "data-name": "meta-3-i",
+    }, React.createElement("p", {
+      className: "text-xl md:text-2xl font-semibold",
+      "data-name": "stat-services-value",
       "data-file": "pages/home/HomeHero.js"
-    }), "\u201CRese\xF1a verificada\u201D de clientes reales")))));
+    }, totalServices), React.createElement("p", {
+      className: "text-[11px] text-[var(--text-muted)] mt-1",
+      "data-name": "stat-services-label",
+      "data-file": "pages/home/HomeHero.js"
+    }, "servicios")), React.createElement("div", {
+      className: "p-4",
+      "data-name": "stat-booking",
+      "data-file": "pages/home/HomeHero.js"
+    }, React.createElement("p", {
+      className: "text-xl md:text-2xl font-semibold",
+      "data-name": "stat-booking-value",
+      "data-file": "pages/home/HomeHero.js"
+    }, "WA"), React.createElement("p", {
+      className: "text-[11px] text-[var(--text-muted)] mt-1",
+      "data-name": "stat-booking-label",
+      "data-file": "pages/home/HomeHero.js"
+    }, "reserva directa"))), React.createElement("div", {
+      className: "mt-6 flex flex-wrap items-center justify-center gap-2",
+      "data-name": "hero-categories",
+      "data-file": "pages/home/HomeHero.js"
+    }, categories.map(category => React.createElement("button", {
+      key: category,
+      className: "px-4 py-2 rounded-full border border-[var(--border)] bg-white text-sm hover:border-[rgba(216,27,96,0.35)] hover:text-[var(--primary-color)] transition-colors",
+      onClick: () => Navigation.goToSearch(category, ''),
+      "data-name": "hero-category",
+      "data-file": "pages/home/HomeHero.js"
+    }, category))))));
   } catch (error) {
     console.error('HomeHero component error:', error);
     return null;
