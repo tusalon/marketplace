@@ -670,7 +670,12 @@ const MockData = (() => {
     return businesses.slice().filter(b => b.totalReseñas > 0).sort((a, b) => b.estrellas - a.estrellas || b.totalReseñas - a.totalReseñas).slice(0, 8);
   }
   function listWeeklyFeatured() {
-    return businesses.slice().sort((a, b) => (b.reservasSemana || 0) - (a.reservasSemana || 0) || a.nombre.localeCompare(b.nombre)).slice(0, 10);
+    const gordis = business => normalizeText(business.nombre).includes('gordis');
+    return businesses.slice().sort((a, b) => {
+      if (gordis(a) && !gordis(b)) return -1;
+      if (!gordis(a) && gordis(b)) return 1;
+      return (b.reservasSemana || 0) - (a.reservasSemana || 0) || a.nombre.localeCompare(b.nombre);
+    }).slice(0, 10);
   }
   function listRomaReviews() {
     return businesses.flatMap(business => (business.reseñas || []).map(review => ({
@@ -687,7 +692,12 @@ const MockData = (() => {
       fecha: new Date().toISOString(),
       verificada: false
     };
-    const inserted = await supabaseInsert('resenas', payload);
+    let inserted;
+    try {
+      inserted = await supabaseInsert('resenas', payload);
+    } catch (error) {
+      throw new Error('No se pudo guardar la reseña porque Supabase no tiene disponible la tabla publica resenas para insertar.');
+    }
     const created = inserted?.[0] || payload;
     const business = businesses.find(b => b.id === negocioId);
     if (business) {
@@ -1674,7 +1684,7 @@ function BusinessReviews({
         setMessage('Gracias. Tu reseña ya fue enviada.');
       } catch (error) {
         console.error('BusinessReviews.submitReview error:', error);
-        setMessage('No se pudo guardar la reseña. Revisa que exista la tabla resenas y sus policies.');
+        setMessage(error.message || 'No se pudo guardar la reseña.');
       } finally {
         setSaving(false);
       }

@@ -482,9 +482,14 @@ const MockData = (() => {
   }
 
   function listWeeklyFeatured() {
+    const gordis = (business) => normalizeText(business.nombre).includes('gordis');
     return businesses
       .slice()
-      .sort((a, b) => (b.reservasSemana || 0) - (a.reservasSemana || 0) || a.nombre.localeCompare(b.nombre))
+      .sort((a, b) => {
+        if (gordis(a) && !gordis(b)) return -1;
+        if (!gordis(a) && gordis(b)) return 1;
+        return (b.reservasSemana || 0) - (a.reservasSemana || 0) || a.nombre.localeCompare(b.nombre);
+      })
       .slice(0, 10);
   }
 
@@ -504,7 +509,12 @@ const MockData = (() => {
       fecha: new Date().toISOString(),
       verificada: false
     };
-    const inserted = await supabaseInsert('resenas', payload);
+    let inserted;
+    try {
+      inserted = await supabaseInsert('resenas', payload);
+    } catch (error) {
+      throw new Error('No se pudo guardar la reseña porque Supabase no tiene disponible la tabla publica resenas para insertar.');
+    }
     const created = inserted?.[0] || payload;
     const business = businesses.find((b) => b.id === negocioId);
     if (business) {

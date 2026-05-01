@@ -132,9 +132,6 @@ function IntrigueWall() {
                       </button>
                     </div>
 
-                    <p className="mt-4 text-xs text-[var(--text-muted)]" data-name="intrigue-note" data-file="pages/home/IntrigueWall.js">
-                      Tip: toca “Esc” para cerrar. Transiciones suaves por diseño.
-                    </p>
                   </div>
                 </div>
               </div>
@@ -152,13 +149,10 @@ function IntrigueWall() {
         <div className="container-rr" data-name="intrigue-wall-inner" data-file="pages/home/IntrigueWall.js">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4" data-name="intrigue-wall-head" data-file="pages/home/IntrigueWall.js">
             <div data-name="intrigue-wall-titlewrap" data-file="pages/home/IntrigueWall.js">
-              <h2 className="text-xl md:text-2xl font-semibold tracking-tight" data-name="intrigue-wall-title" data-file="pages/home/IntrigueWall.js">El Muro de la Intriga</h2>
-              <p className="text-sm text-[var(--text-muted)] mt-1 max-w-[700px]" data-name="intrigue-wall-sub" data-file="pages/home/IntrigueWall.js">
-                Un grid de logos con pistas sutiles. Pasa el cursor, mira lo justo, y abre cuando sientas curiosidad.
-              </p>
+              <h2 className="text-xl md:text-2xl font-semibold tracking-tight" data-name="intrigue-wall-title" data-file="pages/home/IntrigueWall.js">Todos los negocios</h2>
             </div>
             <a className="btn-rr btn-ghost-rr inline-flex items-center justify-center gap-2 w-full md:w-auto" href="search.html" data-name="intrigue-wall-cta" data-file="pages/home/IntrigueWall.js">
-              <span data-name="intrigue-wall-cta-t" data-file="pages/home/IntrigueWall.js">Ver resultados</span>
+              <span data-name="intrigue-wall-cta-t" data-file="pages/home/IntrigueWall.js">Ver todos</span>
               <div className="icon-arrow-right text-xl text-[var(--primary-color)]" data-name="intrigue-wall-cta-i" data-file="pages/home/IntrigueWall.js"></div>
             </a>
           </div>

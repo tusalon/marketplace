@@ -9,7 +9,7 @@ function HomePage({ initialParams }) {
         <HomeHero initialParams={initialParams} data-name="home-hero" data-file="pages/home/HomePage.js" />
         <BusinessRail
           title="Destacados"
-          subtitle="Ordenados por reservas de los ultimos 7 dias."
+          subtitle=""
           badge="Mas reservados esta semana"
           items={featured}
           data-name="weekly-featured"
@@ -18,7 +18,7 @@ function HomePage({ initialParams }) {
         <IntrigueWall data-name="intrigue-wall" data-file="pages/home/HomePage.js" />
         <BusinessRail
           title="Mejor valorados"
-          subtitle="Negocios con mejores estrellas y reseñas reales."
+          subtitle=""
           badge="Clientes felices"
           items={top}
           emptyText="Aun no hay reseñas publicas."

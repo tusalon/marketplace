@@ -38,7 +38,7 @@ function BusinessReviews({ business }) {
         setMessage('Gracias. Tu reseña ya fue enviada.');
       } catch (error) {
         console.error('BusinessReviews.submitReview error:', error);
-        setMessage('No se pudo guardar la reseña. Revisa que exista la tabla resenas y sus policies.');
+        setMessage(error.message || 'No se pudo guardar la reseña.');
       } finally {
         setSaving(false);
       }
