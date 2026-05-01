@@ -93,8 +93,8 @@ function SearchPage({ query, onQueryChange }) {
                 <div className="icon-map-pin text-xl text-[var(--primary-color)]" data-name="field-ubi-i" data-file="pages/search/SearchPage.js"></div>
               </div>
               <div className="flex-1" data-name="field-ubi-in" data-file="pages/search/SearchPage.js">
-                <label className="block text-[11px] text-[var(--text-muted)] mb-1" data-name="lbl-ubi" data-file="pages/search/SearchPage.js">Ubicación</label>
-                <input className="input-rr" value={query?.ubicacion || ''} onChange={(e) => setQueryParam('ubicacion', e.target.value)} placeholder="Ej: Vedado, La Habana" data-name="inp-ubi" data-file="pages/search/SearchPage.js" />
+                <label className="block text-[11px] text-[var(--text-muted)] mb-1" data-name="lbl-ubi" data-file="pages/search/SearchPage.js">Provincia o zona</label>
+                <input className="input-rr" value={query?.ubicacion || ''} onChange={(e) => setQueryParam('ubicacion', e.target.value)} placeholder="Ej: La Habana, Matanzas, Vedado" data-name="inp-ubi" data-file="pages/search/SearchPage.js" />
               </div>
             </div>
           </div>

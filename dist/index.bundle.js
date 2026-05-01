@@ -479,6 +479,13 @@ const MockData = (() => {
     }
     return response.json();
   }
+  async function loadOptionalBusinessProvinces() {
+    const rows = await optionalSupabaseFetch('negocios?select=id,provincia&limit=1000');
+    return (rows || []).reduce((acc, row) => {
+      if (row.id && row.provincia) acc[row.id] = row.provincia;
+      return acc;
+    }, {});
+  }
   function valueFrom(row, keys, fallback = '') {
     for (const key of keys) {
       if (row?.[key] != null && row[key] !== '') return row[key];
@@ -568,7 +575,8 @@ const MockData = (() => {
   }
   function normalizeBusiness(row, relations) {
     const id = String(row.id || row.negocio_id || row.uuid || '');
-    const ciudad = valueFrom(row, ['ciudad', 'municipio', 'provincia'], 'La Habana');
+    const provincia = valueFrom(row, ['provincia', 'province'], 'La Habana');
+    const ciudad = valueFrom(row, ['ciudad', 'municipio', 'city'], provincia);
     const zona = valueFrom(row, ['zona', 'barrio', 'municipio'], ciudad);
     const direccion = valueFrom(row, ['direccion', 'ubicacion', 'address'], zona);
     const lat = numberFrom(row, ['lat', 'latitud', 'latitude'], 23.1136);
@@ -593,6 +601,7 @@ const MockData = (() => {
       masReservado: boolFrom(row, ['mas_reservado', 'masReservado'], false),
       negocioDelMes: boolFrom(row, ['negocio_del_mes', 'negocioDelMes'], false),
       ubicacion: {
+        provincia,
         ciudad,
         zona,
         direccion
@@ -641,6 +650,7 @@ const MockData = (() => {
       try {
         const rows = await supabaseFetch('negocios?configurado=eq.true&suscripciones.estado=eq.activa&select=id,nombre,telefono,especialidad,slug,logo_url,imagen_fondo_url,mensaje_bienvenida,instagram,facebook,sitio_web,direccion,horario_atencion,configurado,plan,suscripciones!inner(estado)&order=nombre.asc');
         const serviciosRows = await supabaseFetch('servicios?activo=eq.true&select=id,negocio_id,nombre,duracion,precio,descripcion,activo,imagen,categoria');
+        const provincias = await loadOptionalBusinessProvinces();
         const resenasRows = await optionalSupabaseFetch('resenas?select=*&limit=500');
         const reservasRows = await optionalSupabaseFetch('reservas?select=*&limit=2000');
         const reservasSemana = countWeeklyReservations(reservasRows);
@@ -651,7 +661,10 @@ const MockData = (() => {
           resenas: groupByBusiness(resenasRows)
         };
         businesses = (rows || []).map(row => {
-          const business = normalizeBusiness(row, relations);
+          const business = normalizeBusiness({
+            ...row,
+            provincia: provincias[row.id] || row.provincia
+          }, relations);
           business.reservasSemana = reservasSemana[business.id] || 0;
           return business;
         }).filter(business => business.id);
@@ -739,7 +752,7 @@ const MockData = (() => {
     const ubicacion = normalizeText(q.ubicacion);
     return businesses.filter(b => {
       const hayServicio = !servicio ? true : [b.nombre, b.categoria, b.descripcion].filter(Boolean).some(t => normalizeText(t).includes(servicio));
-      const hayUbicacion = !ubicacion ? true : [b.ubicacion?.ciudad, b.ubicacion?.zona, b.ubicacion?.direccion].filter(Boolean).some(t => normalizeText(t).includes(ubicacion));
+      const hayUbicacion = !ubicacion ? true : [b.ubicacion?.provincia, b.ubicacion?.ciudad, b.ubicacion?.zona, b.ubicacion?.direccion].filter(Boolean).some(t => normalizeText(t).includes(ubicacion));
       return hayServicio && hayUbicacion;
     });
   }
@@ -1163,13 +1176,13 @@ function SearchBar({
       }
     }, [initialServicio, initialUbicacion]);
     const sugerenciasServicio = ['Unas', 'Barberia', 'Cejas y pestanas', 'Peinados', 'Maquillaje', 'Masajes'];
-    const sugerenciasUbicacion = ['La Habana', 'Vedado', 'Miramar', 'Habana Vieja', 'Centro Habana'];
+    const sugerenciasUbicacion = ['La Habana', 'Matanzas', 'Villa Clara', 'Camaguey', 'Santiago de Cuba'];
     const ejecutarBusqueda = () => {
       try {
         if (!servicio && !ubicacion) {
           toast?.push({
             title: 'Escribe algo',
-            message: 'Busca por servicio o por una zona, por ejemplo Vedado.'
+            message: 'Busca por servicio o provincia, por ejemplo La Habana.'
           });
           return;
         }
@@ -1253,11 +1266,11 @@ function SearchBar({
       className: "block text-[11px] text-[var(--text-muted)] mb-1",
       "data-name": "label-ubicacion",
       "data-file": "components/SearchBar.js"
-    }, "Ubicacion"), React.createElement("input", {
+    }, "Provincia o zona"), React.createElement("input", {
       className: "w-full text-sm bg-transparent outline-none",
       value: ubicacion,
       onChange: e => setUbicacion(e.target.value),
-      placeholder: "Vedado, La Habana",
+      placeholder: "La Habana, Matanzas, Vedado",
       onFocus: () => setFocus(true),
       onBlur: () => setFocus(false),
       onKeyDown: e => {
@@ -1344,7 +1357,7 @@ function BusinessLogoCard({
       className: "text-xs text-[var(--text-muted)] mt-1",
       "data-name": "category",
       "data-file": "components/BusinessLogoCard.js"
-    }, b.categoria, " \xB7 ", b.ubicacion?.zona), React.createElement("div", {
+    }, b.categoria, " \xB7 ", b.ubicacion?.provincia || b.ubicacion?.zona), React.createElement("div", {
       className: "mt-4 flex items-center justify-between gap-3",
       "data-name": "logo-card-bottom",
       "data-file": "components/BusinessLogoCard.js"

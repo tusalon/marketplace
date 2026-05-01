@@ -15,12 +15,12 @@ function SearchBar({ initialServicio, initialUbicacion, compact }) {
     }, [initialServicio, initialUbicacion]);
 
     const sugerenciasServicio = ['Unas', 'Barberia', 'Cejas y pestanas', 'Peinados', 'Maquillaje', 'Masajes'];
-    const sugerenciasUbicacion = ['La Habana', 'Vedado', 'Miramar', 'Habana Vieja', 'Centro Habana'];
+    const sugerenciasUbicacion = ['La Habana', 'Matanzas', 'Villa Clara', 'Camaguey', 'Santiago de Cuba'];
 
     const ejecutarBusqueda = () => {
       try {
         if (!servicio && !ubicacion) {
-          toast?.push({ title: 'Escribe algo', message: 'Busca por servicio o por una zona, por ejemplo Vedado.' });
+          toast?.push({ title: 'Escribe algo', message: 'Busca por servicio o provincia, por ejemplo La Habana.' });
           return;
         }
         Navigation.goToSearch(servicio, ubicacion);
@@ -76,12 +76,12 @@ function SearchBar({ initialServicio, initialUbicacion, compact }) {
                 <div className="icon-map-pin text-xl text-[var(--primary-color)]" data-name="field-ubicacion-icon-i" data-file="components/SearchBar.js"></div>
               </div>
               <div className="min-w-0 flex-1" data-name="field-ubicacion-input" data-file="components/SearchBar.js">
-                <label className="block text-[11px] text-[var(--text-muted)] mb-1" data-name="label-ubicacion" data-file="components/SearchBar.js">Ubicacion</label>
+                <label className="block text-[11px] text-[var(--text-muted)] mb-1" data-name="label-ubicacion" data-file="components/SearchBar.js">Provincia o zona</label>
                 <input
                   className="w-full text-sm bg-transparent outline-none"
                   value={ubicacion}
                   onChange={(e) => setUbicacion(e.target.value)}
-                  placeholder="Vedado, La Habana"
+                  placeholder="La Habana, Matanzas, Vedado"
                   onFocus={() => setFocus(true)}
                   onBlur={() => setFocus(false)}
                   onKeyDown={(e) => {

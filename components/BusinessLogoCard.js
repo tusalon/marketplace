@@ -27,7 +27,7 @@ function BusinessLogoCard({ business, onOpen }) {
 
         <div className="p-4" data-name="logo-card-body" data-file="components/BusinessLogoCard.js">
           <p className="text-sm font-semibold leading-snug" data-name="name" data-file="components/BusinessLogoCard.js">{b.nombre}</p>
-          <p className="text-xs text-[var(--text-muted)] mt-1" data-name="category" data-file="components/BusinessLogoCard.js">{b.categoria} · {b.ubicacion?.zona}</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1" data-name="category" data-file="components/BusinessLogoCard.js">{b.categoria} · {b.ubicacion?.provincia || b.ubicacion?.zona}</p>
 
           <div className="mt-4 flex items-center justify-between gap-3" data-name="logo-card-bottom" data-file="components/BusinessLogoCard.js">
             <div className="flex items-center gap-2" data-name="rating" data-file="components/BusinessLogoCard.js">

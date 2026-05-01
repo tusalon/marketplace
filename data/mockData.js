@@ -275,6 +275,14 @@ const MockData = (() => {
     return response.json();
   }
 
+  async function loadOptionalBusinessProvinces() {
+    const rows = await optionalSupabaseFetch('negocios?select=id,provincia&limit=1000');
+    return (rows || []).reduce((acc, row) => {
+      if (row.id && row.provincia) acc[row.id] = row.provincia;
+      return acc;
+    }, {});
+  }
+
   function valueFrom(row, keys, fallback = '') {
     for (const key of keys) {
       if (row?.[key] != null && row[key] !== '') return row[key];
@@ -371,7 +379,8 @@ const MockData = (() => {
 
   function normalizeBusiness(row, relations) {
     const id = String(row.id || row.negocio_id || row.uuid || '');
-    const ciudad = valueFrom(row, ['ciudad', 'municipio', 'provincia'], 'La Habana');
+    const provincia = valueFrom(row, ['provincia', 'province'], 'La Habana');
+    const ciudad = valueFrom(row, ['ciudad', 'municipio', 'city'], provincia);
     const zona = valueFrom(row, ['zona', 'barrio', 'municipio'], ciudad);
     const direccion = valueFrom(row, ['direccion', 'ubicacion', 'address'], zona);
     const lat = numberFrom(row, ['lat', 'latitud', 'latitude'], 23.1136);
@@ -400,7 +409,7 @@ const MockData = (() => {
       topRoma: boolFrom(row, ['top_roma', 'topRoma', 'destacado'], false),
       masReservado: boolFrom(row, ['mas_reservado', 'masReservado'], false),
       negocioDelMes: boolFrom(row, ['negocio_del_mes', 'negocioDelMes'], false),
-      ubicacion: { ciudad, zona, direccion },
+      ubicacion: { provincia, ciudad, zona, direccion },
       coordenadas: { lat, lng },
       rangoPrecio: {
         min: precios.length ? Math.min(...precios) : numberFrom(row, ['precio_min', 'precio_desde'], 0),
@@ -441,6 +450,7 @@ const MockData = (() => {
       try {
         const rows = await supabaseFetch('negocios?configurado=eq.true&suscripciones.estado=eq.activa&select=id,nombre,telefono,especialidad,slug,logo_url,imagen_fondo_url,mensaje_bienvenida,instagram,facebook,sitio_web,direccion,horario_atencion,configurado,plan,suscripciones!inner(estado)&order=nombre.asc');
         const serviciosRows = await supabaseFetch('servicios?activo=eq.true&select=id,negocio_id,nombre,duracion,precio,descripcion,activo,imagen,categoria');
+        const provincias = await loadOptionalBusinessProvinces();
         const resenasRows = await optionalSupabaseFetch('resenas?select=*&limit=500');
         const reservasRows = await optionalSupabaseFetch('reservas?select=*&limit=2000');
         const reservasSemana = countWeeklyReservations(reservasRows);
@@ -454,7 +464,7 @@ const MockData = (() => {
 
         businesses = (rows || [])
           .map((row) => {
-            const business = normalizeBusiness(row, relations);
+            const business = normalizeBusiness({ ...row, provincia: provincias[row.id] || row.provincia }, relations);
             business.reservasSemana = reservasSemana[business.id] || 0;
             return business;
           })
@@ -568,7 +578,7 @@ const MockData = (() => {
 
       const hayUbicacion = !ubicacion
         ? true
-        : [b.ubicacion?.ciudad, b.ubicacion?.zona, b.ubicacion?.direccion]
+        : [b.ubicacion?.provincia, b.ubicacion?.ciudad, b.ubicacion?.zona, b.ubicacion?.direccion]
           .filter(Boolean)
           .some((t) => normalizeText(t).includes(ubicacion));
 
