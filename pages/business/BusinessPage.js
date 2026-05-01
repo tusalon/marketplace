@@ -11,6 +11,7 @@ function BusinessPage({ business }) {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 items-start" data-name="business-grid" data-file="pages/business/BusinessPage.js">
             <div data-name="left" data-file="pages/business/BusinessPage.js">
               <BusinessCatalog business={b} data-name="catalog" data-file="pages/business/BusinessPage.js" />
+              <BusinessReviews business={b} data-name="reviews" data-file="pages/business/BusinessPage.js" />
             </div>
 
             <aside className="hidden lg:block sticky top-[92px]" data-name="right" data-file="pages/business/BusinessPage.js">

@@ -6,25 +6,26 @@ function BusinessLogoCard({ business, onOpen }) {
 
     return (
       <button
-        className="group surface-rr p-5 text-left transition-transform duration-300 hover:-translate-y-1 hover:bg-[#FDF2F8] hover:shadow-[0_18px_55px_rgba(216,27,96,0.12)] focus:outline-none"
+        className="group surface-rr p-0 text-left overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:rotate-[0.7deg] hover:shadow-[0_18px_50px_rgba(11,18,32,0.12)] focus:outline-none"
         onClick={() => onOpen?.(b)}
         data-name="business-logo-card"
         data-file="components/BusinessLogoCard.js"
       >
-        <div className="flex items-start justify-between gap-4" data-name="logo-card-top" data-file="components/BusinessLogoCard.js">
-          <div className="w-12 h-12 rounded-2xl border border-[var(--border)] bg-white overflow-hidden p-1.5" data-name="logo" data-file="components/BusinessLogoCard.js">
+        <div className="relative h-28 bg-[#F9FAFB] flex items-center justify-center p-6" data-name="logo-card-media" data-file="components/BusinessLogoCard.js">
+          {b.portadaUrl ? (
+            <img src={b.portadaUrl} alt={`Imagen de ${b.nombre}`} className="absolute inset-0 w-full h-full object-cover opacity-90" data-name="logo-card-cover" data-file="components/BusinessLogoCard.js" />
+          ) : null}
+          <div className="relative w-16 h-16 rounded-lg border border-[var(--border)] bg-white overflow-hidden p-2 shadow-sm transition-transform duration-300 group-hover:scale-105" data-name="logo" data-file="components/BusinessLogoCard.js">
             {b.logoUrl ? (
               <img src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="w-full h-full object-contain" data-name="logo-img" data-file="components/BusinessLogoCard.js" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--primary-color)]" data-name="logo-initials" data-file="components/BusinessLogoCard.js">{initials}</div>
             )}
           </div>
-          <div className={`chip-rr px-3 py-1.5 text-xs ${b.vip ? 'bg-black text-white border-black/30' : 'bg-white text-[var(--text-muted)]'}`} data-name="tier" data-file="components/BusinessLogoCard.js">
-            {tier}
-          </div>
+          <span className={`absolute top-3 right-3 chip-rr px-2.5 py-1 text-[11px] ${b.vip ? 'bg-black text-white border-black/30' : 'bg-white text-[var(--text-muted)]'}`} data-name="tier" data-file="components/BusinessLogoCard.js">{tier}</span>
         </div>
 
-        <div className="mt-4" data-name="logo-card-body" data-file="components/BusinessLogoCard.js">
+        <div className="p-4" data-name="logo-card-body" data-file="components/BusinessLogoCard.js">
           <p className="text-sm font-semibold leading-snug" data-name="name" data-file="components/BusinessLogoCard.js">{b.nombre}</p>
           <p className="text-xs text-[var(--text-muted)] mt-1" data-name="category" data-file="components/BusinessLogoCard.js">{b.categoria} · {b.ubicacion?.zona}</p>
 
@@ -34,8 +35,8 @@ function BusinessLogoCard({ business, onOpen }) {
               <span className="text-xs font-semibold" data-name="rating-val" data-file="components/BusinessLogoCard.js">{Number(b.estrellas).toFixed(1)}</span>
               <span className="text-xs text-[var(--text-muted)]" data-name="rating-total" data-file="components/BusinessLogoCard.js">({b.totalReseñas})</span>
             </div>
-            <div className="flex items-center gap-1 text-xs text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity" data-name="peek" data-file="components/BusinessLogoCard.js">
-              <span data-name="peek-text" data-file="components/BusinessLogoCard.js">Ver detalles</span>
+            <div className="flex items-center gap-1 text-xs text-[var(--text-muted)]" data-name="peek" data-file="components/BusinessLogoCard.js">
+              <span data-name="peek-text" data-file="components/BusinessLogoCard.js">{b.reservasSemana || 0} reservas</span>
               <div className="icon-arrow-right text-base text-[var(--primary-color)]" data-name="peek-icon" data-file="components/BusinessLogoCard.js"></div>
             </div>
           </div>

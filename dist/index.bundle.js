@@ -452,6 +452,33 @@ const MockData = (() => {
       return [];
     }
   }
+  async function optionalSupabaseFetch(path) {
+    try {
+      return await supabaseFetch(path);
+    } catch (error) {
+      console.warn('Consulta opcional no disponible:', path, error?.message || error);
+      return [];
+    }
+  }
+  async function supabaseInsert(path, payload) {
+    const config = getSupabaseConfig();
+    if (!config) throw new Error('Supabase no configurado');
+    const response = await fetch(`${config.url}/rest/v1/${path}`, {
+      method: 'POST',
+      headers: {
+        apikey: config.key,
+        Authorization: `Bearer ${config.key}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Supabase ${path}: ${response.status} ${errorText}`);
+    }
+    return response.json();
+  }
   function valueFrom(row, keys, fallback = '') {
     for (const key of keys) {
       if (row?.[key] != null && row[key] !== '') return row[key];
@@ -472,6 +499,20 @@ const MockData = (() => {
       if (!id) return acc;
       if (!acc[id]) acc[id] = [];
       acc[id].push(row);
+      return acc;
+    }, {});
+  }
+  function countWeeklyReservations(rows) {
+    const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return (rows || []).reduce((acc, row) => {
+      const id = row.negocio_id || row.negocioId || row.business_id;
+      if (!id) return acc;
+      const dateValue = row.fecha || row.created_at || row.fecha_reserva || row.inicio;
+      const time = dateValue ? new Date(dateValue).getTime() : Date.now();
+      if (!Number.isFinite(time) || time < since) return acc;
+      const estado = normalizeText(row.estado || row.status || '');
+      if (estado.includes('cancel')) return acc;
+      acc[id] = (acc[id] || 0) + 1;
       return acc;
     }, {});
   }
@@ -592,13 +633,20 @@ const MockData = (() => {
       try {
         const rows = await supabaseFetch('negocios?configurado=eq.true&suscripciones.estado=eq.activa&select=id,nombre,telefono,especialidad,slug,logo_url,imagen_fondo_url,mensaje_bienvenida,instagram,facebook,sitio_web,direccion,horario_atencion,configurado,plan,suscripciones!inner(estado)&order=nombre.asc');
         const serviciosRows = await supabaseFetch('servicios?activo=eq.true&select=id,negocio_id,nombre,duracion,precio,descripcion,activo,imagen,categoria');
+        const resenasRows = await optionalSupabaseFetch('resenas?select=*&limit=500');
+        const reservasRows = await optionalSupabaseFetch('reservas?select=*&limit=2000');
+        const reservasSemana = countWeeklyReservations(reservasRows);
         const relations = {
           servicios: groupByBusiness(serviciosRows),
           productos: {},
           cursos: {},
-          resenas: {}
+          resenas: groupByBusiness(resenasRows)
         };
-        businesses = (rows || []).map(row => normalizeBusiness(row, relations)).filter(business => business.id);
+        businesses = (rows || []).map(row => {
+          const business = normalizeBusiness(row, relations);
+          business.reservasSemana = reservasSemana[business.id] || 0;
+          return business;
+        }).filter(business => business.id);
         loadedFromSupabase = true;
         loadError = null;
         console.log(`✅ Marketplace cargó ${businesses.length} negocios desde Supabase`);
@@ -619,7 +667,43 @@ const MockData = (() => {
     return loadError;
   }
   function listTopRated() {
-    return businesses.slice().filter(b => b.totalReseñas >= 40).sort((a, b) => b.estrellas - a.estrellas).slice(0, 8);
+    return businesses.slice().filter(b => b.totalReseñas > 0).sort((a, b) => b.estrellas - a.estrellas || b.totalReseñas - a.totalReseñas).slice(0, 8);
+  }
+  function listWeeklyFeatured() {
+    return businesses.slice().sort((a, b) => (b.reservasSemana || 0) - (a.reservasSemana || 0) || a.nombre.localeCompare(b.nombre)).slice(0, 10);
+  }
+  function listRomaReviews() {
+    return businesses.flatMap(business => (business.reseñas || []).map(review => ({
+      ...review,
+      negocioNombre: business.nombre
+    }))).sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()).slice(0, 8);
+  }
+  async function addReview(negocioId, review) {
+    const payload = {
+      negocio_id: negocioId,
+      nombre: review.nombre,
+      estrellas: Number(review.estrellas),
+      texto: review.texto,
+      fecha: new Date().toISOString(),
+      verificada: false
+    };
+    const inserted = await supabaseInsert('resenas', payload);
+    const created = inserted?.[0] || payload;
+    const business = businesses.find(b => b.id === negocioId);
+    if (business) {
+      const normalized = {
+        id: String(created.id || `${negocioId}-${Date.now()}`),
+        nombre: created.nombre || payload.nombre,
+        estrellas: Number(created.estrellas || payload.estrellas),
+        verificada: created.verificada === true,
+        texto: created.texto || payload.texto,
+        fecha: created.fecha || created.created_at || payload.fecha
+      };
+      business.reseñas = [normalized, ...(business.reseñas || [])];
+      business.totalReseñas = business.reseñas.length;
+      business.estrellas = business.reseñas.reduce((sum, item) => sum + Number(item.estrellas || 0), 0) / business.reseñas.length;
+    }
+    return created;
   }
   function getBusinessById(id) {
     const found = businesses.find(b => b.id === id);
@@ -644,10 +728,13 @@ const MockData = (() => {
   return {
     listBusinesses,
     listTopRated,
+    listWeeklyFeatured,
+    listRomaReviews,
     searchBusinesses,
     getBusinessById,
     loadBusinesses,
-    getLoadError
+    getLoadError,
+    addReview
   };
 })();
 const ToastContext = React.createContext(null);
@@ -1195,16 +1282,22 @@ function BusinessLogoCard({
     const tier = b.vip ? 'VIP' : 'Free';
     const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
     return React.createElement("button", {
-      className: "group surface-rr p-5 text-left transition-transform duration-300 hover:-translate-y-1 hover:bg-[#FDF2F8] hover:shadow-[0_18px_55px_rgba(216,27,96,0.12)] focus:outline-none",
+      className: "group surface-rr p-0 text-left overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:rotate-[0.7deg] hover:shadow-[0_18px_50px_rgba(11,18,32,0.12)] focus:outline-none",
       onClick: () => onOpen?.(b),
       "data-name": "business-logo-card",
       "data-file": "components/BusinessLogoCard.js"
     }, React.createElement("div", {
-      className: "flex items-start justify-between gap-4",
-      "data-name": "logo-card-top",
+      className: "relative h-28 bg-[#F9FAFB] flex items-center justify-center p-6",
+      "data-name": "logo-card-media",
       "data-file": "components/BusinessLogoCard.js"
-    }, React.createElement("div", {
-      className: "w-12 h-12 rounded-2xl border border-[var(--border)] bg-white overflow-hidden p-1.5",
+    }, b.portadaUrl ? React.createElement("img", {
+      src: b.portadaUrl,
+      alt: `Imagen de ${b.nombre}`,
+      className: "absolute inset-0 w-full h-full object-cover opacity-90",
+      "data-name": "logo-card-cover",
+      "data-file": "components/BusinessLogoCard.js"
+    }) : null, React.createElement("div", {
+      className: "relative w-16 h-16 rounded-lg border border-[var(--border)] bg-white overflow-hidden p-2 shadow-sm transition-transform duration-300 group-hover:scale-105",
       "data-name": "logo",
       "data-file": "components/BusinessLogoCard.js"
     }, b.logoUrl ? React.createElement("img", {
@@ -1217,12 +1310,12 @@ function BusinessLogoCard({
       className: "w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--primary-color)]",
       "data-name": "logo-initials",
       "data-file": "components/BusinessLogoCard.js"
-    }, initials)), React.createElement("div", {
-      className: `chip-rr px-3 py-1.5 text-xs ${b.vip ? 'bg-black text-white border-black/30' : 'bg-white text-[var(--text-muted)]'}`,
+    }, initials)), React.createElement("span", {
+      className: `absolute top-3 right-3 chip-rr px-2.5 py-1 text-[11px] ${b.vip ? 'bg-black text-white border-black/30' : 'bg-white text-[var(--text-muted)]'}`,
       "data-name": "tier",
       "data-file": "components/BusinessLogoCard.js"
     }, tier)), React.createElement("div", {
-      className: "mt-4",
+      className: "p-4",
       "data-name": "logo-card-body",
       "data-file": "components/BusinessLogoCard.js"
     }, React.createElement("p", {
@@ -1254,19 +1347,201 @@ function BusinessLogoCard({
       "data-name": "rating-total",
       "data-file": "components/BusinessLogoCard.js"
     }, "(", b.totalReseñas, ")")), React.createElement("div", {
-      className: "flex items-center gap-1 text-xs text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity",
+      className: "flex items-center gap-1 text-xs text-[var(--text-muted)]",
       "data-name": "peek",
       "data-file": "components/BusinessLogoCard.js"
     }, React.createElement("span", {
       "data-name": "peek-text",
       "data-file": "components/BusinessLogoCard.js"
-    }, "Ver detalles"), React.createElement("div", {
+    }, b.reservasSemana || 0, " reservas"), React.createElement("div", {
       className: "icon-arrow-right text-base text-[var(--primary-color)]",
       "data-name": "peek-icon",
       "data-file": "components/BusinessLogoCard.js"
     })))));
   } catch (error) {
     console.error('BusinessLogoCard component error:', error);
+    return null;
+  }
+}
+function BusinessRail({
+  title,
+  subtitle,
+  items,
+  badge,
+  emptyText
+}) {
+  try {
+    const list = items || [];
+    const ref = React.useRef(null);
+    const scrollBy = dir => {
+      try {
+        const el = ref.current;
+        if (!el) return;
+        el.scrollBy({
+          left: Math.round(el.clientWidth * 0.82) * dir,
+          behavior: 'smooth'
+        });
+      } catch (error) {
+        console.error('BusinessRail.scrollBy error:', error);
+      }
+    };
+    return React.createElement("section", {
+      className: "mt-10",
+      "data-name": "business-rail",
+      "data-file": "components/BusinessRail.js"
+    }, React.createElement("div", {
+      className: "container-rr",
+      "data-name": "business-rail-inner",
+      "data-file": "components/BusinessRail.js"
+    }, React.createElement("div", {
+      className: "flex items-end justify-between gap-4 mb-4",
+      "data-name": "business-rail-head",
+      "data-file": "components/BusinessRail.js"
+    }, React.createElement("div", {
+      "data-name": "business-rail-copy",
+      "data-file": "components/BusinessRail.js"
+    }, badge ? React.createElement("span", {
+      className: "chip-rr px-3 py-1.5 text-xs text-[var(--text-muted)] mb-2 inline-flex",
+      "data-name": "business-rail-badge",
+      "data-file": "components/BusinessRail.js"
+    }, badge) : null, React.createElement("h2", {
+      className: "text-xl md:text-2xl font-semibold tracking-tight",
+      "data-name": "business-rail-title",
+      "data-file": "components/BusinessRail.js"
+    }, title), subtitle ? React.createElement("p", {
+      className: "text-sm text-[var(--text-muted)] mt-1",
+      "data-name": "business-rail-subtitle",
+      "data-file": "components/BusinessRail.js"
+    }, subtitle) : null), React.createElement("div", {
+      className: "hidden md:flex items-center gap-2",
+      "data-name": "business-rail-controls",
+      "data-file": "components/BusinessRail.js"
+    }, React.createElement("button", {
+      className: "w-10 h-10 rounded-lg border border-[var(--border)] bg-white flex items-center justify-center hover:bg-[#F9FAFB]",
+      onClick: () => scrollBy(-1),
+      "aria-label": "Anterior",
+      "data-name": "business-rail-prev",
+      "data-file": "components/BusinessRail.js"
+    }, React.createElement("div", {
+      className: "icon-chevron-left text-xl text-[var(--primary-color)]",
+      "data-name": "business-rail-prev-i",
+      "data-file": "components/BusinessRail.js"
+    })), React.createElement("button", {
+      className: "w-10 h-10 rounded-lg border border-[var(--border)] bg-white flex items-center justify-center hover:bg-[#F9FAFB]",
+      onClick: () => scrollBy(1),
+      "aria-label": "Siguiente",
+      "data-name": "business-rail-next",
+      "data-file": "components/BusinessRail.js"
+    }, React.createElement("div", {
+      className: "icon-chevron-right text-xl text-[var(--primary-color)]",
+      "data-name": "business-rail-next-i",
+      "data-file": "components/BusinessRail.js"
+    })))), React.createElement("div", {
+      ref: ref,
+      className: "flex gap-4 overflow-x-auto no-scrollbar pb-3 snap-x snap-mandatory",
+      "data-name": "business-rail-track",
+      "data-file": "components/BusinessRail.js"
+    }, list.length ? list.map((business, index) => React.createElement("div", {
+      key: business.id,
+      className: "min-w-[250px] md:min-w-[290px] max-w-[290px] snap-start",
+      "data-name": "business-rail-item",
+      "data-file": "components/BusinessRail.js"
+    }, React.createElement("div", {
+      className: "relative",
+      "data-name": "business-rail-card-wrap",
+      "data-file": "components/BusinessRail.js"
+    }, index < 3 ? React.createElement("span", {
+      className: "absolute z-10 left-3 top-3 inline-flex w-8 h-8 items-center justify-center rounded-lg bg-black text-white text-xs font-semibold shadow-sm",
+      "data-name": "business-rail-rank",
+      "data-file": "components/BusinessRail.js"
+    }, index + 1) : null, React.createElement(BusinessLogoCard, {
+      business: business,
+      onOpen: b => Navigation.goToBusiness(b.id),
+      "data-name": "business-rail-card",
+      "data-file": "components/BusinessRail.js"
+    })))) : React.createElement("div", {
+      className: "surface-rr p-5 text-sm text-[var(--text-muted)]",
+      "data-name": "business-rail-empty",
+      "data-file": "components/BusinessRail.js"
+    }, emptyText || 'No hay negocios para mostrar.'))));
+  } catch (error) {
+    console.error('BusinessRail component error:', error);
+    return null;
+  }
+}
+function RomaReviewsRail({
+  reviews
+}) {
+  try {
+    const list = reviews || [];
+    if (!list.length) return null;
+    return React.createElement("section", {
+      className: "mt-12",
+      "data-name": "roma-reviews",
+      "data-file": "components/RomaReviewsRail.js"
+    }, React.createElement("div", {
+      className: "container-rr",
+      "data-name": "roma-reviews-inner",
+      "data-file": "components/RomaReviewsRail.js"
+    }, React.createElement("div", {
+      className: "mb-4",
+      "data-name": "roma-reviews-head",
+      "data-file": "components/RomaReviewsRail.js"
+    }, React.createElement("span", {
+      className: "chip-rr px-3 py-1.5 text-xs text-[var(--text-muted)] mb-2 inline-flex",
+      "data-name": "roma-reviews-badge",
+      "data-file": "components/RomaReviewsRail.js"
+    }, "RservasRoma"), React.createElement("h2", {
+      className: "text-xl md:text-2xl font-semibold tracking-tight",
+      "data-name": "roma-reviews-title",
+      "data-file": "components/RomaReviewsRail.js"
+    }, "Rese\xF1as recientes")), React.createElement("div", {
+      className: "flex gap-4 overflow-x-auto no-scrollbar pb-3 snap-x snap-mandatory",
+      "data-name": "roma-reviews-track",
+      "data-file": "components/RomaReviewsRail.js"
+    }, list.map(review => React.createElement("div", {
+      key: review.id,
+      className: "min-w-[280px] md:min-w-[360px] snap-start",
+      "data-name": "roma-review-item",
+      "data-file": "components/RomaReviewsRail.js"
+    }, React.createElement("div", {
+      className: "surface-rr p-5 h-full",
+      "data-name": "roma-review-card",
+      "data-file": "components/RomaReviewsRail.js"
+    }, React.createElement("div", {
+      className: "flex items-center justify-between gap-3",
+      "data-name": "roma-review-top",
+      "data-file": "components/RomaReviewsRail.js"
+    }, React.createElement("div", {
+      "data-name": "roma-review-person",
+      "data-file": "components/RomaReviewsRail.js"
+    }, React.createElement("p", {
+      className: "text-sm font-semibold",
+      "data-name": "roma-review-name",
+      "data-file": "components/RomaReviewsRail.js"
+    }, review.nombre), React.createElement("p", {
+      className: "text-xs text-[var(--text-muted)] mt-1",
+      "data-name": "roma-review-business",
+      "data-file": "components/RomaReviewsRail.js"
+    }, review.negocioNombre)), React.createElement("div", {
+      className: "flex items-center gap-1",
+      "data-name": "roma-review-stars",
+      "data-file": "components/RomaReviewsRail.js"
+    }, React.createElement("div", {
+      className: "icon-star text-base text-[#F59E0B]",
+      "data-name": "roma-review-star",
+      "data-file": "components/RomaReviewsRail.js"
+    }), React.createElement("span", {
+      className: "text-sm font-semibold",
+      "data-name": "roma-review-score",
+      "data-file": "components/RomaReviewsRail.js"
+    }, Number(review.estrellas).toFixed(1)))), React.createElement("p", {
+      className: "mt-4 text-sm text-[var(--text-muted)] leading-relaxed line-clamp-4",
+      "data-name": "roma-review-text",
+      "data-file": "components/RomaReviewsRail.js"
+    }, review.texto)))))));
+  } catch (error) {
+    console.error('RomaReviewsRail component error:', error);
     return null;
   }
 }
@@ -1844,16 +2119,20 @@ function IntrigueWall() {
       "data-name": "intrigue-wall-cta-i",
       "data-file": "pages/home/IntrigueWall.js"
     }))), React.createElement("div", {
-      className: "mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4",
+      className: "mt-6 flex gap-4 overflow-x-auto no-scrollbar pb-3 snap-x snap-mandatory",
       "data-name": "intrigue-grid",
       "data-file": "pages/home/IntrigueWall.js"
-    }, all.map(b => React.createElement(BusinessLogoCard, {
+    }, all.map(b => React.createElement("div", {
       key: b.id,
+      className: "min-w-[250px] md:min-w-[290px] max-w-[290px] snap-start",
+      "data-name": "intrigue-item-wrap",
+      "data-file": "pages/home/IntrigueWall.js"
+    }, React.createElement(BusinessLogoCard, {
       business: b,
       onOpen: openCard,
       "data-name": "intrigue-item",
       "data-file": "pages/home/IntrigueWall.js"
-    })))), React.createElement(DetailPanel, {
+    }))))), React.createElement(DetailPanel, {
       business: active,
       "data-name": "intrigue-panel",
       "data-file": "pages/home/IntrigueWall.js"
@@ -1868,6 +2147,8 @@ function HomePage({
 }) {
   try {
     const top = MockData.listTopRated();
+    const featured = MockData.listWeeklyFeatured();
+    const reviews = MockData.listRomaReviews();
     return React.createElement("div", {
       "data-name": "home-page",
       "data-file": "pages/home/HomePage.js"
@@ -1875,12 +2156,27 @@ function HomePage({
       initialParams: initialParams,
       "data-name": "home-hero",
       "data-file": "pages/home/HomePage.js"
+    }), React.createElement(BusinessRail, {
+      title: "Destacados",
+      subtitle: "Ordenados por reservas de los ultimos 7 dias.",
+      badge: "Mas reservados esta semana",
+      items: featured,
+      "data-name": "weekly-featured",
+      "data-file": "pages/home/HomePage.js"
     }), React.createElement(IntrigueWall, {
       "data-name": "intrigue-wall",
       "data-file": "pages/home/HomePage.js"
-    }), React.createElement(TopRatedCarousel, {
+    }), React.createElement(BusinessRail, {
+      title: "Mejor valorados",
+      subtitle: "Negocios con mejores estrellas y rese\xF1as reales.",
+      badge: "Clientes felices",
       items: top,
+      emptyText: "Aun no hay rese\xF1as publicas.",
       "data-name": "top-rated",
+      "data-file": "pages/home/HomePage.js"
+    }), React.createElement(RomaReviewsRail, {
+      reviews: reviews,
+      "data-name": "roma-reviews",
       "data-file": "pages/home/HomePage.js"
     }), React.createElement("section", {
       className: "mt-12",

@@ -18,6 +18,8 @@ const bundles = {
     'components/StarRating.js',
     'components/SearchBar.js',
     'components/BusinessLogoCard.js',
+    'components/BusinessRail.js',
+    'components/RomaReviewsRail.js',
     'components/TopRatedCarousel.js',
     'pages/home/HomeHero.js',
     'pages/home/IntrigueWall.js',

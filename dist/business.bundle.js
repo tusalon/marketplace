@@ -452,6 +452,33 @@ const MockData = (() => {
       return [];
     }
   }
+  async function optionalSupabaseFetch(path) {
+    try {
+      return await supabaseFetch(path);
+    } catch (error) {
+      console.warn('Consulta opcional no disponible:', path, error?.message || error);
+      return [];
+    }
+  }
+  async function supabaseInsert(path, payload) {
+    const config = getSupabaseConfig();
+    if (!config) throw new Error('Supabase no configurado');
+    const response = await fetch(`${config.url}/rest/v1/${path}`, {
+      method: 'POST',
+      headers: {
+        apikey: config.key,
+        Authorization: `Bearer ${config.key}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Supabase ${path}: ${response.status} ${errorText}`);
+    }
+    return response.json();
+  }
   function valueFrom(row, keys, fallback = '') {
     for (const key of keys) {
       if (row?.[key] != null && row[key] !== '') return row[key];
@@ -472,6 +499,20 @@ const MockData = (() => {
       if (!id) return acc;
       if (!acc[id]) acc[id] = [];
       acc[id].push(row);
+      return acc;
+    }, {});
+  }
+  function countWeeklyReservations(rows) {
+    const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return (rows || []).reduce((acc, row) => {
+      const id = row.negocio_id || row.negocioId || row.business_id;
+      if (!id) return acc;
+      const dateValue = row.fecha || row.created_at || row.fecha_reserva || row.inicio;
+      const time = dateValue ? new Date(dateValue).getTime() : Date.now();
+      if (!Number.isFinite(time) || time < since) return acc;
+      const estado = normalizeText(row.estado || row.status || '');
+      if (estado.includes('cancel')) return acc;
+      acc[id] = (acc[id] || 0) + 1;
       return acc;
     }, {});
   }
@@ -592,13 +633,20 @@ const MockData = (() => {
       try {
         const rows = await supabaseFetch('negocios?configurado=eq.true&suscripciones.estado=eq.activa&select=id,nombre,telefono,especialidad,slug,logo_url,imagen_fondo_url,mensaje_bienvenida,instagram,facebook,sitio_web,direccion,horario_atencion,configurado,plan,suscripciones!inner(estado)&order=nombre.asc');
         const serviciosRows = await supabaseFetch('servicios?activo=eq.true&select=id,negocio_id,nombre,duracion,precio,descripcion,activo,imagen,categoria');
+        const resenasRows = await optionalSupabaseFetch('resenas?select=*&limit=500');
+        const reservasRows = await optionalSupabaseFetch('reservas?select=*&limit=2000');
+        const reservasSemana = countWeeklyReservations(reservasRows);
         const relations = {
           servicios: groupByBusiness(serviciosRows),
           productos: {},
           cursos: {},
-          resenas: {}
+          resenas: groupByBusiness(resenasRows)
         };
-        businesses = (rows || []).map(row => normalizeBusiness(row, relations)).filter(business => business.id);
+        businesses = (rows || []).map(row => {
+          const business = normalizeBusiness(row, relations);
+          business.reservasSemana = reservasSemana[business.id] || 0;
+          return business;
+        }).filter(business => business.id);
         loadedFromSupabase = true;
         loadError = null;
         console.log(`✅ Marketplace cargó ${businesses.length} negocios desde Supabase`);
@@ -619,7 +667,43 @@ const MockData = (() => {
     return loadError;
   }
   function listTopRated() {
-    return businesses.slice().filter(b => b.totalReseñas >= 40).sort((a, b) => b.estrellas - a.estrellas).slice(0, 8);
+    return businesses.slice().filter(b => b.totalReseñas > 0).sort((a, b) => b.estrellas - a.estrellas || b.totalReseñas - a.totalReseñas).slice(0, 8);
+  }
+  function listWeeklyFeatured() {
+    return businesses.slice().sort((a, b) => (b.reservasSemana || 0) - (a.reservasSemana || 0) || a.nombre.localeCompare(b.nombre)).slice(0, 10);
+  }
+  function listRomaReviews() {
+    return businesses.flatMap(business => (business.reseñas || []).map(review => ({
+      ...review,
+      negocioNombre: business.nombre
+    }))).sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()).slice(0, 8);
+  }
+  async function addReview(negocioId, review) {
+    const payload = {
+      negocio_id: negocioId,
+      nombre: review.nombre,
+      estrellas: Number(review.estrellas),
+      texto: review.texto,
+      fecha: new Date().toISOString(),
+      verificada: false
+    };
+    const inserted = await supabaseInsert('resenas', payload);
+    const created = inserted?.[0] || payload;
+    const business = businesses.find(b => b.id === negocioId);
+    if (business) {
+      const normalized = {
+        id: String(created.id || `${negocioId}-${Date.now()}`),
+        nombre: created.nombre || payload.nombre,
+        estrellas: Number(created.estrellas || payload.estrellas),
+        verificada: created.verificada === true,
+        texto: created.texto || payload.texto,
+        fecha: created.fecha || created.created_at || payload.fecha
+      };
+      business.reseñas = [normalized, ...(business.reseñas || [])];
+      business.totalReseñas = business.reseñas.length;
+      business.estrellas = business.reseñas.reduce((sum, item) => sum + Number(item.estrellas || 0), 0) / business.reseñas.length;
+    }
+    return created;
   }
   function getBusinessById(id) {
     const found = businesses.find(b => b.id === id);
@@ -644,10 +728,13 @@ const MockData = (() => {
   return {
     listBusinesses,
     listTopRated,
+    listWeeklyFeatured,
+    listRomaReviews,
     searchBusinesses,
     getBusinessById,
     loadBusinesses,
-    getLoadError
+    getLoadError,
+    addReview
   };
 })();
 const ToastContext = React.createContext(null);
@@ -1552,63 +1639,135 @@ function BusinessReviews({
 }) {
   try {
     const b = business;
-    const reviews = b.reseñas || [];
-    const verifiedCount = reviews.filter(r => r.verificada).length;
-    return React.createElement("div", {
+    const [reviews, setReviews] = React.useState(b.reseñas || []);
+    const [rating, setRating] = React.useState(5);
+    const [name, setName] = React.useState('');
+    const [text, setText] = React.useState('');
+    const [saving, setSaving] = React.useState(false);
+    const [message, setMessage] = React.useState('');
+    const submitReview = async event => {
+      try {
+        event.preventDefault();
+        setMessage('');
+        if (!name.trim() || !text.trim()) {
+          setMessage('Escribe tu nombre y tu reseña.');
+          return;
+        }
+        setSaving(true);
+        const created = await MockData.addReview(b.id, {
+          nombre: name.trim(),
+          estrellas: rating,
+          texto: text.trim()
+        });
+        const review = {
+          id: String(created.id || `${b.id}-${Date.now()}`),
+          nombre: created.nombre || name.trim(),
+          estrellas: Number(created.estrellas || rating),
+          texto: created.texto || text.trim(),
+          fecha: created.fecha || created.created_at || new Date().toISOString(),
+          verificada: created.verificada === true
+        };
+        setReviews(current => [review, ...current]);
+        setName('');
+        setText('');
+        setRating(5);
+        setMessage('Gracias. Tu reseña ya fue enviada.');
+      } catch (error) {
+        console.error('BusinessReviews.submitReview error:', error);
+        setMessage('No se pudo guardar la reseña. Revisa que exista la tabla resenas y sus policies.');
+      } finally {
+        setSaving(false);
+      }
+    };
+    const average = reviews.length ? reviews.reduce((sum, review) => sum + Number(review.estrellas || 0), 0) / reviews.length : Number(b.estrellas || 0);
+    return React.createElement("section", {
+      className: "mt-4",
       "data-name": "business-reviews",
       "data-file": "pages/business/BusinessReviews.js"
     }, React.createElement("div", {
-      className: "surface-rr p-5",
-      "data-name": "reviews-summary",
+      className: "surface-rr p-4 md:p-5",
+      "data-name": "review-form-card",
       "data-file": "pages/business/BusinessReviews.js"
     }, React.createElement("div", {
-      className: "flex flex-col md:flex-row md:items-center gap-4 justify-between",
-      "data-name": "sum-row",
+      className: "flex flex-col md:flex-row md:items-center md:justify-between gap-4",
+      "data-name": "reviews-head",
       "data-file": "pages/business/BusinessReviews.js"
     }, React.createElement("div", {
-      "data-name": "sum-left",
+      "data-name": "reviews-copy",
       "data-file": "pages/business/BusinessReviews.js"
-    }, React.createElement("p", {
-      className: "text-sm font-semibold",
-      "data-name": "sum-title",
-      "data-file": "pages/business/BusinessReviews.js"
-    }, "Rese\xF1as"), React.createElement("p", {
-      className: "text-sm text-[var(--text-muted)] mt-1",
-      "data-name": "sum-sub",
-      "data-file": "pages/business/BusinessReviews.js"
-    }, verifiedCount, " de ", reviews.length, " son \u201CRese\xF1a Verificada\u201D.")), React.createElement("div", {
-      className: "flex items-center gap-2",
-      "data-name": "sum-right",
-      "data-file": "pages/business/BusinessReviews.js"
-    }, React.createElement("div", {
-      className: "w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
-      "data-name": "sum-iw",
-      "data-file": "pages/business/BusinessReviews.js"
-    }, React.createElement("div", {
-      className: "icon-star text-xl text-[var(--primary-color)]",
-      "data-name": "sum-i",
-      "data-file": "pages/business/BusinessReviews.js"
-    })), React.createElement("div", {
-      "data-name": "sum-score",
-      "data-file": "pages/business/BusinessReviews.js"
-    }, React.createElement("p", {
+    }, React.createElement("h2", {
       className: "text-lg font-semibold",
-      "data-name": "sum-score-v",
+      "data-name": "reviews-title",
       "data-file": "pages/business/BusinessReviews.js"
-    }, Number(b.estrellas).toFixed(1)), React.createElement("p", {
-      className: "text-xs text-[var(--text-muted)]",
-      "data-name": "sum-score-t",
+    }, "Valorar este negocio"), React.createElement("p", {
+      className: "text-sm text-[var(--text-muted)] mt-1",
+      "data-name": "reviews-sub",
       "data-file": "pages/business/BusinessReviews.js"
-    }, b.totalReseñas, " rese\xF1as"))))), React.createElement("div", {
+    }, reviews.length, " rese\xF1as \xB7 ", average.toFixed(1), " estrellas")), React.createElement(StarRating, {
+      value: average,
+      total: reviews.length,
+      verified: false,
+      "data-name": "reviews-stars",
+      "data-file": "pages/business/BusinessReviews.js"
+    })), React.createElement("form", {
+      className: "mt-5 grid gap-3",
+      onSubmit: submitReview,
+      "data-name": "review-form",
+      "data-file": "pages/business/BusinessReviews.js"
+    }, React.createElement("div", {
+      className: "flex gap-2",
+      "data-name": "rating-buttons",
+      "data-file": "pages/business/BusinessReviews.js"
+    }, [1, 2, 3, 4, 5].map(value => React.createElement("button", {
+      key: value,
+      type: "button",
+      className: `w-10 h-10 rounded-lg border flex items-center justify-center ${value <= rating ? 'bg-[#F59E0B] border-[#F59E0B] text-white' : 'bg-white border-[var(--border)] text-[var(--text-muted)]'}`,
+      onClick: () => setRating(value),
+      "aria-label": `${value} estrellas`,
+      "data-name": "rating-button",
+      "data-file": "pages/business/BusinessReviews.js"
+    }, React.createElement("div", {
+      className: "icon-star text-lg",
+      "data-name": "rating-button-icon",
+      "data-file": "pages/business/BusinessReviews.js"
+    })))), React.createElement("input", {
+      className: "input-rr",
+      value: name,
+      onChange: e => setName(e.target.value),
+      placeholder: "Tu nombre",
+      "data-name": "review-name-input",
+      "data-file": "pages/business/BusinessReviews.js"
+    }), React.createElement("textarea", {
+      className: "input-rr min-h-[104px] resize-y",
+      value: text,
+      onChange: e => setText(e.target.value),
+      placeholder: "Cuenta como fue tu experiencia",
+      "data-name": "review-text-input",
+      "data-file": "pages/business/BusinessReviews.js"
+    }), React.createElement("div", {
+      className: "flex flex-col sm:flex-row sm:items-center gap-3",
+      "data-name": "review-submit-row",
+      "data-file": "pages/business/BusinessReviews.js"
+    }, React.createElement("button", {
+      className: "btn-rr btn-primary-rr w-full sm:w-auto",
+      type: "submit",
+      disabled: saving,
+      "data-name": "review-submit",
+      "data-file": "pages/business/BusinessReviews.js"
+    }, saving ? 'Enviando...' : 'Enviar reseña'), message ? React.createElement("p", {
+      className: "text-sm text-[var(--text-muted)]",
+      "data-name": "review-message",
+      "data-file": "pages/business/BusinessReviews.js"
+    }, message) : null))), reviews.length ? React.createElement("div", {
       className: "mt-4 grid grid-cols-1 md:grid-cols-2 gap-4",
       "data-name": "reviews-grid",
       "data-file": "pages/business/BusinessReviews.js"
-    }, reviews.map(r => React.createElement(ReviewCard, {
-      key: r.id,
-      review: r,
+    }, reviews.slice(0, 6).map(review => React.createElement(ReviewCard, {
+      key: review.id,
+      review: review,
       "data-name": "review",
       "data-file": "pages/business/BusinessReviews.js"
-    }))));
+    }))) : null);
   } catch (error) {
     console.error('BusinessReviews component error:', error);
     return null;
@@ -1641,6 +1800,10 @@ function BusinessPage({
     }, React.createElement(BusinessCatalog, {
       business: b,
       "data-name": "catalog",
+      "data-file": "pages/business/BusinessPage.js"
+    }), React.createElement(BusinessReviews, {
+      business: b,
+      "data-name": "reviews",
       "data-file": "pages/business/BusinessPage.js"
     })), React.createElement("aside", {
       className: "hidden lg:block sticky top-[92px]",

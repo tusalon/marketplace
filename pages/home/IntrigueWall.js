@@ -163,9 +163,11 @@ function IntrigueWall() {
             </a>
           </div>
 
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-name="intrigue-grid" data-file="pages/home/IntrigueWall.js">
+          <div className="mt-6 flex gap-4 overflow-x-auto no-scrollbar pb-3 snap-x snap-mandatory" data-name="intrigue-grid" data-file="pages/home/IntrigueWall.js">
             {all.map((b) => (
-              <BusinessLogoCard key={b.id} business={b} onOpen={openCard} data-name="intrigue-item" data-file="pages/home/IntrigueWall.js" />
+              <div key={b.id} className="min-w-[250px] md:min-w-[290px] max-w-[290px] snap-start" data-name="intrigue-item-wrap" data-file="pages/home/IntrigueWall.js">
+                <BusinessLogoCard business={b} onOpen={openCard} data-name="intrigue-item" data-file="pages/home/IntrigueWall.js" />
+              </div>
             ))}
           </div>
         </div>

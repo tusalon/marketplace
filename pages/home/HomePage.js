@@ -1,12 +1,31 @@
 function HomePage({ initialParams }) {
   try {
     const top = MockData.listTopRated();
+    const featured = MockData.listWeeklyFeatured();
+    const reviews = MockData.listRomaReviews();
 
     return (
       <div data-name="home-page" data-file="pages/home/HomePage.js">
         <HomeHero initialParams={initialParams} data-name="home-hero" data-file="pages/home/HomePage.js" />
+        <BusinessRail
+          title="Destacados"
+          subtitle="Ordenados por reservas de los ultimos 7 dias."
+          badge="Mas reservados esta semana"
+          items={featured}
+          data-name="weekly-featured"
+          data-file="pages/home/HomePage.js"
+        />
         <IntrigueWall data-name="intrigue-wall" data-file="pages/home/HomePage.js" />
-        <TopRatedCarousel items={top} data-name="top-rated" data-file="pages/home/HomePage.js" />
+        <BusinessRail
+          title="Mejor valorados"
+          subtitle="Negocios con mejores estrellas y reseñas reales."
+          badge="Clientes felices"
+          items={top}
+          emptyText="Aun no hay reseñas publicas."
+          data-name="top-rated"
+          data-file="pages/home/HomePage.js"
+        />
+        <RomaReviewsRail reviews={reviews} data-name="roma-reviews" data-file="pages/home/HomePage.js" />
 
         <section className="mt-12" data-name="home-trust" data-file="pages/home/HomePage.js">
           <div className="container-rr" data-name="home-trust-inner" data-file="pages/home/HomePage.js">

@@ -243,6 +243,38 @@ const MockData = (() => {
     }
   }
 
+  async function optionalSupabaseFetch(path) {
+    try {
+      return await supabaseFetch(path);
+    } catch (error) {
+      console.warn('Consulta opcional no disponible:', path, error?.message || error);
+      return [];
+    }
+  }
+
+  async function supabaseInsert(path, payload) {
+    const config = getSupabaseConfig();
+    if (!config) throw new Error('Supabase no configurado');
+
+    const response = await fetch(`${config.url}/rest/v1/${path}`, {
+      method: 'POST',
+      headers: {
+        apikey: config.key,
+        Authorization: `Bearer ${config.key}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Supabase ${path}: ${response.status} ${errorText}`);
+    }
+
+    return response.json();
+  }
+
   function valueFrom(row, keys, fallback = '') {
     for (const key of keys) {
       if (row?.[key] != null && row[key] !== '') return row[key];
@@ -266,6 +298,21 @@ const MockData = (() => {
       if (!id) return acc;
       if (!acc[id]) acc[id] = [];
       acc[id].push(row);
+      return acc;
+    }, {});
+  }
+
+  function countWeeklyReservations(rows) {
+    const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return (rows || []).reduce((acc, row) => {
+      const id = row.negocio_id || row.negocioId || row.business_id;
+      if (!id) return acc;
+      const dateValue = row.fecha || row.created_at || row.fecha_reserva || row.inicio;
+      const time = dateValue ? new Date(dateValue).getTime() : Date.now();
+      if (!Number.isFinite(time) || time < since) return acc;
+      const estado = normalizeText(row.estado || row.status || '');
+      if (estado.includes('cancel')) return acc;
+      acc[id] = (acc[id] || 0) + 1;
       return acc;
     }, {});
   }
@@ -385,16 +432,23 @@ const MockData = (() => {
       try {
         const rows = await supabaseFetch('negocios?configurado=eq.true&suscripciones.estado=eq.activa&select=id,nombre,telefono,especialidad,slug,logo_url,imagen_fondo_url,mensaje_bienvenida,instagram,facebook,sitio_web,direccion,horario_atencion,configurado,plan,suscripciones!inner(estado)&order=nombre.asc');
         const serviciosRows = await supabaseFetch('servicios?activo=eq.true&select=id,negocio_id,nombre,duracion,precio,descripcion,activo,imagen,categoria');
+        const resenasRows = await optionalSupabaseFetch('resenas?select=*&limit=500');
+        const reservasRows = await optionalSupabaseFetch('reservas?select=*&limit=2000');
+        const reservasSemana = countWeeklyReservations(reservasRows);
 
         const relations = {
           servicios: groupByBusiness(serviciosRows),
           productos: {},
           cursos: {},
-          resenas: {}
+          resenas: groupByBusiness(resenasRows)
         };
 
         businesses = (rows || [])
-          .map((row) => normalizeBusiness(row, relations))
+          .map((row) => {
+            const business = normalizeBusiness(row, relations);
+            business.reservasSemana = reservasSemana[business.id] || 0;
+            return business;
+          })
           .filter((business) => business.id);
         loadedFromSupabase = true;
         loadError = null;
@@ -422,9 +476,51 @@ const MockData = (() => {
   function listTopRated() {
     return businesses
       .slice()
-      .filter((b) => b.totalReseñas >= 40)
-      .sort((a, b) => b.estrellas - a.estrellas)
+      .filter((b) => b.totalReseñas > 0)
+      .sort((a, b) => (b.estrellas - a.estrellas) || (b.totalReseñas - a.totalReseñas))
       .slice(0, 8);
+  }
+
+  function listWeeklyFeatured() {
+    return businesses
+      .slice()
+      .sort((a, b) => (b.reservasSemana || 0) - (a.reservasSemana || 0) || a.nombre.localeCompare(b.nombre))
+      .slice(0, 10);
+  }
+
+  function listRomaReviews() {
+    return businesses
+      .flatMap((business) => (business.reseñas || []).map((review) => ({ ...review, negocioNombre: business.nombre })))
+      .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
+      .slice(0, 8);
+  }
+
+  async function addReview(negocioId, review) {
+    const payload = {
+      negocio_id: negocioId,
+      nombre: review.nombre,
+      estrellas: Number(review.estrellas),
+      texto: review.texto,
+      fecha: new Date().toISOString(),
+      verificada: false
+    };
+    const inserted = await supabaseInsert('resenas', payload);
+    const created = inserted?.[0] || payload;
+    const business = businesses.find((b) => b.id === negocioId);
+    if (business) {
+      const normalized = {
+        id: String(created.id || `${negocioId}-${Date.now()}`),
+        nombre: created.nombre || payload.nombre,
+        estrellas: Number(created.estrellas || payload.estrellas),
+        verificada: created.verificada === true,
+        texto: created.texto || payload.texto,
+        fecha: created.fecha || created.created_at || payload.fecha
+      };
+      business.reseñas = [normalized, ...(business.reseñas || [])];
+      business.totalReseñas = business.reseñas.length;
+      business.estrellas = business.reseñas.reduce((sum, item) => sum + Number(item.estrellas || 0), 0) / business.reseñas.length;
+    }
+    return created;
   }
 
   function getBusinessById(id) {
@@ -461,5 +557,5 @@ const MockData = (() => {
     });
   }
 
-  return { listBusinesses, listTopRated, searchBusinesses, getBusinessById, loadBusinesses, getLoadError };
+  return { listBusinesses, listTopRated, listWeeklyFeatured, listRomaReviews, searchBusinesses, getBusinessById, loadBusinesses, getLoadError, addReview };
 })();
