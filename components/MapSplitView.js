@@ -9,6 +9,7 @@ function MapSplitView({ businesses, activeId, onSelect }) {
         const size = b.vip ? 'w-12 h-12' : 'w-10 h-10';
         const ring = b.vip ? 'ring-2 ring-[#F59E0B]/60' : 'ring-1 ring-[rgba(31,41,55,0.14)]';
         const scale = b.id === activeId ? 'scale-110' : 'scale-100';
+        const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
 
         return (
           <button
@@ -19,14 +20,18 @@ function MapSplitView({ businesses, activeId, onSelect }) {
             data-file="components/MapSplitView.js"
             aria-label={`Pin de ${b.nombre}`}
           >
-            <div className="w-7 h-7 rounded-xl bg-[#D81B60] flex items-center justify-center overflow-hidden" data-name="map-pin-inner" data-file="components/MapSplitView.js">
-              <img
-                src="https://app.trickle.so/storage/public/images/usr_1dec1efb58008001/55d88a3b-fbdf-46a8-bc34-5c6dac55ec46.png"
-                alt="Rservas.Roma"
-                className="w-full h-full object-cover"
-                data-name="map-pin-logo"
-                data-file="components/MapSplitView.js"
-              />
+            <div className="w-7 h-7 rounded-xl bg-white flex items-center justify-center overflow-hidden p-1" data-name="map-pin-inner" data-file="components/MapSplitView.js">
+              {b.logoUrl ? (
+                <img
+                  src={b.logoUrl}
+                  alt={`Logo de ${b.nombre}`}
+                  className="w-full h-full object-contain"
+                  data-name="map-pin-logo"
+                  data-file="components/MapSplitView.js"
+                />
+              ) : (
+                <span className="text-[10px] font-semibold text-[var(--primary-color)]" data-name="map-pin-initials" data-file="components/MapSplitView.js">{initials}</span>
+              )}
             </div>
           </button>
         );
@@ -71,8 +76,12 @@ function MapSplitView({ businesses, activeId, onSelect }) {
             <div className="absolute bottom-4 left-4 right-4" data-name="map-card" data-file="components/MapSplitView.js">
               <div className="card-rr p-4" data-name="map-card-inner" data-file="components/MapSplitView.js">
                 <div className="flex items-start gap-3" data-name="map-card-row" data-file="components/MapSplitView.js">
-                  <div className="w-12 h-12 rounded-2xl overflow-hidden border border-[var(--border)] bg-white" data-name="map-card-logo" data-file="components/MapSplitView.js">
-                    <img src={active.logoUrl} alt={`Logo de ${active.nombre}`} className="w-full h-full object-cover" data-name="map-card-logo-img" data-file="components/MapSplitView.js" />
+                  <div className="w-12 h-12 rounded-2xl overflow-hidden border border-[var(--border)] bg-white p-1.5" data-name="map-card-logo" data-file="components/MapSplitView.js">
+                    {active.logoUrl ? (
+                      <img src={active.logoUrl} alt={`Logo de ${active.nombre}`} className="w-full h-full object-contain" data-name="map-card-logo-img" data-file="components/MapSplitView.js" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--primary-color)]" data-name="map-card-initials" data-file="components/MapSplitView.js">{String(active.nombre || 'N').trim().slice(0, 2).toUpperCase()}</div>
+                    )}
                   </div>
                   <div className="min-w-0" data-name="map-card-content" data-file="components/MapSplitView.js">
                     <p className="text-sm font-semibold truncate" data-name="map-card-name" data-file="components/MapSplitView.js">{active.nombre}</p>

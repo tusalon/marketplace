@@ -2,6 +2,7 @@ function BusinessLogoCard({ business, onOpen }) {
   try {
     const b = business;
     const tier = b.vip ? 'VIP' : 'Free';
+    const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
 
     return (
       <button
@@ -11,8 +12,12 @@ function BusinessLogoCard({ business, onOpen }) {
         data-file="components/BusinessLogoCard.js"
       >
         <div className="flex items-start justify-between gap-4" data-name="logo-card-top" data-file="components/BusinessLogoCard.js">
-          <div className="w-12 h-12 rounded-2xl border border-[var(--border)] bg-white overflow-hidden" data-name="logo" data-file="components/BusinessLogoCard.js">
-            <img src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="w-full h-full object-cover" data-name="logo-img" data-file="components/BusinessLogoCard.js" />
+          <div className="w-12 h-12 rounded-2xl border border-[var(--border)] bg-white overflow-hidden p-1.5" data-name="logo" data-file="components/BusinessLogoCard.js">
+            {b.logoUrl ? (
+              <img src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="w-full h-full object-contain" data-name="logo-img" data-file="components/BusinessLogoCard.js" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--primary-color)]" data-name="logo-initials" data-file="components/BusinessLogoCard.js">{initials}</div>
+            )}
           </div>
           <div className={`chip-rr px-3 py-1.5 text-xs ${b.vip ? 'bg-black text-white border-black/30' : 'bg-white text-[var(--text-muted)]'}`} data-name="tier" data-file="components/BusinessLogoCard.js">
             {tier}

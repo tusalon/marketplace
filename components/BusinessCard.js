@@ -2,7 +2,10 @@ function BusinessCard({ business, onHover, active }) {
   try {
     const b = business;
     const border = active ? 'border-[rgba(216,27,96,0.35)] shadow-[0_16px_40px_rgba(216,27,96,0.10)]' : '';
-    const serviceCount = (b.categoriasCatalogo || []).reduce((sum, section) => sum + (section.items?.length || 0), 0);
+    const serviceSection = (b.categoriasCatalogo || []).find((section) => section.tipo === 'servicios');
+    const serviceCount = serviceSection?.items?.length || 0;
+    const firstService = serviceSection?.items?.[0] || null;
+    const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
 
     const onOpen = () => {
       try {
@@ -49,9 +52,13 @@ function BusinessCard({ business, onHover, active }) {
         data-file="components/BusinessCard.js"
         aria-label={`Abrir perfil de ${b.nombre}`}
       >
-        <div className="grid grid-cols-[112px_1fr] gap-4 p-3" data-name="business-card-inner" data-file="components/BusinessCard.js">
-          <div className="relative w-28 h-28 rounded-lg overflow-hidden bg-[#F9FAFB] border border-[var(--border)]" data-name="photo" data-file="components/BusinessCard.js">
-            <img src={b.fotos?.[0]} alt={`Foto de ${b.nombre}`} className="w-full h-full object-cover" data-name="photo-img" data-file="components/BusinessCard.js" />
+        <div className="grid grid-cols-[96px_1fr] gap-4 p-3" data-name="business-card-inner" data-file="components/BusinessCard.js">
+          <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-white border border-[var(--border)] p-2" data-name="photo" data-file="components/BusinessCard.js">
+            {b.logoUrl ? (
+              <img src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="w-full h-full object-contain" data-name="photo-img" data-file="components/BusinessCard.js" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-xl font-semibold text-[var(--primary-color)]" data-name="photo-initials" data-file="components/BusinessCard.js">{initials}</div>
+            )}
             {b.vip ? (
               <div className="absolute top-2 left-2" data-name="vip" data-file="components/BusinessCard.js">
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-[#1F2937] text-white text-[11px] border border-white/20" data-name="vip-chip" data-file="components/BusinessCard.js">
@@ -70,7 +77,7 @@ function BusinessCard({ business, onHover, active }) {
                   {b.categoria} · {b.ubicacion?.zona}
                 </p>
               </div>
-              <div className="ml-auto flex flex-col items-end gap-1" data-name="top-right" data-file="components/BusinessCard.js">
+              <div className="ml-auto hidden sm:flex flex-col items-end gap-1" data-name="top-right" data-file="components/BusinessCard.js">
                 <div className="flex items-center gap-1" data-name="stars" data-file="components/BusinessCard.js">
                   <div className="icon-star text-base text-[#F59E0B]" data-name="star" data-file="components/BusinessCard.js"></div>
                   <span className="text-sm font-semibold" data-name="star-val" data-file="components/BusinessCard.js">{Number(b.estrellas).toFixed(1)}</span>
@@ -81,14 +88,11 @@ function BusinessCard({ business, onHover, active }) {
 
             <div className="mt-3 flex flex-wrap gap-2" data-name="badges" data-file="components/BusinessCard.js">
               {serviceCount ? <span className="chip-rr px-2.5 py-1 text-[11px] text-[var(--text-muted)]" data-name="services-count" data-file="components/BusinessCard.js">{serviceCount} servicios</span> : null}
-              {b.topRoma ? <Badge type="top" text="Top Roma" data-name="badge-top" data-file="components/BusinessCard.js" /> : null}
-              {b.masReservado ? <Badge type="reservado" text="Mas reservado" data-name="badge-reservado" data-file="components/BusinessCard.js" /> : null}
-              {b.negocioDelMes ? <Badge type="mes" text="Negocio del Mes" data-name="badge-mes" data-file="components/BusinessCard.js" /> : null}
             </div>
 
             <div className="mt-4 flex items-center justify-between gap-3" data-name="bottom" data-file="components/BusinessCard.js">
-              <span className="text-xs text-[var(--text-muted)]" data-name="price" data-file="components/BusinessCard.js">
-                {Format.formatRangoPrecio(b.rangoPrecio?.min, b.rangoPrecio?.max)}
+              <span className="text-xs text-[var(--text-muted)] truncate" data-name="price" data-file="components/BusinessCard.js">
+                {firstService ? `${firstService.nombre} - ${Format.formatPrecioCUP(firstService.precio)}` : Format.formatRangoPrecio(b.rangoPrecio?.min, b.rangoPrecio?.max)}
               </span>
 
               <button

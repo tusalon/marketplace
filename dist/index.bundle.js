@@ -414,8 +414,8 @@ const MockData = (() => {
   let loadPromise = null;
   let loadedFromSupabase = false;
   let loadError = null;
-  const defaultCoverUrl = 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=80';
-  const defaultLogoUrl = 'https://app.trickle.so/storage/public/images/usr_1dec1efb58008001/55d88a3b-fbdf-46a8-bc34-5c6dac55ec46.png';
+  const defaultCoverUrl = '';
+  const defaultLogoUrl = '';
   function getSupabaseConfig() {
     const url = window.SUPABASE_URL || window.supabaseUrl || '';
     const key = window.SUPABASE_ANON_KEY || window.supabaseAnonKey || '';
@@ -489,6 +489,7 @@ const MockData = (() => {
           nombre: valueFrom(item, ['nombre', 'titulo', 'servicio'], 'Servicio'),
           duracionMin: numberFrom(item, ['duracion_min', 'duracionMin', 'duracion', 'minutos'], 60),
           precio: numberFrom(item, ['precio', 'precio_cup', 'monto'], 0),
+          descripcion: valueFrom(item, ['descripcion', 'description', 'detalle'], ''),
           destacado: boolFrom(item, ['destacado', 'recomendado'], false)
         }))
       });
@@ -526,7 +527,9 @@ const MockData = (() => {
     const lat = numberFrom(row, ['lat', 'latitud', 'latitude'], 23.1136);
     const lng = numberFrom(row, ['lng', 'longitud', 'lon', 'longitude'], -82.3666);
     const telefono = valueFrom(row, ['whatsapp', 'telefono', 'phone'], '');
-    const fotos = [valueFrom(row, ['portada_url', 'cover_url', 'foto_portada', 'imagen_url'], ''), valueFrom(row, ['logo_url', 'logo', 'avatar_url'], '')].filter(Boolean);
+    const coverUrl = valueFrom(row, ['imagen_fondo_url', 'portada_url', 'cover_url', 'foto_portada', 'imagen_url'], '');
+    const logoUrl = valueFrom(row, ['logo_url', 'logo', 'avatar_url'], defaultLogoUrl);
+    const fotos = [coverUrl, logoUrl].filter(Boolean);
     const servicios = relations.servicios[id] || [];
     const productos = relations.productos[id] || [];
     const cursos = relations.cursos[id] || [];
@@ -556,9 +559,9 @@ const MockData = (() => {
       },
       estrellas: numberFrom(row, ['estrellas', 'rating', 'calificacion'], resenas.length ? 4.8 : 0),
       totalReseñas: numberFrom(row, ['total_resenas', 'totalResenas', 'reviews_count'], resenas.length),
-      portadaUrl: valueFrom(row, ['portada_url', 'cover_url', 'foto_portada', 'imagen_url'], defaultCoverUrl),
-      logoUrl: valueFrom(row, ['logo_url', 'logo', 'avatar_url'], defaultLogoUrl),
-      fotos: fotos.length ? fotos : [defaultCoverUrl],
+      portadaUrl: coverUrl,
+      logoUrl,
+      fotos: fotos.length ? fotos : [logoUrl],
       whatsapp: telefono ? String(telefono).replace(/[^\d+]/g, '') : '',
       descripcion: valueFrom(row, ['descripcion', 'description', 'mensaje_bienvenida'], 'Negocio disponible para reservas.'),
       categoriasCatalogo: buildCatalogSections({
@@ -1190,6 +1193,7 @@ function BusinessLogoCard({
   try {
     const b = business;
     const tier = b.vip ? 'VIP' : 'Free';
+    const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
     return React.createElement("button", {
       className: "group surface-rr p-5 text-left transition-transform duration-300 hover:-translate-y-1 hover:bg-[#FDF2F8] hover:shadow-[0_18px_55px_rgba(216,27,96,0.12)] focus:outline-none",
       onClick: () => onOpen?.(b),
@@ -1200,16 +1204,20 @@ function BusinessLogoCard({
       "data-name": "logo-card-top",
       "data-file": "components/BusinessLogoCard.js"
     }, React.createElement("div", {
-      className: "w-12 h-12 rounded-2xl border border-[var(--border)] bg-white overflow-hidden",
+      className: "w-12 h-12 rounded-2xl border border-[var(--border)] bg-white overflow-hidden p-1.5",
       "data-name": "logo",
       "data-file": "components/BusinessLogoCard.js"
-    }, React.createElement("img", {
+    }, b.logoUrl ? React.createElement("img", {
       src: b.logoUrl,
       alt: `Logo de ${b.nombre}`,
-      className: "w-full h-full object-cover",
+      className: "w-full h-full object-contain",
       "data-name": "logo-img",
       "data-file": "components/BusinessLogoCard.js"
-    })), React.createElement("div", {
+    }) : React.createElement("div", {
+      className: "w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--primary-color)]",
+      "data-name": "logo-initials",
+      "data-file": "components/BusinessLogoCard.js"
+    }, initials)), React.createElement("div", {
       className: `chip-rr px-3 py-1.5 text-xs ${b.vip ? 'bg-black text-white border-black/30' : 'bg-white text-[var(--text-muted)]'}`,
       "data-name": "tier",
       "data-file": "components/BusinessLogoCard.js"
@@ -1334,89 +1342,106 @@ function TopRatedCarousel({
       className: "flex gap-4 overflow-x-auto no-scrollbar pb-2",
       "data-name": "top-rated-track",
       "data-file": "components/TopRatedCarousel.js"
-    }, list.map(b => React.createElement("div", {
-      key: b.id,
-      className: "min-w-[260px] md:min-w-[320px]",
-      "data-name": "top-rated-item",
-      "data-file": "components/TopRatedCarousel.js"
-    }, React.createElement("button", {
-      className: "card-rr w-full overflow-hidden text-left hover:shadow-[0_22px_70px_rgba(11,18,32,0.12)] transition-shadow",
-      onClick: () => Navigation.goToBusiness(b.id),
-      "data-name": "top-rated-card",
-      "data-file": "components/TopRatedCarousel.js"
-    }, React.createElement("div", {
-      className: "relative h-[170px] bg-[#F9FAFB]",
-      "data-name": "top-rated-photo",
-      "data-file": "components/TopRatedCarousel.js"
-    }, React.createElement("img", {
-      src: b.fotos?.[0],
-      alt: `Foto de ${b.nombre}`,
-      className: "w-full h-full object-cover",
-      "data-name": "top-rated-img",
-      "data-file": "components/TopRatedCarousel.js"
-    }), React.createElement("div", {
-      className: "absolute top-3 left-3 flex flex-wrap gap-2",
-      "data-name": "top-rated-badges",
-      "data-file": "components/TopRatedCarousel.js"
-    }, b.topRoma ? React.createElement(Badge, {
-      type: "top",
-      text: "\uD83C\uDF1F Top Roma",
-      "data-name": "badge-top",
-      "data-file": "components/TopRatedCarousel.js"
-    }) : null, b.negocioDelMes ? React.createElement(Badge, {
-      type: "mes",
-      text: "Negocio del Mes",
-      "data-name": "badge-mes",
-      "data-file": "components/TopRatedCarousel.js"
-    }) : null), b.vip ? React.createElement("div", {
-      className: "absolute top-3 right-3",
-      "data-name": "vip-pin",
-      "data-file": "components/TopRatedCarousel.js"
-    }, React.createElement("span", {
-      className: "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black text-white text-xs border border-black/30",
-      "data-name": "vip",
-      "data-file": "components/TopRatedCarousel.js"
-    }, React.createElement("div", {
-      className: "icon-crown text-base text-white",
-      "data-name": "vip-i",
-      "data-file": "components/TopRatedCarousel.js"
-    }), "VIP")) : null), React.createElement("div", {
-      className: "p-4",
-      "data-name": "top-rated-body",
-      "data-file": "components/TopRatedCarousel.js"
-    }, React.createElement("p", {
-      className: "text-sm font-semibold",
-      "data-name": "top-rated-name",
-      "data-file": "components/TopRatedCarousel.js"
-    }, b.nombre), React.createElement("p", {
-      className: "text-xs text-[var(--text-muted)] mt-1",
-      "data-name": "top-rated-meta",
-      "data-file": "components/TopRatedCarousel.js"
-    }, b.categoria, " \xB7 ", b.ubicacion?.zona), React.createElement("div", {
-      className: "mt-3 flex items-center justify-between gap-3",
-      "data-name": "top-rated-bottom",
-      "data-file": "components/TopRatedCarousel.js"
-    }, React.createElement("div", {
-      className: "flex items-center gap-2",
-      "data-name": "top-rated-rating",
-      "data-file": "components/TopRatedCarousel.js"
-    }, React.createElement("div", {
-      className: "icon-star text-base text-[#F59E0B]",
-      "data-name": "star",
-      "data-file": "components/TopRatedCarousel.js"
-    }), React.createElement("span", {
-      className: "text-sm font-semibold",
-      "data-name": "val",
-      "data-file": "components/TopRatedCarousel.js"
-    }, Number(b.estrellas).toFixed(1)), React.createElement("span", {
-      className: "text-xs text-[var(--text-muted)]",
-      "data-name": "count",
-      "data-file": "components/TopRatedCarousel.js"
-    }, "(", b.totalReseñas, ")")), React.createElement("span", {
-      className: "text-xs text-[var(--text-muted)]",
-      "data-name": "price",
-      "data-file": "components/TopRatedCarousel.js"
-    }, Format.formatRangoPrecio(b.rangoPrecio?.min, b.rangoPrecio?.max)))))))), React.createElement("div", {
+    }, list.map(b => {
+      const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
+      return React.createElement("div", {
+        key: b.id,
+        className: "min-w-[260px] md:min-w-[320px]",
+        "data-name": "top-rated-item",
+        "data-file": "components/TopRatedCarousel.js"
+      }, React.createElement("button", {
+        className: "card-rr w-full overflow-hidden text-left hover:shadow-[0_22px_70px_rgba(11,18,32,0.12)] transition-shadow",
+        onClick: () => Navigation.goToBusiness(b.id),
+        "data-name": "top-rated-card",
+        "data-file": "components/TopRatedCarousel.js"
+      }, React.createElement("div", {
+        className: "relative h-[170px] bg-[#F9FAFB]",
+        "data-name": "top-rated-photo",
+        "data-file": "components/TopRatedCarousel.js"
+      }, b.portadaUrl ? React.createElement("img", {
+        src: b.portadaUrl,
+        alt: `Imagen de ${b.nombre}`,
+        className: "w-full h-full object-cover",
+        "data-name": "top-rated-img",
+        "data-file": "components/TopRatedCarousel.js"
+      }) : React.createElement("div", {
+        className: "w-full h-full flex items-center justify-center p-10 bg-white",
+        "data-name": "top-rated-logo-wrap",
+        "data-file": "components/TopRatedCarousel.js"
+      }, b.logoUrl ? React.createElement("img", {
+        src: b.logoUrl,
+        alt: `Logo de ${b.nombre}`,
+        className: "max-w-full max-h-full object-contain",
+        "data-name": "top-rated-logo",
+        "data-file": "components/TopRatedCarousel.js"
+      }) : React.createElement("div", {
+        className: "text-3xl font-semibold text-[var(--primary-color)]",
+        "data-name": "top-rated-initials",
+        "data-file": "components/TopRatedCarousel.js"
+      }, initials)), React.createElement("div", {
+        className: "absolute top-3 left-3 flex flex-wrap gap-2",
+        "data-name": "top-rated-badges",
+        "data-file": "components/TopRatedCarousel.js"
+      }, b.topRoma ? React.createElement(Badge, {
+        type: "top",
+        text: "\uD83C\uDF1F Top Roma",
+        "data-name": "badge-top",
+        "data-file": "components/TopRatedCarousel.js"
+      }) : null, b.negocioDelMes ? React.createElement(Badge, {
+        type: "mes",
+        text: "Negocio del Mes",
+        "data-name": "badge-mes",
+        "data-file": "components/TopRatedCarousel.js"
+      }) : null), b.vip ? React.createElement("div", {
+        className: "absolute top-3 right-3",
+        "data-name": "vip-pin",
+        "data-file": "components/TopRatedCarousel.js"
+      }, React.createElement("span", {
+        className: "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black text-white text-xs border border-black/30",
+        "data-name": "vip",
+        "data-file": "components/TopRatedCarousel.js"
+      }, React.createElement("div", {
+        className: "icon-crown text-base text-white",
+        "data-name": "vip-i",
+        "data-file": "components/TopRatedCarousel.js"
+      }), "VIP")) : null), React.createElement("div", {
+        className: "p-4",
+        "data-name": "top-rated-body",
+        "data-file": "components/TopRatedCarousel.js"
+      }, React.createElement("p", {
+        className: "text-sm font-semibold",
+        "data-name": "top-rated-name",
+        "data-file": "components/TopRatedCarousel.js"
+      }, b.nombre), React.createElement("p", {
+        className: "text-xs text-[var(--text-muted)] mt-1",
+        "data-name": "top-rated-meta",
+        "data-file": "components/TopRatedCarousel.js"
+      }, b.categoria, " \xB7 ", b.ubicacion?.zona), React.createElement("div", {
+        className: "mt-3 flex items-center justify-between gap-3",
+        "data-name": "top-rated-bottom",
+        "data-file": "components/TopRatedCarousel.js"
+      }, React.createElement("div", {
+        className: "flex items-center gap-2",
+        "data-name": "top-rated-rating",
+        "data-file": "components/TopRatedCarousel.js"
+      }, React.createElement("div", {
+        className: "icon-star text-base text-[#F59E0B]",
+        "data-name": "star",
+        "data-file": "components/TopRatedCarousel.js"
+      }), React.createElement("span", {
+        className: "text-sm font-semibold",
+        "data-name": "val",
+        "data-file": "components/TopRatedCarousel.js"
+      }, Number(b.estrellas).toFixed(1)), React.createElement("span", {
+        className: "text-xs text-[var(--text-muted)]",
+        "data-name": "count",
+        "data-file": "components/TopRatedCarousel.js"
+      }, "(", b.totalReseñas, ")")), React.createElement("span", {
+        className: "text-xs text-[var(--text-muted)]",
+        "data-name": "price",
+        "data-file": "components/TopRatedCarousel.js"
+      }, Format.formatRangoPrecio(b.rangoPrecio?.min, b.rangoPrecio?.max))))));
+    })), React.createElement("div", {
       className: "md:hidden flex items-center gap-2 mt-4",
       "data-name": "top-rated-controls-mobile",
       "data-file": "components/TopRatedCarousel.js"

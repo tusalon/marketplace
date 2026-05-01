@@ -201,8 +201,8 @@ const MockData = (() => {
   let loadedFromSupabase = false;
   let loadError = null;
 
-  const defaultCoverUrl = 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=80';
-  const defaultLogoUrl = 'https://app.trickle.so/storage/public/images/usr_1dec1efb58008001/55d88a3b-fbdf-46a8-bc34-5c6dac55ec46.png';
+  const defaultCoverUrl = '';
+  const defaultLogoUrl = '';
 
   function getSupabaseConfig() {
     const url = window.SUPABASE_URL || window.supabaseUrl || '';
@@ -281,6 +281,7 @@ const MockData = (() => {
           nombre: valueFrom(item, ['nombre', 'titulo', 'servicio'], 'Servicio'),
           duracionMin: numberFrom(item, ['duracion_min', 'duracionMin', 'duracion', 'minutos'], 60),
           precio: numberFrom(item, ['precio', 'precio_cup', 'monto'], 0),
+          descripcion: valueFrom(item, ['descripcion', 'description', 'detalle'], ''),
           destacado: boolFrom(item, ['destacado', 'recomendado'], false)
         }))
       });
@@ -322,10 +323,9 @@ const MockData = (() => {
     const lat = numberFrom(row, ['lat', 'latitud', 'latitude'], 23.1136);
     const lng = numberFrom(row, ['lng', 'longitud', 'lon', 'longitude'], -82.3666);
     const telefono = valueFrom(row, ['whatsapp', 'telefono', 'phone'], '');
-    const fotos = [
-      valueFrom(row, ['portada_url', 'cover_url', 'foto_portada', 'imagen_url'], ''),
-      valueFrom(row, ['logo_url', 'logo', 'avatar_url'], '')
-    ].filter(Boolean);
+    const coverUrl = valueFrom(row, ['imagen_fondo_url', 'portada_url', 'cover_url', 'foto_portada', 'imagen_url'], '');
+    const logoUrl = valueFrom(row, ['logo_url', 'logo', 'avatar_url'], defaultLogoUrl);
+    const fotos = [coverUrl, logoUrl].filter(Boolean);
 
     const servicios = relations.servicios[id] || [];
     const productos = relations.productos[id] || [];
@@ -353,9 +353,9 @@ const MockData = (() => {
       },
       estrellas: numberFrom(row, ['estrellas', 'rating', 'calificacion'], resenas.length ? 4.8 : 0),
       totalReseñas: numberFrom(row, ['total_resenas', 'totalResenas', 'reviews_count'], resenas.length),
-      portadaUrl: valueFrom(row, ['portada_url', 'cover_url', 'foto_portada', 'imagen_url'], defaultCoverUrl),
-      logoUrl: valueFrom(row, ['logo_url', 'logo', 'avatar_url'], defaultLogoUrl),
-      fotos: fotos.length ? fotos : [defaultCoverUrl],
+      portadaUrl: coverUrl,
+      logoUrl,
+      fotos: fotos.length ? fotos : [logoUrl],
       whatsapp: telefono ? String(telefono).replace(/[^\d+]/g, '') : '',
       descripcion: valueFrom(row, ['descripcion', 'description', 'mensaje_bienvenida'], 'Negocio disponible para reservas.'),
       categoriasCatalogo: buildCatalogSections({ servicios, productos, cursos }),

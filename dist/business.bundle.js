@@ -414,8 +414,8 @@ const MockData = (() => {
   let loadPromise = null;
   let loadedFromSupabase = false;
   let loadError = null;
-  const defaultCoverUrl = 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=80';
-  const defaultLogoUrl = 'https://app.trickle.so/storage/public/images/usr_1dec1efb58008001/55d88a3b-fbdf-46a8-bc34-5c6dac55ec46.png';
+  const defaultCoverUrl = '';
+  const defaultLogoUrl = '';
   function getSupabaseConfig() {
     const url = window.SUPABASE_URL || window.supabaseUrl || '';
     const key = window.SUPABASE_ANON_KEY || window.supabaseAnonKey || '';
@@ -489,6 +489,7 @@ const MockData = (() => {
           nombre: valueFrom(item, ['nombre', 'titulo', 'servicio'], 'Servicio'),
           duracionMin: numberFrom(item, ['duracion_min', 'duracionMin', 'duracion', 'minutos'], 60),
           precio: numberFrom(item, ['precio', 'precio_cup', 'monto'], 0),
+          descripcion: valueFrom(item, ['descripcion', 'description', 'detalle'], ''),
           destacado: boolFrom(item, ['destacado', 'recomendado'], false)
         }))
       });
@@ -526,7 +527,9 @@ const MockData = (() => {
     const lat = numberFrom(row, ['lat', 'latitud', 'latitude'], 23.1136);
     const lng = numberFrom(row, ['lng', 'longitud', 'lon', 'longitude'], -82.3666);
     const telefono = valueFrom(row, ['whatsapp', 'telefono', 'phone'], '');
-    const fotos = [valueFrom(row, ['portada_url', 'cover_url', 'foto_portada', 'imagen_url'], ''), valueFrom(row, ['logo_url', 'logo', 'avatar_url'], '')].filter(Boolean);
+    const coverUrl = valueFrom(row, ['imagen_fondo_url', 'portada_url', 'cover_url', 'foto_portada', 'imagen_url'], '');
+    const logoUrl = valueFrom(row, ['logo_url', 'logo', 'avatar_url'], defaultLogoUrl);
+    const fotos = [coverUrl, logoUrl].filter(Boolean);
     const servicios = relations.servicios[id] || [];
     const productos = relations.productos[id] || [];
     const cursos = relations.cursos[id] || [];
@@ -556,9 +559,9 @@ const MockData = (() => {
       },
       estrellas: numberFrom(row, ['estrellas', 'rating', 'calificacion'], resenas.length ? 4.8 : 0),
       totalReseñas: numberFrom(row, ['total_resenas', 'totalResenas', 'reviews_count'], resenas.length),
-      portadaUrl: valueFrom(row, ['portada_url', 'cover_url', 'foto_portada', 'imagen_url'], defaultCoverUrl),
-      logoUrl: valueFrom(row, ['logo_url', 'logo', 'avatar_url'], defaultLogoUrl),
-      fotos: fotos.length ? fotos : [defaultCoverUrl],
+      portadaUrl: coverUrl,
+      logoUrl,
+      fotos: fotos.length ? fotos : [logoUrl],
       whatsapp: telefono ? String(telefono).replace(/[^\d+]/g, '') : '',
       descripcion: valueFrom(row, ['descripcion', 'description', 'mensaje_bienvenida'], 'Negocio disponible para reservas.'),
       categoriasCatalogo: buildCatalogSections({
@@ -1293,63 +1296,70 @@ function BusinessHeader({
 }) {
   try {
     const b = business;
+    const hasCover = Boolean(b.portadaUrl);
+    const services = (b.categoriasCatalogo || []).find(section => section.tipo === 'servicios')?.items || [];
+    const firstPrice = services[0] ? Format.formatPrecioCUP(services[0].precio) : Format.formatRangoPrecio(b.rangoPrecio?.min, b.rangoPrecio?.max);
+    const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
     return React.createElement("section", {
+      className: "bg-white border-b border-[var(--border)]",
       "data-name": "business-header",
       "data-file": "pages/business/BusinessHeader.js"
     }, React.createElement("div", {
-      className: "relative h-[240px] md:h-[320px] bg-[#F9FAFB]",
-      "data-name": "cover",
+      className: "container-rr py-5 md:py-7",
+      "data-name": "header-wrap",
       "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement("img", {
+    }, React.createElement("div", {
+      className: "grid grid-cols-1 lg:grid-cols-[220px_1fr_auto] gap-5 items-center",
+      "data-name": "header-grid",
+      "data-file": "pages/business/BusinessHeader.js"
+    }, React.createElement("div", {
+      className: "relative h-[180px] lg:h-[160px] rounded-lg overflow-hidden border border-[var(--border)] bg-[#F9FAFB]",
+      "data-name": "brand-media",
+      "data-file": "pages/business/BusinessHeader.js"
+    }, hasCover ? React.createElement("img", {
       src: b.portadaUrl,
-      alt: `Portada de ${b.nombre}`,
+      alt: `Imagen de ${b.nombre}`,
       className: "w-full h-full object-cover",
       "data-name": "cover-img",
       "data-file": "pages/business/BusinessHeader.js"
-    }), React.createElement("div", {
-      className: "absolute inset-0 bg-gradient-to-t from-[#D81B60]/22 via-black/10 to-transparent",
-      "data-name": "cover-grad",
+    }) : React.createElement("div", {
+      className: "w-full h-full flex items-center justify-center p-8",
+      "data-name": "logo-only",
       "data-file": "pages/business/BusinessHeader.js"
-    })), React.createElement("div", {
-      className: "-mt-14 md:-mt-16",
-      "data-name": "overlap",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement("div", {
-      className: "container-rr",
-      "data-name": "overlap-inner",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement("div", {
-      className: "card-rr p-5 md:p-6",
-      "data-name": "header-card",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement("div", {
-      className: "flex flex-col md:flex-row md:items-center gap-4",
-      "data-name": "header-row",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement("div", {
-      className: "flex items-start gap-4 min-w-0",
-      "data-name": "left",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement("div", {
-      className: "w-16 h-16 md:w-20 md:h-20 rounded-3xl overflow-hidden bg-white border border-[var(--border)] shrink-0",
-      "data-name": "logo",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement("img", {
+    }, b.logoUrl ? React.createElement("img", {
       src: b.logoUrl,
       alt: `Logo de ${b.nombre}`,
-      className: "w-full h-full object-cover",
+      className: "max-w-full max-h-full object-contain",
+      "data-name": "logo-only-img",
+      "data-file": "pages/business/BusinessHeader.js"
+    }) : React.createElement("div", {
+      className: "text-4xl font-semibold text-[var(--primary-color)]",
+      "data-name": "logo-only-initials",
+      "data-file": "pages/business/BusinessHeader.js"
+    }, initials)), React.createElement("div", {
+      className: "absolute left-3 bottom-3 w-16 h-16 rounded-lg overflow-hidden bg-white border border-white shadow-sm p-2",
+      "data-name": "logo",
+      "data-file": "pages/business/BusinessHeader.js"
+    }, b.logoUrl ? React.createElement("img", {
+      src: b.logoUrl,
+      alt: `Logo de ${b.nombre}`,
+      className: "w-full h-full object-contain",
       "data-name": "logo-img",
       "data-file": "pages/business/BusinessHeader.js"
-    })), React.createElement("div", {
+    }) : React.createElement("div", {
+      className: "w-full h-full flex items-center justify-center text-lg font-semibold text-[var(--primary-color)]",
+      "data-name": "logo-initials",
+      "data-file": "pages/business/BusinessHeader.js"
+    }, initials))), React.createElement("div", {
       className: "min-w-0",
-      "data-name": "title",
+      "data-name": "header-copy",
       "data-file": "pages/business/BusinessHeader.js"
     }, React.createElement("div", {
       className: "flex flex-wrap items-center gap-2",
       "data-name": "title-row",
       "data-file": "pages/business/BusinessHeader.js"
     }, React.createElement("h1", {
-      className: "text-xl md:text-2xl font-semibold tracking-tight truncate",
+      className: "text-2xl md:text-3xl font-semibold tracking-tight leading-tight",
       "data-name": "name",
       "data-file": "pages/business/BusinessHeader.js"
     }, b.nombre), b.vip ? React.createElement(Badge, {
@@ -1357,90 +1367,33 @@ function BusinessHeader({
       text: "VIP",
       "data-name": "vip",
       "data-file": "pages/business/BusinessHeader.js"
-    }) : null, b.topRoma ? React.createElement(Badge, {
-      type: "top",
-      text: "\uD83C\uDF1F Top Roma",
-      "data-name": "top",
-      "data-file": "pages/business/BusinessHeader.js"
-    }) : null, b.masReservado ? React.createElement(Badge, {
-      type: "reservado",
-      text: "M\xE1s reservado",
-      "data-name": "res",
-      "data-file": "pages/business/BusinessHeader.js"
-    }) : null, b.negocioDelMes ? React.createElement(Badge, {
-      type: "mes",
-      text: "Negocio del Mes",
-      "data-name": "mes",
-      "data-file": "pages/business/BusinessHeader.js"
     }) : null), React.createElement("p", {
-      className: "text-sm text-[var(--text-muted)] mt-1",
+      className: "text-sm text-[var(--text-muted)] mt-2",
       "data-name": "meta",
       "data-file": "pages/business/BusinessHeader.js"
-    }, b.categoria, " \xB7 ", b.ubicacion?.zona, " \xB7 ", b.ubicacion?.ciudad), React.createElement("div", {
-      className: "mt-3",
-      "data-name": "rating",
+    }, b.categoria, " \xB7 ", b.ubicacion?.zona || b.ubicacion?.ciudad), b.ubicacion?.direccion ? React.createElement("p", {
+      className: "text-sm text-[var(--text-muted)] mt-1",
+      "data-name": "address",
       "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement(StarRating, {
-      value: b.estrellas,
-      total: b.totalReseñas,
-      verified: b.verificado,
-      "data-name": "stars",
-      "data-file": "pages/business/BusinessHeader.js"
-    })))), React.createElement("div", {
-      className: "md:ml-auto w-full md:w-auto",
-      "data-name": "right",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement("div", {
-      className: "surface-rr p-4",
-      "data-name": "addr",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement("div", {
-      className: "flex items-start gap-3",
-      "data-name": "addr-row",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement("div", {
-      className: "w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
-      "data-name": "addr-iw",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement("div", {
-      className: "icon-map-pin text-xl text-[var(--primary-color)]",
-      "data-name": "addr-i",
-      "data-file": "pages/business/BusinessHeader.js"
-    })), React.createElement("div", {
-      className: "min-w-0",
-      "data-name": "addr-t",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement("p", {
-      className: "text-xs text-[var(--text-muted)]",
-      "data-name": "addr-l",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, "Ubicaci\xF3n"), React.createElement("p", {
-      className: "text-sm font-medium leading-snug",
-      "data-name": "addr-v",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, b.ubicacion?.direccion))), React.createElement("div", {
-      className: "divider-rr my-4",
-      "data-name": "addr-div",
-      "data-file": "pages/business/BusinessHeader.js"
-    }), React.createElement("div", {
-      className: "flex items-center justify-between gap-3",
-      "data-name": "addr-price",
+    }, b.ubicacion.direccion) : null, React.createElement("div", {
+      className: "mt-4 flex flex-wrap gap-2",
+      "data-name": "quick-facts",
       "data-file": "pages/business/BusinessHeader.js"
     }, React.createElement("span", {
-      className: "text-xs text-[var(--text-muted)]",
-      "data-name": "addr-price-l",
+      className: "chip-rr px-3 py-1.5 text-xs text-[var(--text-muted)]",
+      "data-name": "services-count",
       "data-file": "pages/business/BusinessHeader.js"
-    }, "Rango de precio"), React.createElement("span", {
-      className: "text-sm font-semibold",
-      "data-name": "addr-price-v",
+    }, services.length, " servicios"), React.createElement("span", {
+      className: "chip-rr px-3 py-1.5 text-xs text-[var(--text-muted)]",
+      "data-name": "first-price",
       "data-file": "pages/business/BusinessHeader.js"
-    }, Format.formatRangoPrecio(b.rangoPrecio?.min, b.rangoPrecio?.max)))))), React.createElement("div", {
-      className: "mt-5 flex flex-col sm:flex-row gap-2",
-      "data-name": "header-ctas",
+    }, "Desde ", firstPrice))), React.createElement("div", {
+      className: "w-full lg:w-[230px]",
+      "data-name": "header-action",
       "data-file": "pages/business/BusinessHeader.js"
     }, React.createElement("a", {
       className: "btn-rr btn-primary-rr w-full flex items-center justify-center gap-2",
-      href: `https://wa.me/${String(b.whatsapp || '').replace('+', '')}?text=${encodeURIComponent(`Hola, quiero reservar en ${b.nombre}. ¿Tienen disponibilidad?`)}`,
+      href: `https://wa.me/${String(b.whatsapp || '').replace('+', '')}?text=${encodeURIComponent(`Hola, quiero reservar en ${b.nombre}. Tienen disponibilidad?`)}`,
       target: "_blank",
       rel: "noreferrer",
       "data-name": "cta-wa",
@@ -1449,16 +1402,7 @@ function BusinessHeader({
       className: "icon-message-circle text-xl text-white",
       "data-name": "cta-wa-i",
       "data-file": "pages/business/BusinessHeader.js"
-    }), "Reservar por WhatsApp"), React.createElement("button", {
-      className: "btn-rr btn-ghost-rr w-full flex items-center justify-center gap-2",
-      onClick: () => Navigation.goToSearch(b.categoria, b.ubicacion?.zona || b.ubicacion?.ciudad || ''),
-      "data-name": "cta-sim",
-      "data-file": "pages/business/BusinessHeader.js"
-    }, React.createElement("div", {
-      className: "icon-search text-xl text-[var(--primary-color)]",
-      "data-name": "cta-sim-i",
-      "data-file": "pages/business/BusinessHeader.js"
-    }), "Ver similares"))))));
+    }), "Reservar")))));
   } catch (error) {
     console.error('BusinessHeader component error:', error);
     return null;
@@ -1522,65 +1466,12 @@ function BusinessTabs({
   }
 }
 function BusinessCatalog({
-  business,
-  mode
+  business
 }) {
   try {
     const b = business;
-    const sections = React.useMemo(() => {
-      try {
-        const cats = b.categoriasCatalogo || [];
-        const toRows = cat => {
-          const tipo = cat.tipo;
-          if (tipo === 'servicios') {
-            return (cat.items || []).map(x => ({
-              icon: 'icon-scissors',
-              title: x.destacado ? `${x.nombre} (Recomendado)` : x.nombre,
-              meta: `${x.duracionMin} min`,
-              price: Format.formatPrecioCUP(x.precio),
-              note: null
-            }));
-          }
-          if (tipo === 'productos') {
-            return (cat.items || []).map(x => ({
-              icon: 'icon-shopping-bag',
-              title: x.nombre,
-              meta: `Stock: ${x.stock}`,
-              price: Format.formatPrecioCUP(x.precio),
-              note: null
-            }));
-          }
-          if (tipo === 'cursos') {
-            return (cat.items || []).map(x => ({
-              icon: 'icon-calendar',
-              title: x.nombre,
-              meta: `${new Date(x.fecha).toLocaleDateString('es-ES', {
-                weekday: 'short',
-                day: '2-digit',
-                month: 'short'
-              })} · ${x.ubicacion}`,
-              price: Format.formatPrecioCUP(x.precio),
-              note: 'Cupo limitado'
-            }));
-          }
-          return [];
-        };
-        const filtered = cats.filter(c => {
-          if (mode === 'catalogo') return c.tipo !== 'cursos';
-          if (mode === 'cursos') return c.tipo === 'cursos';
-          return true;
-        });
-        return filtered.map((c, idx) => ({
-          key: `${c.tipo}-${c.titulo}-${idx}`,
-          title: c.titulo,
-          subtitle: c.tipo === 'servicios' ? 'Duración y precio alineados' : c.tipo === 'productos' ? 'Stock y precio en CUP' : 'Fecha, ubicación y precio',
-          rows: toRows(c)
-        }));
-      } catch (e) {
-        return [];
-      }
-    }, [b, mode]);
-    if (!sections.length) {
+    const services = ((b.categoriasCatalogo || []).find(cat => cat.tipo === 'servicios')?.items || []).filter(item => item && item.nombre);
+    if (!services.length) {
       return React.createElement("div", {
         className: "surface-rr p-5",
         "data-name": "empty",
@@ -1589,16 +1480,68 @@ function BusinessCatalog({
         className: "text-sm text-[var(--text-muted)]",
         "data-name": "empty-t",
         "data-file": "pages/business/BusinessCatalog.js"
-      }, "Este negocio a\xFAn no public\xF3 su cat\xE1logo."));
+      }, "Este negocio aun no publico servicios."));
     }
     return React.createElement("div", {
+      className: "surface-rr overflow-hidden",
       "data-name": "business-catalog",
       "data-file": "pages/business/BusinessCatalog.js"
-    }, React.createElement(Accordion, {
-      items: sections,
-      "data-name": "accordion",
+    }, React.createElement("div", {
+      className: "p-4 md:p-5 border-b border-[var(--border)]",
+      "data-name": "catalog-head",
       "data-file": "pages/business/BusinessCatalog.js"
-    }));
+    }, React.createElement("h2", {
+      className: "text-lg font-semibold",
+      "data-name": "catalog-title",
+      "data-file": "pages/business/BusinessCatalog.js"
+    }, "Servicios")), React.createElement("div", {
+      className: "divide-y divide-[var(--border)]",
+      "data-name": "service-list",
+      "data-file": "pages/business/BusinessCatalog.js"
+    }, services.map((service, index) => React.createElement("div", {
+      key: `${service.nombre}-${index}`,
+      className: "p-4 md:p-5 flex items-start justify-between gap-4 hover:bg-[#F9FAFB]",
+      "data-name": "service-row",
+      "data-file": "pages/business/BusinessCatalog.js"
+    }, React.createElement("div", {
+      className: "min-w-0",
+      "data-name": "service-copy",
+      "data-file": "pages/business/BusinessCatalog.js"
+    }, React.createElement("p", {
+      className: "text-sm md:text-base font-semibold leading-snug",
+      "data-name": "service-name",
+      "data-file": "pages/business/BusinessCatalog.js"
+    }, service.nombre), React.createElement("div", {
+      className: "mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--text-muted)]",
+      "data-name": "service-meta",
+      "data-file": "pages/business/BusinessCatalog.js"
+    }, service.duracionMin ? React.createElement("span", {
+      "data-name": "service-duration",
+      "data-file": "pages/business/BusinessCatalog.js"
+    }, service.duracionMin, " min") : null, service.destacado ? React.createElement("span", {
+      className: "chip-rr px-2 py-0.5",
+      "data-name": "service-featured",
+      "data-file": "pages/business/BusinessCatalog.js"
+    }, "Recomendado") : null), service.descripcion ? React.createElement("p", {
+      className: "text-sm text-[var(--text-muted)] mt-2 leading-relaxed",
+      "data-name": "service-description",
+      "data-file": "pages/business/BusinessCatalog.js"
+    }, service.descripcion) : null), React.createElement("div", {
+      className: "shrink-0 text-right",
+      "data-name": "service-price-wrap",
+      "data-file": "pages/business/BusinessCatalog.js"
+    }, React.createElement("p", {
+      className: "text-sm md:text-base font-semibold whitespace-nowrap",
+      "data-name": "service-price",
+      "data-file": "pages/business/BusinessCatalog.js"
+    }, Format.formatPrecioCUP(service.precio)), React.createElement("a", {
+      className: "mt-2 btn-rr btn-ghost-rr py-2 px-3 text-xs inline-flex items-center gap-2",
+      href: `https://wa.me/${String(b.whatsapp || '').replace('+', '')}?text=${encodeURIComponent(`Hola, quiero reservar ${service.nombre} en ${b.nombre}.`)}`,
+      target: "_blank",
+      rel: "noreferrer",
+      "data-name": "service-book",
+      "data-file": "pages/business/BusinessCatalog.js"
+    }, "Reservar"))))));
   } catch (error) {
     console.error('BusinessCatalog component error:', error);
     return null;
@@ -1676,29 +1619,7 @@ function BusinessPage({
 }) {
   try {
     const b = business;
-    const [tab, setTab] = React.useState('portafolio');
-    React.useEffect(() => {
-      try {
-        const url = new URL(window.location.href);
-        const t = url.hash ? url.hash.replace('#', '') : '';
-        if (t) setTab(t);
-      } catch (error) {
-        console.error('BusinessPage hash error:', error);
-      }
-    }, []);
-    const changeTab = t => {
-      try {
-        setTab(t);
-        window.history.replaceState({}, '', `business.html?id=${encodeURIComponent(b.id)}#${t}`);
-        const sectionEl = document.getElementById(`tab-${t}`);
-        if (sectionEl) sectionEl.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      } catch (error) {
-        console.error('BusinessPage.changeTab error:', error);
-      }
-    };
+    const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
     return React.createElement("div", {
       "data-name": "business-page",
       "data-file": "pages/business/BusinessPage.js"
@@ -1706,119 +1627,66 @@ function BusinessPage({
       business: b,
       "data-name": "business-header",
       "data-file": "pages/business/BusinessPage.js"
-    }), React.createElement(BusinessTabs, {
-      active: tab,
-      onChange: changeTab,
-      "data-name": "business-tabs",
-      "data-file": "pages/business/BusinessPage.js"
     }), React.createElement("div", {
-      className: "container-rr mt-6",
+      className: "container-rr mt-5 md:mt-7",
       "data-name": "business-content",
       "data-file": "pages/business/BusinessPage.js"
     }, React.createElement("div", {
-      className: "grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-4 items-start",
+      className: "grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 items-start",
       "data-name": "business-grid",
       "data-file": "pages/business/BusinessPage.js"
     }, React.createElement("div", {
-      className: "space-y-4",
       "data-name": "left",
       "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("section", {
-      id: "tab-portafolio",
-      className: `surface-rr p-4 md:p-5 ${tab === 'portafolio' ? '' : 'hidden'}`,
-      "data-name": "sec-portfolio",
-      "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("div", {
-      className: "flex items-end justify-between gap-4 mb-4",
-      "data-name": "sec-head",
-      "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("div", {
-      "data-name": "sec-titlewrap",
-      "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("h2", {
-      className: "text-lg font-semibold",
-      "data-name": "sec-title",
-      "data-file": "pages/business/BusinessPage.js"
-    }, "Portafolio"), React.createElement("p", {
-      className: "text-sm text-[var(--text-muted)] mt-1",
-      "data-name": "sec-sub",
-      "data-file": "pages/business/BusinessPage.js"
-    }, "Grid tipo Instagram con enfoque minimal.")), React.createElement("span", {
-      className: "chip-rr px-3 py-1.5 text-xs text-[var(--text-muted)]",
-      "data-name": "sec-chip",
-      "data-file": "pages/business/BusinessPage.js"
-    }, b.fotos?.length || 0, " fotos")), React.createElement(MasonryGrid, {
-      images: b.fotos || [],
-      "data-name": "masonry",
-      "data-file": "pages/business/BusinessPage.js"
-    })), React.createElement("section", {
-      id: "tab-catalogo",
-      className: `surface-rr p-4 md:p-5 ${tab === 'catalogo' ? '' : 'hidden'}`,
-      "data-name": "sec-catalog",
-      "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("h2", {
-      className: "text-lg font-semibold",
-      "data-name": "catalog-title",
-      "data-file": "pages/business/BusinessPage.js"
-    }, "Servicios y Productos"), React.createElement("p", {
-      className: "text-sm text-[var(--text-muted)] mt-1 mb-4",
-      "data-name": "catalog-sub",
-      "data-file": "pages/business/BusinessPage.js"
-    }, "Categor\xEDas plegables con precios alineados para decidir r\xE1pido."), React.createElement(BusinessCatalog, {
+    }, React.createElement(BusinessCatalog, {
       business: b,
-      mode: "catalogo",
       "data-name": "catalog",
       "data-file": "pages/business/BusinessPage.js"
-    })), React.createElement("section", {
-      id: "tab-cursos",
-      className: `surface-rr p-4 md:p-5 ${tab === 'cursos' ? '' : 'hidden'}`,
-      "data-name": "sec-courses",
-      "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("h2", {
-      className: "text-lg font-semibold",
-      "data-name": "courses-title",
-      "data-file": "pages/business/BusinessPage.js"
-    }, "Cursos y Talleres"), React.createElement("p", {
-      className: "text-sm text-[var(--text-muted)] mt-1 mb-4",
-      "data-name": "courses-sub",
-      "data-file": "pages/business/BusinessPage.js"
-    }, "Fechas, ubicaciones y precios en CUP con indicaci\xF3n de cupo."), React.createElement(BusinessCatalog, {
-      business: b,
-      mode: "cursos",
-      "data-name": "courses",
-      "data-file": "pages/business/BusinessPage.js"
-    })), React.createElement("section", {
-      id: "tab-resenas",
-      className: `surface-rr p-4 md:p-5 ${tab === 'resenas' ? '' : 'hidden'}`,
-      "data-name": "sec-reviews",
-      "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement(BusinessReviews, {
-      business: b,
-      "data-name": "reviews",
-      "data-file": "pages/business/BusinessPage.js"
-    }))), React.createElement("aside", {
-      className: "hidden lg:block space-y-4 sticky top-[92px]",
+    })), React.createElement("aside", {
+      className: "hidden lg:block sticky top-[92px]",
       "data-name": "right",
       "data-file": "pages/business/BusinessPage.js"
     }, React.createElement("div", {
       className: "surface-rr p-5",
-      "data-name": "sticky-card",
+      "data-name": "contact-card",
+      "data-file": "pages/business/BusinessPage.js"
+    }, React.createElement("div", {
+      className: "flex items-center gap-3",
+      "data-name": "contact-top",
+      "data-file": "pages/business/BusinessPage.js"
+    }, React.createElement("div", {
+      className: "w-12 h-12 rounded-lg border border-[var(--border)] bg-white overflow-hidden p-1.5",
+      "data-name": "contact-logo",
+      "data-file": "pages/business/BusinessPage.js"
+    }, b.logoUrl ? React.createElement("img", {
+      src: b.logoUrl,
+      alt: `Logo de ${b.nombre}`,
+      className: "w-full h-full object-contain",
+      "data-name": "contact-logo-img",
+      "data-file": "pages/business/BusinessPage.js"
+    }) : React.createElement("div", {
+      className: "w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--primary-color)]",
+      "data-name": "contact-logo-initials",
+      "data-file": "pages/business/BusinessPage.js"
+    }, initials)), React.createElement("div", {
+      className: "min-w-0",
+      "data-name": "contact-copy",
       "data-file": "pages/business/BusinessPage.js"
     }, React.createElement("p", {
-      className: "text-sm font-semibold",
-      "data-name": "sticky-title",
+      className: "text-sm font-semibold truncate",
+      "data-name": "contact-name",
       "data-file": "pages/business/BusinessPage.js"
-    }, "Atajo r\xE1pido"), React.createElement("p", {
-      className: "text-sm text-[var(--text-muted)] mt-1",
-      "data-name": "sticky-sub",
+    }, b.nombre), React.createElement("p", {
+      className: "text-xs text-[var(--text-muted)] truncate",
+      "data-name": "contact-area",
       "data-file": "pages/business/BusinessPage.js"
-    }, "Ideal si vienes directo a reservar."), React.createElement("div", {
-      className: "mt-4 space-y-2",
-      "data-name": "sticky-actions",
+    }, b.ubicacion?.zona || b.ubicacion?.ciudad))), React.createElement("div", {
+      className: "divider-rr my-4",
+      "data-name": "contact-div",
       "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("a", {
+    }), React.createElement("a", {
       className: "btn-rr btn-primary-rr w-full flex items-center justify-center gap-2",
-      href: `https://wa.me/${String(b.whatsapp || '').replace('+', '')}?text=${encodeURIComponent(`Hola, quiero reservar en ${b.nombre}. ¿Tienen disponibilidad?`)}`,
+      href: `https://wa.me/${String(b.whatsapp || '').replace('+', '')}?text=${encodeURIComponent(`Hola, quiero reservar en ${b.nombre}.`)}`,
       target: "_blank",
       rel: "noreferrer",
       "data-name": "sticky-wa",
@@ -1827,70 +1695,7 @@ function BusinessPage({
       className: "icon-message-circle text-xl text-white",
       "data-name": "sticky-wa-i",
       "data-file": "pages/business/BusinessPage.js"
-    }), "Contactar por WhatsApp"), React.createElement("button", {
-      className: "btn-rr btn-ghost-rr w-full flex items-center justify-center gap-2",
-      onClick: () => Navigation.goToSearch(b.categoria, b.ubicacion?.zona || b.ubicacion?.ciudad || ''),
-      "data-name": "sticky-sim",
-      "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("div", {
-      className: "icon-search text-xl text-[var(--primary-color)]",
-      "data-name": "sticky-sim-i",
-      "data-file": "pages/business/BusinessPage.js"
-    }), "Buscar similares")), React.createElement("div", {
-      className: "divider-rr my-5",
-      "data-name": "sticky-div",
-      "data-file": "pages/business/BusinessPage.js"
-    }), React.createElement("div", {
-      className: "space-y-3",
-      "data-name": "sticky-trust",
-      "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("div", {
-      className: "flex items-start gap-3",
-      "data-name": "t1",
-      "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("div", {
-      className: "w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
-      "data-name": "t1-iw",
-      "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("div", {
-      className: "icon-circle-check text-xl text-[var(--primary-color)]",
-      "data-name": "t1-i",
-      "data-file": "pages/business/BusinessPage.js"
-    })), React.createElement("div", {
-      "data-name": "t1-t",
-      "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("p", {
-      className: "text-sm font-semibold",
-      "data-name": "t1-tt",
-      "data-file": "pages/business/BusinessPage.js"
-    }, "Rese\xF1as verificadas"), React.createElement("p", {
-      className: "text-xs text-[var(--text-muted)] mt-1",
-      "data-name": "t1-dd",
-      "data-file": "pages/business/BusinessPage.js"
-    }, "M\xE1s confianza al reservar."))), React.createElement("div", {
-      className: "flex items-start gap-3",
-      "data-name": "t2",
-      "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("div", {
-      className: "w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
-      "data-name": "t2-iw",
-      "data-file": "pages/business/Business/BusinessPage.js"
-    }, React.createElement("div", {
-      className: "icon-award text-xl text-[var(--primary-color)]",
-      "data-name": "t2-i",
-      "data-file": "pages/business/BusinessPage.js"
-    })), React.createElement("div", {
-      "data-name": "t2-t",
-      "data-file": "pages/business/BusinessPage.js"
-    }, React.createElement("p", {
-      className: "text-sm font-semibold",
-      "data-name": "t2-tt",
-      "data-file": "pages/business/BusinessPage.js"
-    }, "Badges visibles"), React.createElement("p", {
-      className: "text-xs text-[var(--text-muted)] mt-1",
-      "data-name": "t2-dd",
-      "data-file": "pages/business/BusinessPage.js"
-    }, "Top Roma, M\xE1s reservado, Negocio del Mes.")))))))), React.createElement(MobileWhatsAppBar, {
+    }), "Reservar por WhatsApp"))))), React.createElement(MobileWhatsAppBar, {
       whatsapp: b.whatsapp,
       nombre: b.nombre,
       "data-name": "wa",

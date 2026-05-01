@@ -414,8 +414,8 @@ const MockData = (() => {
   let loadPromise = null;
   let loadedFromSupabase = false;
   let loadError = null;
-  const defaultCoverUrl = 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=80';
-  const defaultLogoUrl = 'https://app.trickle.so/storage/public/images/usr_1dec1efb58008001/55d88a3b-fbdf-46a8-bc34-5c6dac55ec46.png';
+  const defaultCoverUrl = '';
+  const defaultLogoUrl = '';
   function getSupabaseConfig() {
     const url = window.SUPABASE_URL || window.supabaseUrl || '';
     const key = window.SUPABASE_ANON_KEY || window.supabaseAnonKey || '';
@@ -489,6 +489,7 @@ const MockData = (() => {
           nombre: valueFrom(item, ['nombre', 'titulo', 'servicio'], 'Servicio'),
           duracionMin: numberFrom(item, ['duracion_min', 'duracionMin', 'duracion', 'minutos'], 60),
           precio: numberFrom(item, ['precio', 'precio_cup', 'monto'], 0),
+          descripcion: valueFrom(item, ['descripcion', 'description', 'detalle'], ''),
           destacado: boolFrom(item, ['destacado', 'recomendado'], false)
         }))
       });
@@ -526,7 +527,9 @@ const MockData = (() => {
     const lat = numberFrom(row, ['lat', 'latitud', 'latitude'], 23.1136);
     const lng = numberFrom(row, ['lng', 'longitud', 'lon', 'longitude'], -82.3666);
     const telefono = valueFrom(row, ['whatsapp', 'telefono', 'phone'], '');
-    const fotos = [valueFrom(row, ['portada_url', 'cover_url', 'foto_portada', 'imagen_url'], ''), valueFrom(row, ['logo_url', 'logo', 'avatar_url'], '')].filter(Boolean);
+    const coverUrl = valueFrom(row, ['imagen_fondo_url', 'portada_url', 'cover_url', 'foto_portada', 'imagen_url'], '');
+    const logoUrl = valueFrom(row, ['logo_url', 'logo', 'avatar_url'], defaultLogoUrl);
+    const fotos = [coverUrl, logoUrl].filter(Boolean);
     const servicios = relations.servicios[id] || [];
     const productos = relations.productos[id] || [];
     const cursos = relations.cursos[id] || [];
@@ -556,9 +559,9 @@ const MockData = (() => {
       },
       estrellas: numberFrom(row, ['estrellas', 'rating', 'calificacion'], resenas.length ? 4.8 : 0),
       totalReseñas: numberFrom(row, ['total_resenas', 'totalResenas', 'reviews_count'], resenas.length),
-      portadaUrl: valueFrom(row, ['portada_url', 'cover_url', 'foto_portada', 'imagen_url'], defaultCoverUrl),
-      logoUrl: valueFrom(row, ['logo_url', 'logo', 'avatar_url'], defaultLogoUrl),
-      fotos: fotos.length ? fotos : [defaultCoverUrl],
+      portadaUrl: coverUrl,
+      logoUrl,
+      fotos: fotos.length ? fotos : [logoUrl],
       whatsapp: telefono ? String(telefono).replace(/[^\d+]/g, '') : '',
       descripcion: valueFrom(row, ['descripcion', 'description', 'mensaje_bienvenida'], 'Negocio disponible para reservas.'),
       categoriasCatalogo: buildCatalogSections({
@@ -1191,7 +1194,10 @@ function BusinessCard({
   try {
     const b = business;
     const border = active ? 'border-[rgba(216,27,96,0.35)] shadow-[0_16px_40px_rgba(216,27,96,0.10)]' : '';
-    const serviceCount = (b.categoriasCatalogo || []).reduce((sum, section) => sum + (section.items?.length || 0), 0);
+    const serviceSection = (b.categoriasCatalogo || []).find(section => section.tipo === 'servicios');
+    const serviceCount = serviceSection?.items?.length || 0;
+    const firstService = serviceSection?.items?.[0] || null;
+    const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
     const onOpen = () => {
       try {
         Navigation.goToBusiness(b.id);
@@ -1233,20 +1239,24 @@ function BusinessCard({
       "data-file": "components/BusinessCard.js",
       "aria-label": `Abrir perfil de ${b.nombre}`
     }, React.createElement("div", {
-      className: "grid grid-cols-[112px_1fr] gap-4 p-3",
+      className: "grid grid-cols-[96px_1fr] gap-4 p-3",
       "data-name": "business-card-inner",
       "data-file": "components/BusinessCard.js"
     }, React.createElement("div", {
-      className: "relative w-28 h-28 rounded-lg overflow-hidden bg-[#F9FAFB] border border-[var(--border)]",
+      className: "relative w-24 h-24 rounded-lg overflow-hidden bg-white border border-[var(--border)] p-2",
       "data-name": "photo",
       "data-file": "components/BusinessCard.js"
-    }, React.createElement("img", {
-      src: b.fotos?.[0],
-      alt: `Foto de ${b.nombre}`,
-      className: "w-full h-full object-cover",
+    }, b.logoUrl ? React.createElement("img", {
+      src: b.logoUrl,
+      alt: `Logo de ${b.nombre}`,
+      className: "w-full h-full object-contain",
       "data-name": "photo-img",
       "data-file": "components/BusinessCard.js"
-    }), b.vip ? React.createElement("div", {
+    }) : React.createElement("div", {
+      className: "w-full h-full flex items-center justify-center text-xl font-semibold text-[var(--primary-color)]",
+      "data-name": "photo-initials",
+      "data-file": "components/BusinessCard.js"
+    }, initials), b.vip ? React.createElement("div", {
       className: "absolute top-2 left-2",
       "data-name": "vip",
       "data-file": "components/BusinessCard.js"
@@ -1279,7 +1289,7 @@ function BusinessCard({
       "data-name": "meta",
       "data-file": "components/BusinessCard.js"
     }, b.categoria, " \xB7 ", b.ubicacion?.zona)), React.createElement("div", {
-      className: "ml-auto flex flex-col items-end gap-1",
+      className: "ml-auto hidden sm:flex flex-col items-end gap-1",
       "data-name": "top-right",
       "data-file": "components/BusinessCard.js"
     }, React.createElement("div", {
@@ -1306,30 +1316,15 @@ function BusinessCard({
       className: "chip-rr px-2.5 py-1 text-[11px] text-[var(--text-muted)]",
       "data-name": "services-count",
       "data-file": "components/BusinessCard.js"
-    }, serviceCount, " servicios") : null, b.topRoma ? React.createElement(Badge, {
-      type: "top",
-      text: "Top Roma",
-      "data-name": "badge-top",
-      "data-file": "components/BusinessCard.js"
-    }) : null, b.masReservado ? React.createElement(Badge, {
-      type: "reservado",
-      text: "Mas reservado",
-      "data-name": "badge-reservado",
-      "data-file": "components/BusinessCard.js"
-    }) : null, b.negocioDelMes ? React.createElement(Badge, {
-      type: "mes",
-      text: "Negocio del Mes",
-      "data-name": "badge-mes",
-      "data-file": "components/BusinessCard.js"
-    }) : null), React.createElement("div", {
+    }, serviceCount, " servicios") : null), React.createElement("div", {
       className: "mt-4 flex items-center justify-between gap-3",
       "data-name": "bottom",
       "data-file": "components/BusinessCard.js"
     }, React.createElement("span", {
-      className: "text-xs text-[var(--text-muted)]",
+      className: "text-xs text-[var(--text-muted)] truncate",
       "data-name": "price",
       "data-file": "components/BusinessCard.js"
-    }, Format.formatRangoPrecio(b.rangoPrecio?.min, b.rangoPrecio?.max)), React.createElement("button", {
+    }, firstService ? `${firstService.nombre} - ${Format.formatPrecioCUP(firstService.precio)}` : Format.formatRangoPrecio(b.rangoPrecio?.min, b.rangoPrecio?.max)), React.createElement("button", {
       type: "button",
       className: "btn-rr btn-primary-rr py-2 px-4 text-xs flex items-center gap-2 shadow-md",
       onClick: onContact,
@@ -1362,6 +1357,7 @@ function MapSplitView({
         const size = b.vip ? 'w-12 h-12' : 'w-10 h-10';
         const ring = b.vip ? 'ring-2 ring-[#F59E0B]/60' : 'ring-1 ring-[rgba(31,41,55,0.14)]';
         const scale = b.id === activeId ? 'scale-110' : 'scale-100';
+        const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
         return React.createElement("button", {
           className: `absolute ${size} ${ring} rounded-2xl bg-white flex items-center justify-center shadow-[0_18px_55px_rgba(11,18,32,0.16)] transform ${scale} transition-transform`,
           style: {
@@ -1374,16 +1370,20 @@ function MapSplitView({
           "data-file": "components/MapSplitView.js",
           "aria-label": `Pin de ${b.nombre}`
         }, React.createElement("div", {
-          className: "w-7 h-7 rounded-xl bg-[#D81B60] flex items-center justify-center overflow-hidden",
+          className: "w-7 h-7 rounded-xl bg-white flex items-center justify-center overflow-hidden p-1",
           "data-name": "map-pin-inner",
           "data-file": "components/MapSplitView.js"
-        }, React.createElement("img", {
-          src: "https://app.trickle.so/storage/public/images/usr_1dec1efb58008001/55d88a3b-fbdf-46a8-bc34-5c6dac55ec46.png",
-          alt: "Rservas.Roma",
-          className: "w-full h-full object-cover",
+        }, b.logoUrl ? React.createElement("img", {
+          src: b.logoUrl,
+          alt: `Logo de ${b.nombre}`,
+          className: "w-full h-full object-contain",
           "data-name": "map-pin-logo",
           "data-file": "components/MapSplitView.js"
-        })));
+        }) : React.createElement("span", {
+          className: "text-[10px] font-semibold text-[var(--primary-color)]",
+          "data-name": "map-pin-initials",
+          "data-file": "components/MapSplitView.js"
+        }, initials)));
       } catch (error) {
         console.error('MapSplitView.MapPin error:', error);
         return null;
@@ -1455,16 +1455,20 @@ function MapSplitView({
       "data-name": "map-card-row",
       "data-file": "components/MapSplitView.js"
     }, React.createElement("div", {
-      className: "w-12 h-12 rounded-2xl overflow-hidden border border-[var(--border)] bg-white",
+      className: "w-12 h-12 rounded-2xl overflow-hidden border border-[var(--border)] bg-white p-1.5",
       "data-name": "map-card-logo",
       "data-file": "components/MapSplitView.js"
-    }, React.createElement("img", {
+    }, active.logoUrl ? React.createElement("img", {
       src: active.logoUrl,
       alt: `Logo de ${active.nombre}`,
-      className: "w-full h-full object-cover",
+      className: "w-full h-full object-contain",
       "data-name": "map-card-logo-img",
       "data-file": "components/MapSplitView.js"
-    })), React.createElement("div", {
+    }) : React.createElement("div", {
+      className: "w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--primary-color)]",
+      "data-name": "map-card-initials",
+      "data-file": "components/MapSplitView.js"
+    }, String(active.nombre || 'N').trim().slice(0, 2).toUpperCase())), React.createElement("div", {
       className: "min-w-0",
       "data-name": "map-card-content",
       "data-file": "components/MapSplitView.js"

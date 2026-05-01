@@ -35,7 +35,9 @@ function TopRatedCarousel({ items }) {
           </div>
 
           <div ref={ref} className="flex gap-4 overflow-x-auto no-scrollbar pb-2" data-name="top-rated-track" data-file="components/TopRatedCarousel.js">
-            {list.map((b) => (
+            {list.map((b) => {
+              const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
+              return (
               <div key={b.id} className="min-w-[260px] md:min-w-[320px]" data-name="top-rated-item" data-file="components/TopRatedCarousel.js">
                 <button
                   className="card-rr w-full overflow-hidden text-left hover:shadow-[0_22px_70px_rgba(11,18,32,0.12)] transition-shadow"
@@ -44,7 +46,17 @@ function TopRatedCarousel({ items }) {
                   data-file="components/TopRatedCarousel.js"
                 >
                   <div className="relative h-[170px] bg-[#F9FAFB]" data-name="top-rated-photo" data-file="components/TopRatedCarousel.js">
-                    <img src={b.fotos?.[0]} alt={`Foto de ${b.nombre}`} className="w-full h-full object-cover" data-name="top-rated-img" data-file="components/TopRatedCarousel.js" />
+                    {b.portadaUrl ? (
+                      <img src={b.portadaUrl} alt={`Imagen de ${b.nombre}`} className="w-full h-full object-cover" data-name="top-rated-img" data-file="components/TopRatedCarousel.js" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center p-10 bg-white" data-name="top-rated-logo-wrap" data-file="components/TopRatedCarousel.js">
+                        {b.logoUrl ? (
+                          <img src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="max-w-full max-h-full object-contain" data-name="top-rated-logo" data-file="components/TopRatedCarousel.js" />
+                        ) : (
+                          <div className="text-3xl font-semibold text-[var(--primary-color)]" data-name="top-rated-initials" data-file="components/TopRatedCarousel.js">{initials}</div>
+                        )}
+                      </div>
+                    )}
                     <div className="absolute top-3 left-3 flex flex-wrap gap-2" data-name="top-rated-badges" data-file="components/TopRatedCarousel.js">
                       {b.topRoma ? <Badge type="top" text="🌟 Top Roma" data-name="badge-top" data-file="components/TopRatedCarousel.js" /> : null}
                       {b.negocioDelMes ? <Badge type="mes" text="Negocio del Mes" data-name="badge-mes" data-file="components/TopRatedCarousel.js" /> : null}
@@ -75,7 +87,7 @@ function TopRatedCarousel({ items }) {
                   </div>
                 </button>
               </div>
-            ))}
+            )})}
           </div>
 
           <div className="md:hidden flex items-center gap-2 mt-4" data-name="top-rated-controls-mobile" data-file="components/TopRatedCarousel.js">
