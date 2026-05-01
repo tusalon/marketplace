@@ -41,7 +41,7 @@ function BusinessPage({ business }) {
                   data-file="pages/business/BusinessPage.js"
                 >
                   <div className="icon-message-circle text-xl text-white" data-name="sticky-wa-i" data-file="pages/business/BusinessPage.js"></div>
-                  Reservar por WhatsApp
+                  Reservar
                 </a>
               </div>
             </aside>

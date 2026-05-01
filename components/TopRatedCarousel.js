@@ -59,7 +59,6 @@ function TopRatedCarousel({ items }) {
                     )}
                     <div className="absolute top-3 left-3 flex flex-wrap gap-2" data-name="top-rated-badges" data-file="components/TopRatedCarousel.js">
                       {b.topRoma ? <Badge type="top" text="🌟 Top Roma" data-name="badge-top" data-file="components/TopRatedCarousel.js" /> : null}
-                      {b.negocioDelMes ? <Badge type="mes" text="Negocio del Mes" data-name="badge-mes" data-file="components/TopRatedCarousel.js" /> : null}
                     </div>
                     {b.vip ? (
                       <div className="absolute top-3 right-3" data-name="vip-pin" data-file="components/TopRatedCarousel.js">

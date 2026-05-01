@@ -1672,11 +1672,6 @@ function TopRatedCarousel({
         text: "\uD83C\uDF1F Top Roma",
         "data-name": "badge-top",
         "data-file": "components/TopRatedCarousel.js"
-      }) : null, b.negocioDelMes ? React.createElement(Badge, {
-        type: "mes",
-        text: "Negocio del Mes",
-        "data-name": "badge-mes",
-        "data-file": "components/TopRatedCarousel.js"
       }) : null), b.vip ? React.createElement("div", {
         className: "absolute top-3 right-3",
         "data-name": "vip-pin",
@@ -1770,7 +1765,7 @@ function HomeHero({
       const count = (business.categoriasCatalogo || []).reduce((innerSum, section) => innerSum + (section.items?.length || 0), 0);
       return sum + count;
     }, 0);
-    const showcase = businesses.slice(0, 5);
+    const featured = MockData.listWeeklyFeatured()[0] || businesses[0] || null;
     const categories = Array.from(new Set(businesses.map(business => business.categoria).filter(Boolean))).slice(0, 8);
     return React.createElement("section", {
       className: "pt-6 md:pt-10",
@@ -1781,7 +1776,7 @@ function HomeHero({
       "data-name": "home-hero-inner",
       "data-file": "pages/home/HomeHero.js"
     }, React.createElement("div", {
-      className: "grid grid-cols-1 lg:grid-cols-[1fr_480px] gap-8 lg:gap-10 items-center",
+      className: "grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 lg:gap-10 items-center",
       "data-name": "home-hero-grid",
       "data-file": "pages/home/HomeHero.js"
     }, React.createElement("div", {
@@ -1824,7 +1819,7 @@ function HomeHero({
       "data-file": "pages/home/HomeHero.js"
     })), React.createElement("a", {
       className: "btn-rr btn-ghost-rr flex items-center justify-center gap-2",
-      href: "https://wa.me/5353066647?text=Hola,%20quiero%20listar%20mi%20negocio%20en%20RservasRoma",
+      href: "https://wa.me/5354066204?text=Hola,%20quiero%20listar%20mi%20negocio%20en%20RservasRoma",
       target: "_blank",
       rel: "noreferrer",
       "data-name": "hero-list",
@@ -1873,58 +1868,57 @@ function HomeHero({
       "data-name": "stat-booking-label",
       "data-file": "pages/home/HomeHero.js"
     }, "reserva")))), React.createElement("div", {
-      className: "relative min-h-[460px] lg:min-h-[560px]",
+      className: "hidden lg:block",
       "data-name": "home-hero-showcase",
       "data-file": "pages/home/HomeHero.js"
-    }, showcase.map((business, index) => {
-      const initials = String(business.nombre || 'N').trim().slice(0, 2).toUpperCase();
-      const positions = ['left-0 top-8 rotate-[-4deg] z-[4]', 'right-0 top-0 rotate-[5deg] z-[3]', 'left-12 top-[190px] rotate-[3deg] z-[5]', 'right-8 top-[300px] rotate-[-3deg] z-[2]', 'left-2 bottom-0 rotate-[2deg] z-[1]'];
-      return React.createElement("button", {
-        key: business.id,
-        className: `absolute w-[250px] md:w-[280px] surface-rr overflow-hidden text-left shadow-[0_24px_80px_rgba(11,18,32,0.14)] hover:-translate-y-2 hover:rotate-0 transition-transform duration-300 ${positions[index] || positions[0]}`,
-        onClick: () => Navigation.goToBusiness(business.id),
-        "data-name": "hero-showcase-card",
-        "data-file": "pages/home/HomeHero.js"
-      }, React.createElement("div", {
-        className: "h-28 bg-[#F9FAFB] flex items-center justify-center p-7",
-        "data-name": "hero-showcase-media",
-        "data-file": "pages/home/HomeHero.js"
-      }, business.logoUrl ? React.createElement("img", {
-        src: business.logoUrl,
-        alt: `Logo de ${business.nombre}`,
-        className: "max-w-full max-h-full object-contain",
-        "data-name": "hero-showcase-logo",
-        "data-file": "pages/home/HomeHero.js"
-      }) : React.createElement("div", {
-        className: "text-3xl font-semibold text-[var(--primary-color)]",
-        "data-name": "hero-showcase-initials",
-        "data-file": "pages/home/HomeHero.js"
-      }, initials)), React.createElement("div", {
-        className: "p-4",
-        "data-name": "hero-showcase-body",
-        "data-file": "pages/home/HomeHero.js"
-      }, React.createElement("p", {
-        className: "text-sm font-semibold truncate",
-        "data-name": "hero-showcase-name",
-        "data-file": "pages/home/HomeHero.js"
-      }, business.nombre), React.createElement("p", {
-        className: "text-xs text-[var(--text-muted)] mt-1 truncate",
-        "data-name": "hero-showcase-meta",
-        "data-file": "pages/home/HomeHero.js"
-      }, business.categoria, " \xB7 ", business.ubicacion?.zona), React.createElement("div", {
-        className: "mt-3 flex items-center justify-between gap-3",
-        "data-name": "hero-showcase-bottom",
-        "data-file": "pages/home/HomeHero.js"
-      }, React.createElement("span", {
-        className: "text-xs text-[var(--text-muted)]",
-        "data-name": "hero-showcase-services",
-        "data-file": "pages/home/HomeHero.js"
-      }, (business.categoriasCatalogo?.[0]?.items || []).length, " servicios"), React.createElement("span", {
-        className: "text-xs font-semibold text-[var(--primary-color)]",
-        "data-name": "hero-showcase-action",
-        "data-file": "pages/home/HomeHero.js"
-      }, "Ver perfil"))));
-    }))), React.createElement("div", {
+    }, featured ? React.createElement("button", {
+      className: "surface-rr w-full overflow-hidden text-left shadow-[0_28px_90px_rgba(11,18,32,0.14)] hover:-translate-y-1 transition-transform duration-300",
+      onClick: () => Navigation.goToBusiness(featured.id),
+      "data-name": "hero-feature-card",
+      "data-file": "pages/home/HomeHero.js"
+    }, React.createElement("div", {
+      className: "h-[260px] bg-white flex items-center justify-center p-12 border-b border-[var(--border)]",
+      "data-name": "hero-feature-media",
+      "data-file": "pages/home/HomeHero.js"
+    }, featured.logoUrl ? React.createElement("img", {
+      src: featured.logoUrl,
+      alt: `Logo de ${featured.nombre}`,
+      className: "max-w-full max-h-full object-contain",
+      "data-name": "hero-feature-logo",
+      "data-file": "pages/home/HomeHero.js"
+    }) : React.createElement("div", {
+      className: "text-5xl font-semibold text-[var(--primary-color)]",
+      "data-name": "hero-feature-initials",
+      "data-file": "pages/home/HomeHero.js"
+    }, String(featured.nombre || 'N').trim().slice(0, 2).toUpperCase())), React.createElement("div", {
+      className: "p-5",
+      "data-name": "hero-feature-body",
+      "data-file": "pages/home/HomeHero.js"
+    }, React.createElement("p", {
+      className: "text-xs uppercase tracking-[0.16em] text-[var(--primary-color)] font-semibold",
+      "data-name": "hero-feature-kicker",
+      "data-file": "pages/home/HomeHero.js"
+    }, "Destacado"), React.createElement("p", {
+      className: "mt-2 text-xl font-semibold leading-tight",
+      "data-name": "hero-feature-name",
+      "data-file": "pages/home/HomeHero.js"
+    }, featured.nombre), React.createElement("p", {
+      className: "mt-1 text-sm text-[var(--text-muted)]",
+      "data-name": "hero-feature-meta",
+      "data-file": "pages/home/HomeHero.js"
+    }, featured.categoria, " \xB7 ", featured.ubicacion?.zona || featured.ubicacion?.ciudad), React.createElement("div", {
+      className: "mt-5 flex items-center justify-between gap-3",
+      "data-name": "hero-feature-bottom",
+      "data-file": "pages/home/HomeHero.js"
+    }, React.createElement("span", {
+      className: "text-sm text-[var(--text-muted)]",
+      "data-name": "hero-feature-services",
+      "data-file": "pages/home/HomeHero.js"
+    }, (featured.categoriasCatalogo?.[0]?.items || []).length, " servicios"), React.createElement("span", {
+      className: "btn-rr btn-primary-rr py-2 px-4 text-sm",
+      "data-name": "hero-feature-open",
+      "data-file": "pages/home/HomeHero.js"
+    }, "Ver perfil")))) : null)), React.createElement("div", {
       className: "mt-4 flex flex-wrap items-center gap-2",
       "data-name": "hero-categories",
       "data-file": "pages/home/HomeHero.js"
@@ -2008,26 +2002,7 @@ function IntrigueWall() {
           className: "w-full h-full object-cover",
           "data-name": "intrigue-photo-img",
           "data-file": "pages/home/IntrigueWall.js"
-        }), React.createElement("div", {
-          className: "absolute top-4 left-4 flex flex-wrap gap-2",
-          "data-name": "intrigue-badges",
-          "data-file": "pages/home/IntrigueWall.js"
-        }, business.topRoma ? React.createElement(Badge, {
-          type: "top",
-          text: "\uD83C\uDF1F Top Roma",
-          "data-name": "badge-top",
-          "data-file": "pages/home/IntrigueWall.js"
-        }) : null, business.masReservado ? React.createElement(Badge, {
-          type: "reservado",
-          text: "M\xE1s reservado",
-          "data-name": "badge-reservado",
-          "data-file": "pages/home/IntrigueWall.js"
-        }) : null, business.negocioDelMes ? React.createElement(Badge, {
-          type: "mes",
-          text: "Negocio del Mes",
-          "data-name": "badge-mes",
-          "data-file": "pages/home/IntrigueWall.js"
-        }) : null), React.createElement("button", {
+        }), React.createElement("button", {
           className: "absolute top-4 right-4 w-11 h-11 rounded-2xl bg-white/90 backdrop-blur border border-[var(--border)] flex items-center justify-center hover:bg-white transition-colors",
           onClick: closeCard,
           "data-name": "intrigue-close",
@@ -2327,11 +2302,11 @@ function HomePage({
       className: "mt-4 text-sm font-semibold",
       "data-name": "trust-3-t",
       "data-file": "pages/home/HomePage.js"
-    }, "Negocio del Mes"), React.createElement("p", {
+    }, "Perfil premium"), React.createElement("p", {
       className: "mt-1 text-sm text-[var(--text-muted)] leading-relaxed",
       "data-name": "trust-3-d",
       "data-file": "pages/home/HomePage.js"
-    }, "Un badge con presencia: para negocios con calidad y consistencia."))))));
+    }, "Una ficha clara, elegante y lista para convertir visitas en reservas."))))));
   } catch (error) {
     console.error('HomePage component error:', error);
     return null;

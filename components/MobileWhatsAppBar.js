@@ -21,11 +21,8 @@ function MobileWhatsAppBar({ whatsapp, nombre }) {
             data-file="components/MobileWhatsAppBar.js"
           >
             <div className="icon-message-circle text-xl text-white" data-name="wa-icon" data-file="components/MobileWhatsAppBar.js"></div>
-            <span data-name="wa-text" data-file="components/MobileWhatsAppBar.js">Contactar por WhatsApp</span>
+            <span data-name="wa-text" data-file="components/MobileWhatsAppBar.js">Reservar</span>
           </button>
-          <p className="mt-2 text-[11px] text-[var(--text-muted)] text-center" data-name="wa-note" data-file="components/MobileWhatsAppBar.js">
-            Respuesta típica: 5–20 min según disponibilidad.
-          </p>
         </div>
       </div>
     );

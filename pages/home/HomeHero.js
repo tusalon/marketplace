@@ -6,13 +6,13 @@ function HomeHero({ initialParams }) {
       const count = (business.categoriasCatalogo || []).reduce((innerSum, section) => innerSum + (section.items?.length || 0), 0);
       return sum + count;
     }, 0);
-    const showcase = businesses.slice(0, 5);
+    const featured = MockData.listWeeklyFeatured()[0] || businesses[0] || null;
     const categories = Array.from(new Set(businesses.map((business) => business.categoria).filter(Boolean))).slice(0, 8);
 
     return (
       <section className="pt-6 md:pt-10" data-name="home-hero" data-file="pages/home/HomeHero.js">
         <div className="container-rr" data-name="home-hero-inner" data-file="pages/home/HomeHero.js">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_480px] gap-8 lg:gap-10 items-center" data-name="home-hero-grid" data-file="pages/home/HomeHero.js">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 lg:gap-10 items-center" data-name="home-hero-grid" data-file="pages/home/HomeHero.js">
             <div data-name="home-hero-copy" data-file="pages/home/HomeHero.js">
               <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.18em] text-[var(--primary-color)]" data-name="hero-kicker" data-file="pages/home/HomeHero.js">
                 RservasRoma Marketplace
@@ -40,7 +40,7 @@ function HomeHero({ initialParams }) {
                   Explorar negocios
                   <div className="icon-arrow-right text-xl text-white" data-name="hero-explore-i" data-file="pages/home/HomeHero.js"></div>
                 </button>
-                <a className="btn-rr btn-ghost-rr flex items-center justify-center gap-2" href="https://wa.me/5353066647?text=Hola,%20quiero%20listar%20mi%20negocio%20en%20RservasRoma" target="_blank" rel="noreferrer" data-name="hero-list" data-file="pages/home/HomeHero.js">
+                <a className="btn-rr btn-ghost-rr flex items-center justify-center gap-2" href="https://wa.me/5354066204?text=Hola,%20quiero%20listar%20mi%20negocio%20en%20RservasRoma" target="_blank" rel="noreferrer" data-name="hero-list" data-file="pages/home/HomeHero.js">
                   Quiero listar mi negocio
                   <div className="icon-sparkles text-xl text-[var(--primary-color)]" data-name="hero-list-i" data-file="pages/home/HomeHero.js"></div>
                 </a>
@@ -62,42 +62,32 @@ function HomeHero({ initialParams }) {
               </div>
             </div>
 
-            <div className="relative min-h-[460px] lg:min-h-[560px]" data-name="home-hero-showcase" data-file="pages/home/HomeHero.js">
-              {showcase.map((business, index) => {
-                const initials = String(business.nombre || 'N').trim().slice(0, 2).toUpperCase();
-                const positions = [
-                  'left-0 top-8 rotate-[-4deg] z-[4]',
-                  'right-0 top-0 rotate-[5deg] z-[3]',
-                  'left-12 top-[190px] rotate-[3deg] z-[5]',
-                  'right-8 top-[300px] rotate-[-3deg] z-[2]',
-                  'left-2 bottom-0 rotate-[2deg] z-[1]'
-                ];
-                return (
-                  <button
-                    key={business.id}
-                    className={`absolute w-[250px] md:w-[280px] surface-rr overflow-hidden text-left shadow-[0_24px_80px_rgba(11,18,32,0.14)] hover:-translate-y-2 hover:rotate-0 transition-transform duration-300 ${positions[index] || positions[0]}`}
-                    onClick={() => Navigation.goToBusiness(business.id)}
-                    data-name="hero-showcase-card"
-                    data-file="pages/home/HomeHero.js"
-                  >
-                    <div className="h-28 bg-[#F9FAFB] flex items-center justify-center p-7" data-name="hero-showcase-media" data-file="pages/home/HomeHero.js">
-                      {business.logoUrl ? (
-                        <img src={business.logoUrl} alt={`Logo de ${business.nombre}`} className="max-w-full max-h-full object-contain" data-name="hero-showcase-logo" data-file="pages/home/HomeHero.js" />
-                      ) : (
-                        <div className="text-3xl font-semibold text-[var(--primary-color)]" data-name="hero-showcase-initials" data-file="pages/home/HomeHero.js">{initials}</div>
-                      )}
+            <div className="hidden lg:block" data-name="home-hero-showcase" data-file="pages/home/HomeHero.js">
+              {featured ? (
+                <button
+                  className="surface-rr w-full overflow-hidden text-left shadow-[0_28px_90px_rgba(11,18,32,0.14)] hover:-translate-y-1 transition-transform duration-300"
+                  onClick={() => Navigation.goToBusiness(featured.id)}
+                  data-name="hero-feature-card"
+                  data-file="pages/home/HomeHero.js"
+                >
+                  <div className="h-[260px] bg-white flex items-center justify-center p-12 border-b border-[var(--border)]" data-name="hero-feature-media" data-file="pages/home/HomeHero.js">
+                    {featured.logoUrl ? (
+                      <img src={featured.logoUrl} alt={`Logo de ${featured.nombre}`} className="max-w-full max-h-full object-contain" data-name="hero-feature-logo" data-file="pages/home/HomeHero.js" />
+                    ) : (
+                      <div className="text-5xl font-semibold text-[var(--primary-color)]" data-name="hero-feature-initials" data-file="pages/home/HomeHero.js">{String(featured.nombre || 'N').trim().slice(0, 2).toUpperCase()}</div>
+                    )}
+                  </div>
+                  <div className="p-5" data-name="hero-feature-body" data-file="pages/home/HomeHero.js">
+                    <p className="text-xs uppercase tracking-[0.16em] text-[var(--primary-color)] font-semibold" data-name="hero-feature-kicker" data-file="pages/home/HomeHero.js">Destacado</p>
+                    <p className="mt-2 text-xl font-semibold leading-tight" data-name="hero-feature-name" data-file="pages/home/HomeHero.js">{featured.nombre}</p>
+                    <p className="mt-1 text-sm text-[var(--text-muted)]" data-name="hero-feature-meta" data-file="pages/home/HomeHero.js">{featured.categoria} · {featured.ubicacion?.zona || featured.ubicacion?.ciudad}</p>
+                    <div className="mt-5 flex items-center justify-between gap-3" data-name="hero-feature-bottom" data-file="pages/home/HomeHero.js">
+                      <span className="text-sm text-[var(--text-muted)]" data-name="hero-feature-services" data-file="pages/home/HomeHero.js">{(featured.categoriasCatalogo?.[0]?.items || []).length} servicios</span>
+                      <span className="btn-rr btn-primary-rr py-2 px-4 text-sm" data-name="hero-feature-open" data-file="pages/home/HomeHero.js">Ver perfil</span>
                     </div>
-                    <div className="p-4" data-name="hero-showcase-body" data-file="pages/home/HomeHero.js">
-                      <p className="text-sm font-semibold truncate" data-name="hero-showcase-name" data-file="pages/home/HomeHero.js">{business.nombre}</p>
-                      <p className="text-xs text-[var(--text-muted)] mt-1 truncate" data-name="hero-showcase-meta" data-file="pages/home/HomeHero.js">{business.categoria} · {business.ubicacion?.zona}</p>
-                      <div className="mt-3 flex items-center justify-between gap-3" data-name="hero-showcase-bottom" data-file="pages/home/HomeHero.js">
-                        <span className="text-xs text-[var(--text-muted)]" data-name="hero-showcase-services" data-file="pages/home/HomeHero.js">{(business.categoriasCatalogo?.[0]?.items || []).length} servicios</span>
-                        <span className="text-xs font-semibold text-[var(--primary-color)]" data-name="hero-showcase-action" data-file="pages/home/HomeHero.js">Ver perfil</span>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
+                  </div>
+                </button>
+              ) : null}
             </div>
           </div>
 

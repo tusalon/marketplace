@@ -1378,11 +1378,7 @@ function MobileWhatsAppBar({
     }), React.createElement("span", {
       "data-name": "wa-text",
       "data-file": "components/MobileWhatsAppBar.js"
-    }, "Contactar por WhatsApp")), React.createElement("p", {
-      className: "mt-2 text-[11px] text-[var(--text-muted)] text-center",
-      "data-name": "wa-note",
-      "data-file": "components/MobileWhatsAppBar.js"
-    }, "Respuesta t\xEDpica: 5\u201320 min seg\xFAn disponibilidad.")));
+    }, "Reservar"))));
   } catch (error) {
     console.error('MobileWhatsAppBar component error:', error);
     return null;
@@ -1868,7 +1864,7 @@ function BusinessPage({
       className: "icon-message-circle text-xl text-white",
       "data-name": "sticky-wa-i",
       "data-file": "pages/business/BusinessPage.js"
-    }), "Reservar por WhatsApp"))))), React.createElement(MobileWhatsAppBar, {
+    }), "Reservar"))))), React.createElement(MobileWhatsAppBar, {
       whatsapp: b.whatsapp,
       nombre: b.nombre,
       "data-name": "wa",

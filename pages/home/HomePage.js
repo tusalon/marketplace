@@ -54,9 +54,9 @@ function HomePage({ initialParams }) {
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]" data-name="trust-3-iw" data-file="pages/home/HomePage.js">
                   <div className="icon-award text-xl text-[var(--primary-color)]" data-name="trust-3-i" data-file="pages/home/HomePage.js"></div>
                 </div>
-                <p className="mt-4 text-sm font-semibold" data-name="trust-3-t" data-file="pages/home/HomePage.js">Negocio del Mes</p>
+                <p className="mt-4 text-sm font-semibold" data-name="trust-3-t" data-file="pages/home/HomePage.js">Perfil premium</p>
                 <p className="mt-1 text-sm text-[var(--text-muted)] leading-relaxed" data-name="trust-3-d" data-file="pages/home/HomePage.js">
-                  Un badge con presencia: para negocios con calidad y consistencia.
+                  Una ficha clara, elegante y lista para convertir visitas en reservas.
                 </p>
               </div>
             </div>

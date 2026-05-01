@@ -101,7 +101,7 @@ function BusinessCard({ business, onHover, active }) {
                 onClick={onContact}
                 data-name="contact"
                 data-file="components/BusinessCard.js"
-                aria-label={`Contactar por WhatsApp a ${b.nombre}`}
+                aria-label={`Reservar en ${b.nombre}`}
               >
                 <div className="icon-message-circle text-base text-white" data-name="contact-i" data-file="components/BusinessCard.js"></div>
                 Reservar
