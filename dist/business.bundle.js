@@ -1375,7 +1375,7 @@ function MobileWhatsAppBar({
         const wa = String(whatsapp || '').replace(/\s+/g, '');
         const msg = encodeURIComponent(`Hola, quiero reservar en ${nombre}. ¿Me ayudas con disponibilidad y precios?`);
         const url = reservaUrl || `https://wa.me/${wa.replace('+', '')}?text=${msg}`;
-        window.open(url, '_blank', 'noopener,noreferrer');
+        window.location.href = url;
       } catch (error) {
         console.error('MobileWhatsAppBar.onWhatsApp error:', error);
       }
@@ -1509,7 +1509,7 @@ function BusinessHeader({
     }, React.createElement("a", {
       className: "btn-rr btn-primary-rr w-full flex items-center justify-center gap-2",
       href: b.reservaUrl || `https://wa.me/${String(b.whatsapp || '').replace('+', '')}?text=${encodeURIComponent(`Hola, quiero reservar en ${b.nombre}. Tienen disponibilidad?`)}`,
-      target: "_blank",
+      target: "_self",
       rel: "noreferrer",
       "data-name": "cta-wa",
       "data-file": "pages/business/BusinessHeader.js"
@@ -1652,7 +1652,7 @@ function BusinessCatalog({
     }, Format.formatPrecioCUP(service.precio)), React.createElement("a", {
       className: "mt-2 btn-rr btn-ghost-rr py-2 px-3 text-xs inline-flex items-center gap-2",
       href: b.reservaUrl || `https://wa.me/${String(b.whatsapp || '').replace('+', '')}?text=${encodeURIComponent(`Hola, quiero reservar ${service.nombre} en ${b.nombre}.`)}`,
-      target: "_blank",
+      target: "_self",
       rel: "noreferrer",
       "data-name": "service-book",
       "data-file": "pages/business/BusinessCatalog.js"
@@ -1878,7 +1878,7 @@ function BusinessPage({
     }), React.createElement("a", {
       className: "btn-rr btn-primary-rr w-full flex items-center justify-center gap-2",
       href: b.reservaUrl || `https://wa.me/${String(b.whatsapp || '').replace('+', '')}?text=${encodeURIComponent(`Hola, quiero reservar en ${b.nombre}.`)}`,
-      target: "_blank",
+      target: "_self",
       rel: "noreferrer",
       "data-name": "sticky-wa",
       "data-file": "pages/business/BusinessPage.js"
