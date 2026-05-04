@@ -2,22 +2,22 @@
   try {
     const list = businesses || [];
     const provinces = [
-      { name: 'Pinar del Río', x: 9, y: 50 },
-      { name: 'Artemisa', x: 19, y: 48 },
-      { name: 'La Habana', x: 25, y: 44 },
-      { name: 'Mayabeque', x: 30, y: 48 },
-      { name: 'Matanzas', x: 38, y: 50 },
-      { name: 'Cienfuegos', x: 47, y: 59 },
-      { name: 'Villa Clara', x: 50, y: 50 },
-      { name: 'Sancti Spíritus', x: 58, y: 56 },
-      { name: 'Ciego de Ávila', x: 66, y: 55 },
-      { name: 'Camagüey', x: 74, y: 58 },
-      { name: 'Las Tunas', x: 83, y: 61 },
-      { name: 'Holguín', x: 89, y: 57 },
+      { name: 'Pinar del Río', x: 11, y: 45 },
+      { name: 'Artemisa', x: 21, y: 43 },
+      { name: 'La Habana', x: 25, y: 39 },
+      { name: 'Mayabeque', x: 29, y: 44 },
+      { name: 'Matanzas', x: 36, y: 47 },
+      { name: 'Cienfuegos', x: 45, y: 58 },
+      { name: 'Villa Clara', x: 49, y: 47 },
+      { name: 'Sancti Spíritus', x: 57, y: 55 },
+      { name: 'Ciego de Ávila', x: 65, y: 52 },
+      { name: 'Camagüey', x: 72, y: 57 },
+      { name: 'Las Tunas', x: 81, y: 58 },
+      { name: 'Holguín', x: 87, y: 51 },
       { name: 'Granma', x: 86, y: 70 },
-      { name: 'Santiago de Cuba', x: 93, y: 72 },
-      { name: 'Guantánamo', x: 97, y: 68 },
-      { name: 'Isla de la Juventud', x: 29, y: 72 }
+      { name: 'Santiago de Cuba', x: 92, y: 70 },
+      { name: 'Guantánamo', x: 96, y: 64 },
+      { name: 'Isla de la Juventud', x: 29, y: 74 }
     ];
 
     const normalize = (value) => String(value || '')
@@ -42,32 +42,21 @@
       || provinces[2];
 
     const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-    const hasRealCoords = (coords) => {
-      const lat = Number(coords?.lat);
-      const lng = Number(coords?.lng);
-      return Number.isFinite(lat) && Number.isFinite(lng) && lat >= 19.4 && lat <= 23.6 && lng >= -85.5 && lng <= -73.8;
-    };
-
-    const coordsToPoint = (coords) => {
-      const lat = Number(coords.lat);
-      const lng = Number(coords.lng);
-      const x = ((lng + 85.5) / 11.7) * 100;
-      const y = ((23.6 - lat) / 4.2) * 100;
-      return { x: clamp(x, 5, 97), y: clamp(y, 24, 78) };
-    };
-
-    const markers = list.map((business, index) => {
+    const provinceIndexes = {};
+    const markers = list.map((business) => {
       const provinceName = business.ubicacion?.provincia || business.ubicacion?.ciudad || 'La Habana';
-      const province = provinceByKey[normalize(provinceName)] || provinces[2];
-      const point = hasRealCoords(business.coordenadas) ? coordsToPoint(business.coordenadas) : province;
+      const key = normalize(provinceName);
+      const province = provinceByKey[key] || provinces[2];
+      const index = provinceIndexes[key] || 0;
+      provinceIndexes[key] = index + 1;
       const ring = Math.floor(index / 8);
       const angle = (index % 8) * 0.785;
-      const radius = hasRealCoords(business.coordenadas) ? 1.1 : 2.6 + ring * 1.2;
+      const radius = index === 0 ? 0 : 2.8 + ring * 1.5;
       return {
         business,
         provinceName,
-        x: clamp(point.x + Math.cos(angle) * radius, 5, 97),
-        y: clamp(point.y + Math.sin(angle) * radius, 24, 78)
+        x: clamp(province.x + Math.cos(angle) * radius, 5, 97),
+        y: clamp(province.y + Math.sin(angle) * radius, 18, 80)
       };
     });
 
