@@ -354,9 +354,12 @@ const MockData = (() => {
         tipo: 'productos',
         titulo: 'Productos',
         items: productos.map((item) => ({
+          id: String(item.id || valueFrom(item, ['nombre', 'titulo', 'producto'], 'Producto')),
           nombre: valueFrom(item, ['nombre', 'titulo', 'producto'], 'Producto'),
           stock: numberFrom(item, ['stock', 'cantidad'], 0),
-          precio: numberFrom(item, ['precio', 'precio_cup', 'monto'], 0)
+          precio: numberFrom(item, ['precio', 'precio_cup', 'monto'], 0),
+          descripcion: valueFrom(item, ['descripcion', 'description', 'detalle'], ''),
+          imagen: valueFrom(item, ['imagen', 'imagen_url', 'foto_url'], '')
         }))
       });
     }
@@ -366,10 +369,13 @@ const MockData = (() => {
         tipo: 'cursos',
         titulo: 'Cursos y Talleres',
         items: cursos.map((item) => ({
+          id: String(item.id || valueFrom(item, ['nombre', 'titulo', 'curso'], 'Curso')),
           nombre: valueFrom(item, ['nombre', 'titulo', 'curso'], 'Curso'),
           fecha: valueFrom(item, ['fecha', 'fecha_inicio', 'created_at'], new Date().toISOString()),
           ubicacion: valueFrom(item, ['ubicacion', 'direccion', 'lugar'], ''),
-          precio: numberFrom(item, ['precio', 'precio_cup', 'monto'], 0)
+          precio: numberFrom(item, ['precio', 'precio_cup', 'monto'], 0),
+          descripcion: valueFrom(item, ['descripcion', 'description', 'detalle'], ''),
+          imagen: valueFrom(item, ['imagen', 'imagen_url', 'foto_url'], '')
         }))
       });
     }
@@ -416,7 +422,7 @@ const MockData = (() => {
         max: precios.length ? Math.max(...precios) : numberFrom(row, ['precio_max', 'precio_hasta'], 0)
       },
       estrellas: numberFrom(row, ['estrellas', 'rating', 'calificacion'], resenas.length ? 4.8 : 0),
-      totalReseñas: numberFrom(row, ['total_resenas', 'totalResenas', 'reviews_count'], resenas.length),
+      totalResenas: numberFrom(row, ['total_resenas', 'totalResenas', 'reviews_count'], resenas.length),
       portadaUrl: coverUrl,
       logoUrl,
       reservaUrl,
@@ -452,13 +458,15 @@ const MockData = (() => {
         const serviciosRows = await supabaseFetch('servicios?activo=eq.true&select=id,negocio_id,nombre,duracion,precio,descripcion,activo,imagen,categoria');
         const provincias = await loadOptionalBusinessProvinces();
         const resenasRows = await optionalSupabaseFetch('resenas?select=*&limit=500');
+        const productosRows = await optionalSupabaseFetch('productos?activo=eq.true&select=id,negocio_id,nombre,descripcion,precio,imagen,categoria,stock,activo&limit=1000');
+        const cursosRows = await optionalSupabaseFetch('cursos?activo=eq.true&select=id,negocio_id,nombre,descripcion,precio,imagen,fecha,ubicacion,activo&limit=1000');
         const reservasRows = await optionalSupabaseFetch('reservas?select=*&limit=2000');
         const reservasSemana = countWeeklyReservations(reservasRows);
 
         const relations = {
           servicios: groupByBusiness(serviciosRows),
-          productos: {},
-          cursos: {},
+          productos: groupByBusiness(productosRows),
+          cursos: groupByBusiness(cursosRows),
           resenas: groupByBusiness(resenasRows)
         };
 
@@ -495,8 +503,8 @@ const MockData = (() => {
   function listTopRated() {
     return businesses
       .slice()
-      .filter((b) => b.totalReseñas > 0)
-      .sort((a, b) => (b.estrellas - a.estrellas) || (b.totalReseñas - a.totalReseñas))
+      .filter((b) => (b.totalResenas || b.totalReseñas || 0) > 0)
+      .sort((a, b) => (b.estrellas - a.estrellas) || ((b.totalResenas || b.totalReseñas || 0) - (a.totalResenas || a.totalReseñas || 0)))
       .slice(0, 8);
   }
 
@@ -546,7 +554,7 @@ const MockData = (() => {
         fecha: created.fecha || created.created_at || payload.fecha
       };
       business.reseñas = [normalized, ...(business.reseñas || [])];
-      business.totalReseñas = business.reseñas.length;
+      business.totalResenas = business.reseñas.length;
       business.estrellas = business.reseñas.reduce((sum, item) => sum + Number(item.estrellas || 0), 0) / business.reseñas.length;
     }
     return created;
