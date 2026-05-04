@@ -1,8 +1,9 @@
-const CACHE_NAME = 'rservasroma-marketplace-v5';
+const CACHE_NAME = 'rservasroma-marketplace-v6';
 const APP_SHELL = [
   './index.html',
   './search.html',
   './business.html',
+  './register.html',
   './manifest.webmanifest',
   './styles/tailwind.css',
   './styles/global.css',
@@ -11,6 +12,7 @@ const APP_SHELL = [
   './dist/index.bundle.js',
   './dist/search.bundle.js',
   './dist/business.bundle.js',
+  './dist/register.bundle.js',
   './icons/icon-72x72.png',
   './icons/icon-96x96.png',
   './icons/icon-128x128.png',

@@ -60,6 +60,14 @@ const bundles = {
     'pages/business/BusinessReviews.js',
     'pages/business/BusinessPage.js',
     'business-app.js'
+  ],
+  'register.bundle.js': [
+    'utils/navigation.js',
+    'components/ToastProvider.js',
+    'components/Header.js',
+    'components/Footer.js',
+    'pages/register/RegisterBusinessPage.js',
+    'register-app.js'
   ]
 };
 

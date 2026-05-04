@@ -61,5 +61,13 @@ const Navigation = (() => {
     }
   }
 
-  return { getCurrentPage, getSearchParams, goToSearch, goHome, goToBusiness };
+  function goToRegister() {
+    try {
+      window.location.href = 'register.html';
+    } catch (error) {
+      console.error('Navigation.goToRegister error:', error);
+    }
+  }
+
+  return { getCurrentPage, getSearchParams, goToSearch, goHome, goToBusiness, goToRegister };
 })();

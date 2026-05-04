@@ -40,8 +40,8 @@ function HomeHero({ initialParams }) {
                   Explorar negocios
                   <div className="icon-arrow-right text-xl text-white" data-name="hero-explore-i" data-file="pages/home/HomeHero.js"></div>
                 </button>
-                <a className="btn-rr btn-ghost-rr flex items-center justify-center gap-2" href="https://wa.me/5354066204?text=Hola,%20quiero%20listar%20mi%20negocio%20en%20RservasRoma" target="_blank" rel="noreferrer" data-name="hero-list" data-file="pages/home/HomeHero.js">
-                  Quiero listar mi negocio
+                <a className="btn-rr btn-ghost-rr flex items-center justify-center gap-2" href="register.html" data-name="hero-list" data-file="pages/home/HomeHero.js">
+                  Registrar mi negocio
                   <div className="icon-sparkles text-xl text-[var(--primary-color)]" data-name="hero-list-i" data-file="pages/home/HomeHero.js"></div>
                 </a>
               </div>

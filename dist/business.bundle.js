@@ -64,12 +64,20 @@ const Navigation = (() => {
       console.error('Navigation.goToBusiness error:', error);
     }
   }
+  function goToRegister() {
+    try {
+      window.location.href = 'register.html';
+    } catch (error) {
+      console.error('Navigation.goToRegister error:', error);
+    }
+  }
   return {
     getCurrentPage,
     getSearchParams,
     goToSearch,
     goHome,
-    goToBusiness
+    goToBusiness,
+    goToRegister
   };
 })();
 const Format = (() => {
@@ -938,7 +946,12 @@ function Header({
       href: "search.html",
       "data-name": "nav-demo",
       "data-file": "components/Header.js"
-    }, "Negocios")), React.createElement("button", {
+    }, "Negocios"), React.createElement("a", {
+      className: `btn-rr ${page === 'register.html' ? 'btn-primary-rr' : 'btn-ghost-rr'}`,
+      href: "register.html",
+      "data-name": "nav-register",
+      "data-file": "components/Header.js"
+    }, "Registrar negocio")), React.createElement("button", {
       className: "ml-auto md:hidden w-11 h-11 rounded-lg border border-[var(--border)] bg-white flex items-center justify-center",
       onClick: () => setOpen(v => !v),
       "data-name": "nav-toggle",
@@ -995,6 +1008,18 @@ function Header({
     }, "Negocios"), React.createElement("div", {
       className: "icon-external-link text-xl text-[var(--primary-color)]",
       "data-name": "m-demo-icon",
+      "data-file": "components/Header.js"
+    })), React.createElement("a", {
+      className: "btn-rr btn-ghost-rr w-full flex items-center justify-between",
+      href: "register.html",
+      "data-name": "m-register",
+      "data-file": "components/Header.js"
+    }, React.createElement("span", {
+      "data-name": "m-register-text",
+      "data-file": "components/Header.js"
+    }, "Registrar negocio"), React.createElement("div", {
+      className: "icon-arrow-right text-xl text-[var(--primary-color)]",
+      "data-name": "m-register-icon",
       "data-file": "components/Header.js"
     }))))) : null));
   } catch (error) {
