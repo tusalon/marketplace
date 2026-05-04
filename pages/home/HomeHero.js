@@ -7,6 +7,7 @@
       return sum + count;
     }, 0);
     const reservasHoy = MockData.getTodayReservations ? MockData.getTodayReservations() : 0;
+    const reservasHoyLabel = Number(reservasHoy || 0).toLocaleString('es-ES');
     const featured = MockData.listWeeklyFeatured()[0] || businesses[0] || null;
     const categories = Array.from(new Set(businesses.map((business) => business.categoria).filter(Boolean))).slice(0, 8);
 
@@ -36,6 +37,12 @@
                 />
               </div>
 
+              <div className="mt-5 flex justify-center lg:justify-start" data-name="hero-today-reservations" data-file="pages/home/HomeHero.js">
+                <p className="text-base md:text-lg text-[var(--text)]" data-name="hero-today-reservations-text" data-file="pages/home/HomeHero.js">
+                  <span className="font-semibold" data-name="hero-today-reservations-value" data-file="pages/home/HomeHero.js">{reservasHoyLabel}</span> reservas hechas hoy
+                </p>
+              </div>
+
               <div className="mt-6 flex flex-col sm:flex-row gap-3" data-name="hero-actions" data-file="pages/home/HomeHero.js">
                 <button className="btn-rr btn-primary-rr flex items-center justify-center gap-2" onClick={() => Navigation.goToSearch('', '')} data-name="hero-explore" data-file="pages/home/HomeHero.js">
                   Explorar negocios
@@ -47,11 +54,7 @@
                 </a>
               </div>
 
-              <div className="mt-7 grid grid-cols-3 max-w-[560px] border border-[var(--border)] rounded-lg overflow-hidden bg-white" data-name="hero-stats" data-file="pages/home/HomeHero.js">
-                <div className="p-4 border-r border-[var(--border)]" data-name="stat-today" data-file="pages/home/HomeHero.js">
-                  <p className="text-xl md:text-2xl font-semibold" data-name="stat-today-value" data-file="pages/home/HomeHero.js">{reservasHoy}</p>
-                  <p className="text-[11px] text-[var(--text-muted)] mt-1" data-name="stat-today-label" data-file="pages/home/HomeHero.js">reservas de hoy</p>
-                </div>
+              <div className="mt-7 grid grid-cols-2 max-w-[380px] border border-[var(--border)] rounded-lg overflow-hidden bg-white" data-name="hero-stats" data-file="pages/home/HomeHero.js">
                 <div className="p-4 border-r border-[var(--border)]" data-name="stat-businesses" data-file="pages/home/HomeHero.js">
                   <p className="text-xl md:text-2xl font-semibold" data-name="stat-businesses-value" data-file="pages/home/HomeHero.js">{totalBusinesses}</p>
                   <p className="text-[11px] text-[var(--text-muted)] mt-1" data-name="stat-businesses-label" data-file="pages/home/HomeHero.js">negocios</p>
@@ -113,5 +116,6 @@
     return null;
   }
 }
+
 
 

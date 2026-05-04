@@ -340,16 +340,14 @@
     }, {});
   }
 
-  function countTodayReservations(rows) {
+  function getTodayStartIso() {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
-    const startTime = todayStart.getTime();
-    return (rows || []).reduce((acc, row) => {
-      const dateValue = getReservationCreatedAt(row);
-      const time = dateValue ? new Date(dateValue).getTime() : NaN;
-      if (!Number.isFinite(time) || time < startTime || !isActiveReservation(row)) return acc;
-      return acc + 1;
-    }, 0);
+    return todayStart.toISOString();
+  }
+
+  function countTodayReservations(rows) {
+    return (rows || []).length;
   }
 
   function buildCatalogSections({ servicios, productos, cursos }) {
@@ -481,8 +479,9 @@
         const productosRows = await optionalSupabaseFetch('productos?activo=eq.true&select=id,negocio_id,nombre,descripcion,precio,imagen,categoria,stock,activo&limit=1000');
         const cursosRows = await optionalSupabaseFetch('cursos?activo=eq.true&select=id,negocio_id,nombre,descripcion,precio,imagen,fecha,ubicacion,activo&limit=1000');
         const reservasRows = await optionalSupabaseFetch('reservas?select=*&limit=2000');
+        const reservasHoyRows = await optionalSupabaseFetch(`reservas?created_at=gte.&select=created_at,negocio_id&limit=5000`);
         const reservasSemana = countWeeklyReservations(reservasRows);
-        totalReservasHoy = countTodayReservations(reservasRows);
+        totalReservasHoy = countTodayReservations(reservasHoyRows);
 
         const relations = {
           servicios: groupByBusiness(serviciosRows),
@@ -629,6 +628,7 @@
 
   return { listBusinesses, listTopRated, listWeeklyFeatured, listRomaReviews, searchBusinesses, getBusinessById, loadBusinesses, getLoadError, getTodayReservations, addReview };
 })();
+
 
 
 
