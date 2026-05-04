@@ -68,6 +68,22 @@ const bundles = {
     'components/Footer.js',
     'pages/register/RegisterBusinessPage.js',
     'register-app.js'
+  ],
+  'login.bundle.js': [
+    'utils/navigation.js',
+    'components/ToastProvider.js',
+    'components/Header.js',
+    'components/Footer.js',
+    'pages/panel/LoginBusinessPage.js',
+    'login-app.js'
+  ],
+  'panel.bundle.js': [
+    'utils/navigation.js',
+    'components/ToastProvider.js',
+    'components/Header.js',
+    'components/Footer.js',
+    'pages/panel/BusinessPanelPage.js',
+    'panel-app.js'
   ]
 };
 
