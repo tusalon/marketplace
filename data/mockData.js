@@ -479,7 +479,7 @@
         const productosRows = [];
         const cursosRows = [];
         const reservasRows = await optionalSupabaseFetch('reservas?select=*&limit=2000');
-        const reservasHoyRows = await optionalSupabaseFetch(`reservas?created_at=gte.&select=created_at,negocio_id&limit=5000`);
+        const reservasHoyRows = await optionalSupabaseFetch('reservas?created_at=gte.' + encodeURIComponent(getTodayStartIso()) + '&select=created_at,negocio_id&limit=5000');
         const reservasSemana = countWeeklyReservations(reservasRows);
         totalReservasHoy = countTodayReservations(reservasHoyRows);
 
