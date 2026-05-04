@@ -1,119 +1,133 @@
-function MapSplitView({ businesses, activeId, onSelect }) {
+function MapSplitView({ businesses, selectedProvince, onProvinceSelect }) {
   try {
     const list = businesses || [];
-    const active = list.find((b) => b.id === activeId) || null;
+    const provinces = [
+      { name: 'Pinar del Río', x: 9, y: 50 },
+      { name: 'Artemisa', x: 19, y: 48 },
+      { name: 'La Habana', x: 25, y: 44 },
+      { name: 'Mayabeque', x: 30, y: 48 },
+      { name: 'Matanzas', x: 38, y: 50 },
+      { name: 'Cienfuegos', x: 47, y: 59 },
+      { name: 'Villa Clara', x: 50, y: 50 },
+      { name: 'Sancti Spíritus', x: 58, y: 56 },
+      { name: 'Ciego de Ávila', x: 66, y: 55 },
+      { name: 'Camagüey', x: 74, y: 58 },
+      { name: 'Las Tunas', x: 83, y: 61 },
+      { name: 'Holguín', x: 89, y: 57 },
+      { name: 'Granma', x: 86, y: 70 },
+      { name: 'Santiago de Cuba', x: 93, y: 72 },
+      { name: 'Guantánamo', x: 97, y: 68 },
+      { name: 'Isla de la Juventud', x: 29, y: 72 }
+    ];
 
-    const MapPin = ({ business }) => {
-      try {
-        const b = business;
-        const size = b.vip ? 'w-12 h-12' : 'w-10 h-10';
-        const ring = b.vip ? 'ring-2 ring-[#F59E0B]/60' : 'ring-1 ring-[rgba(31,41,55,0.14)]';
-        const scale = b.id === activeId ? 'scale-110' : 'scale-100';
-        const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
+    const normalize = (value) => String(value || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
 
-        return (
-          <button
-            className={`absolute ${size} ${ring} rounded-2xl bg-white flex items-center justify-center shadow-[0_18px_55px_rgba(11,18,32,0.16)] transform ${scale} transition-transform`}
-            style={{ left: `${b._mapX}%`, top: `${b._mapY}%`, translate: '-50% -50%' }}
-            onClick={() => onSelect?.(b)}
-            data-name="map-pin"
-            data-file="components/MapSplitView.js"
-            aria-label={`Pin de ${b.nombre}`}
-          >
-            <div className="w-7 h-7 rounded-xl bg-white flex items-center justify-center overflow-hidden p-1" data-name="map-pin-inner" data-file="components/MapSplitView.js">
-              {b.logoUrl ? (
-                <img
-                  src={b.logoUrl}
-                  alt={`Logo de ${b.nombre}`}
-                  className="w-full h-full object-contain"
-                  data-name="map-pin-logo"
-                  data-file="components/MapSplitView.js"
-                />
-              ) : (
-                <span className="text-[10px] font-semibold text-[var(--primary-color)]" data-name="map-pin-initials" data-file="components/MapSplitView.js">{initials}</span>
-              )}
-            </div>
-          </button>
-        );
-      } catch (error) {
-        console.error('MapSplitView.MapPin error:', error);
-        return null;
-      }
-    };
+    const selected = normalize(selectedProvince);
+    const counts = list.reduce((acc, business) => {
+      const province = business.ubicacion?.provincia || business.ubicacion?.ciudad || 'La Habana';
+      acc[normalize(province)] = (acc[normalize(province)] || 0) + 1;
+      return acc;
+    }, {});
+
+    const activeProvince = provinces.find((province) => normalize(province.name) === selected)
+      || provinces.find((province) => counts[normalize(province.name)] > 0)
+      || provinces[2];
 
     return (
-      <div className="relative w-full h-full" data-name="map-split-view" data-file="components/MapSplitView.js">
-        <div className="absolute inset-0 bg-[#F9FAFB]" data-name="map-bg" data-file="components/MapSplitView.js">
-          <div className="absolute inset-0" data-name="map-grid" data-file="components/MapSplitView.js"
-            style={{
-              backgroundImage:
-                'radial-gradient(circle at 1px 1px, rgba(11,18,32,0.12) 1px, transparent 0)',
-              backgroundSize: '22px 22px'
-            }}
-          ></div>
+      <div className="relative w-full h-full bg-[#F9FAFB]" data-name="map-split-view" data-file="components/MapSplitView.js">
+        <div className="absolute inset-0" data-name="map-texture" data-file="components/MapSplitView.js"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(11,18,32,0.10) 1px, transparent 0)',
+            backgroundSize: '24px 24px'
+          }}
+        ></div>
 
-          <div className="absolute top-4 left-4 right-4" data-name="map-hint" data-file="components/MapSplitView.js">
-            <div className="surface-rr p-3 flex items-center gap-3" data-name="map-hint-inner" data-file="components/MapSplitView.js">
-              <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]" data-name="map-hint-iw" data-file="components/MapSplitView.js">
-                <div className="icon-map text-xl text-[var(--primary-color)]" data-name="map-hint-i" data-file="components/MapSplitView.js"></div>
-              </div>
-              <div className="min-w-0" data-name="map-hint-text" data-file="components/MapSplitView.js">
-                <p className="text-sm font-semibold" data-name="map-hint-title" data-file="components/MapSplitView.js">Mapa interactivo</p>
-                <p className="text-xs text-[var(--text-muted)]" data-name="map-hint-sub" data-file="components/MapSplitView.js">
-                  Pins VIP más grandes. Toca para ver una tarjeta mínima.
-                </p>
-              </div>
+        <div className="absolute top-4 left-4 right-4 z-10" data-name="map-hint" data-file="components/MapSplitView.js">
+          <div className="surface-rr p-3 flex items-center gap-3" data-name="map-hint-inner" data-file="components/MapSplitView.js">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[var(--secondary-color)]" data-name="map-hint-iw" data-file="components/MapSplitView.js">
+              <div className="icon-map text-xl text-[var(--primary-color)]" data-name="map-hint-i" data-file="components/MapSplitView.js"></div>
+            </div>
+            <div className="min-w-0" data-name="map-hint-text" data-file="components/MapSplitView.js">
+              <p className="text-sm font-semibold" data-name="map-hint-title" data-file="components/MapSplitView.js">Mapa de Cuba</p>
+              <p className="text-xs text-[var(--text-muted)]" data-name="map-hint-sub" data-file="components/MapSplitView.js">
+                Toca una provincia para filtrar negocios activos.
+              </p>
             </div>
           </div>
+        </div>
 
-          <div className="absolute inset-0" data-name="map-pins" data-file="components/MapSplitView.js">
-            {list.map((b) => (
-              <MapPin key={b.id} business={b} data-name="pin" data-file="components/MapSplitView.js" />
-            ))}
-          </div>
+        <svg viewBox="0 0 1000 520" className="absolute inset-x-4 top-[92px] bottom-[120px] w-[calc(100%-2rem)] h-[calc(100%-212px)]" role="img" aria-label="Mapa de Cuba" data-name="cuba-map-svg" data-file="components/MapSplitView.js">
+          <path
+            d="M52 245 C120 195 196 182 270 199 C340 215 392 196 465 208 C550 222 620 260 700 272 C786 284 860 270 942 305 C872 340 786 342 702 328 C625 316 570 285 495 278 C420 272 355 300 276 282 C196 264 122 282 52 245 Z"
+            fill="#EAF7F0"
+            stroke="#0B1220"
+            strokeOpacity="0.18"
+            strokeWidth="5"
+            data-name="cuba-main"
+            data-file="components/MapSplitView.js"
+          />
+          <path
+            d="M235 378 C275 352 318 355 355 382 C318 405 271 406 235 378 Z"
+            fill="#EAF7F0"
+            stroke="#0B1220"
+            strokeOpacity="0.18"
+            strokeWidth="4"
+            data-name="cuba-isla"
+            data-file="components/MapSplitView.js"
+          />
+        </svg>
 
-          {active ? (
-            <div className="absolute bottom-4 left-4 right-4" data-name="map-card" data-file="components/MapSplitView.js">
-              <div className="card-rr p-4" data-name="map-card-inner" data-file="components/MapSplitView.js">
-                <div className="flex items-start gap-3" data-name="map-card-row" data-file="components/MapSplitView.js">
-                  <div className="w-12 h-12 rounded-2xl overflow-hidden border border-[var(--border)] bg-white p-1.5" data-name="map-card-logo" data-file="components/MapSplitView.js">
-                    {active.logoUrl ? (
-                      <img src={active.logoUrl} alt={`Logo de ${active.nombre}`} className="w-full h-full object-contain" data-name="map-card-logo-img" data-file="components/MapSplitView.js" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--primary-color)]" data-name="map-card-initials" data-file="components/MapSplitView.js">{String(active.nombre || 'N').trim().slice(0, 2).toUpperCase()}</div>
-                    )}
-                  </div>
-                  <div className="min-w-0" data-name="map-card-content" data-file="components/MapSplitView.js">
-                    <p className="text-sm font-semibold truncate" data-name="map-card-name" data-file="components/MapSplitView.js">{active.nombre}</p>
-                    <p className="text-xs text-[var(--text-muted)] truncate mt-1" data-name="map-card-meta" data-file="components/MapSplitView.js">{active.categoria} · {active.ubicacion?.zona}</p>
-                    <div className="mt-2 flex items-center justify-between gap-3" data-name="map-card-bottom" data-file="components/MapSplitView.js">
-                      <span className="text-xs text-[var(--text-muted)]" data-name="map-card-price" data-file="components/MapSplitView.js">
-                        {Format.formatRangoPrecio(active.rangoPrecio?.min, active.rangoPrecio?.max)}
-                      </span>
-                      <button
-                        className="btn-rr btn-primary-rr py-2 px-3 text-xs flex items-center gap-2"
-                        onClick={() => Navigation.goToBusiness(active.id)}
-                        data-name="map-card-open"
-                        data-file="components/MapSplitView.js"
-                      >
-                        Ver perfil
-                        <div className="icon-arrow-right text-base text-white" data-name="map-card-open-i" data-file="components/MapSplitView.js"></div>
-                      </button>
-                    </div>
-                  </div>
-                  <button
-                    className="ml-auto text-[var(--text-muted)] hover:text-[var(--primary-color)] transition-colors"
-                    onClick={() => onSelect?.(null)}
-                    data-name="map-card-close"
-                    data-file="components/MapSplitView.js"
-                    aria-label="Cerrar"
-                  >
-                    <div className="icon-x text-lg" data-name="map-card-close-i" data-file="components/MapSplitView.js"></div>
-                  </button>
-                </div>
-              </div>
+        <div className="absolute inset-x-4 top-[92px] bottom-[120px]" data-name="province-pins" data-file="components/MapSplitView.js">
+          {provinces.map((province) => {
+            const key = normalize(province.name);
+            const count = counts[key] || 0;
+            const isSelected = selected && key === selected;
+            const isActiveFallback = !selected && activeProvince.name === province.name;
+            const active = isSelected || isActiveFallback;
+
+            return (
+              <button
+                key={province.name}
+                className={`absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1 transition-transform ${active ? 'scale-110 z-20' : 'scale-100 z-10'} ${count ? '' : 'opacity-45'}`}
+                style={{ left: `${province.x}%`, top: `${province.y}%` }}
+                onClick={() => onProvinceSelect?.(province.name)}
+                data-name="province-pin"
+                data-file="components/MapSplitView.js"
+                aria-label={`Filtrar por ${province.name}`}
+              >
+                <span className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-[0_12px_34px_rgba(11,18,32,0.16)] border ${active ? 'bg-[var(--primary-color)] border-[var(--primary-color)] text-white' : 'bg-white border-[var(--border)] text-[var(--primary-color)]'}`} data-name="province-pin-mark" data-file="components/MapSplitView.js">
+                  <span className="text-xs font-semibold" data-name="province-pin-logo" data-file="components/MapSplitView.js">RR</span>
+                </span>
+                <span className="px-2 py-1 rounded-full bg-white/95 border border-[var(--border)] text-[10px] font-medium whitespace-nowrap shadow-sm" data-name="province-pin-label" data-file="components/MapSplitView.js">
+                  {province.name} · {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="absolute left-4 right-4 bottom-4 z-20" data-name="province-summary" data-file="components/MapSplitView.js">
+          <div className="card-rr p-4 flex items-center justify-between gap-3" data-name="province-summary-card" data-file="components/MapSplitView.js">
+            <div className="min-w-0" data-name="province-summary-copy" data-file="components/MapSplitView.js">
+              <p className="text-sm font-semibold truncate" data-name="province-summary-title" data-file="components/MapSplitView.js">{activeProvince.name}</p>
+              <p className="text-xs text-[var(--text-muted)] mt-1" data-name="province-summary-sub" data-file="components/MapSplitView.js">
+                {counts[normalize(activeProvince.name)] || 0} negocios activos en esta provincia.
+              </p>
             </div>
-          ) : null}
+            {selected ? (
+              <button
+                className="btn-rr btn-ghost-rr py-2 px-3 text-xs"
+                onClick={() => onProvinceSelect?.('')}
+                data-name="province-clear"
+                data-file="components/MapSplitView.js"
+              >
+                Ver Cuba
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
     );
