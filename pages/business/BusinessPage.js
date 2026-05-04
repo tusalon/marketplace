@@ -2,6 +2,8 @@
   try {
     const b = business;
     const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
+    const catalog = b.categoriasCatalogo || [];
+    const hasStore = Boolean((catalog.find((section) => section.tipo === 'productos')?.items || []).length || (catalog.find((section) => section.tipo === 'cursos')?.items || []).length);
     const [cart, setCart] = React.useState([]);
     const total = cart.reduce((sum, entry) => sum + (Number(entry.precio || 0) * entry.qty), 0);
 
@@ -91,9 +93,9 @@
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 items-start" data-name="business-grid" data-file="pages/business/BusinessPage.js">
             <div data-name="left" data-file="pages/business/BusinessPage.js">
               <BusinessCatalog business={b} onAddToCart={addToCart} data-name="catalog" data-file="pages/business/BusinessPage.js" />
-              <div className="lg:hidden mt-4" data-name="mobile-cart" data-file="pages/business/BusinessPage.js">
+              {hasStore ? <div className="lg:hidden mt-4" data-name="mobile-cart" data-file="pages/business/BusinessPage.js">
                 <CartCard />
-              </div>
+              </div> : null}
               <BusinessReviews business={b} data-name="reviews" data-file="pages/business/BusinessPage.js" />
             </div>
 
@@ -127,9 +129,9 @@
                   Reservar
                 </a>
               </div>
-              <div className="mt-4" data-name="desktop-cart" data-file="pages/business/BusinessPage.js">
+              {hasStore ? <div className="mt-4" data-name="desktop-cart" data-file="pages/business/BusinessPage.js">
                 <CartCard />
-              </div>
+              </div> : null}
             </aside>
           </div>
         </div>

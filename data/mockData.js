@@ -1,9 +1,9 @@
-const MockData = (() => {
+﻿const MockData = (() => {
   const fallbackBusinesses = [
     {
       id: 'roma-001',
       nombre: 'Gordis Nails Boutique',
-      categoria: 'Uñas Acrílicas',
+      categoria: 'UÃ±as AcrÃ­licas',
       vip: true,
       verificado: true,
       topRoma: true,
@@ -13,7 +13,7 @@ const MockData = (() => {
       coordenadas: { lat: 23.1291, lng: -82.3790 },
       rangoPrecio: { min: 800, max: 3500 },
       estrellas: 4.9,
-      totalReseñas: 212,
+      totalResenas: 212,
       portadaUrl: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=80',
       logoUrl: 'https://images.unsplash.com/photo-1520975958221-17f0d4a12a4a?auto=format&fit=crop&w=256&q=80',
       fotos: [
@@ -23,14 +23,14 @@ const MockData = (() => {
         'https://images.unsplash.com/photo-1605034313761-73ea4a8f35a1?auto=format&fit=crop&w=1200&q=70'
       ],
       whatsapp: '+5355550101',
-      descripcion: 'Boutique minimalista de uñas, diseño premium y protocolos higiénicos.',
+      descripcion: 'Boutique minimalista de uÃ±as, diseÃ±o premium y protocolos higiÃ©nicos.',
       categoriasCatalogo: [
         {
           tipo: 'servicios',
           titulo: 'Manos',
           items: [
-            { nombre: 'Uñas acrílicas + diseño natural', duracionMin: 90, precio: 1800, destacado: true },
-            { nombre: 'Relleno acrílico', duracionMin: 60, precio: 1400 },
+            { nombre: 'UÃ±as acrÃ­licas + diseÃ±o natural', duracionMin: 90, precio: 1800, destacado: true },
+            { nombre: 'Relleno acrÃ­lico', duracionMin: 60, precio: 1400 },
             { nombre: 'Esmaltado semipermanente', duracionMin: 45, precio: 900 }
           ]
         },
@@ -39,14 +39,14 @@ const MockData = (() => {
           titulo: 'Pies',
           items: [
             { nombre: 'Pedicura spa', duracionMin: 55, precio: 1200 },
-            { nombre: 'Reconstrucción de uña', duracionMin: 30, precio: 650 }
+            { nombre: 'ReconstrucciÃ³n de uÃ±a', duracionMin: 30, precio: 650 }
           ]
         },
         {
           tipo: 'productos',
           titulo: 'Productos',
           items: [
-            { nombre: 'Aceite de cutícula (15 ml)', stock: 12, precio: 350 },
+            { nombre: 'Aceite de cutÃ­cula (15 ml)', stock: 12, precio: 350 },
             { nombre: 'Crema de manos premium', stock: 6, precio: 500 }
           ]
         },
@@ -54,31 +54,31 @@ const MockData = (() => {
           tipo: 'cursos',
           titulo: 'Cursos y Talleres',
           items: [
-            { nombre: 'Taller: diseño minimalista', fecha: '2026-05-04T10:00:00.000Z', ubicacion: 'Vedado, La Habana', precio: 4500 },
-            { nombre: 'Curso completo: acrílico desde cero', fecha: '2026-05-18T09:30:00.000Z', ubicacion: 'Vedado, La Habana', precio: 12000 }
+            { nombre: 'Taller: diseÃ±o minimalista', fecha: '2026-05-04T10:00:00.000Z', ubicacion: 'Vedado, La Habana', precio: 4500 },
+            { nombre: 'Curso completo: acrÃ­lico desde cero', fecha: '2026-05-18T09:30:00.000Z', ubicacion: 'Vedado, La Habana', precio: 12000 }
           ]
         }
       ],
-      reseñas: [
-        { id: 'r1', nombre: 'Camila', estrellas: 5, verificada: true, texto: 'Atención impecable y un acabado súper fino. Se nota el nivel.', fecha: '2026-03-22' },
-        { id: 'r2', nombre: 'Dayana', estrellas: 5, verificada: true, texto: 'Higiene top y diseño minimalista tal cual lo quería.', fecha: '2026-03-10' },
-        { id: 'r3', nombre: 'Roxana', estrellas: 4, verificada: false, texto: 'Muy buen servicio, solo esperé un poquito, pero valió la pena.', fecha: '2026-02-18' }
+      resenas: [
+        { id: 'r1', nombre: 'Camila', estrellas: 5, verificada: true, texto: 'AtenciÃ³n impecable y un acabado sÃºper fino. Se nota el nivel.', fecha: '2026-03-22' },
+        { id: 'r2', nombre: 'Dayana', estrellas: 5, verificada: true, texto: 'Higiene top y diseÃ±o minimalista tal cual lo querÃ­a.', fecha: '2026-03-10' },
+        { id: 'r3', nombre: 'Roxana', estrellas: 4, verificada: false, texto: 'Muy buen servicio, solo esperÃ© un poquito, pero valiÃ³ la pena.', fecha: '2026-02-18' }
       ]
     },
     {
       id: 'roma-002',
-      nombre: 'Barbería Malecón',
-      categoria: 'Barbería',
+      nombre: 'BarberÃ­a MalecÃ³n',
+      categoria: 'BarberÃ­a',
       vip: false,
       verificado: true,
       topRoma: false,
       masReservado: true,
       negocioDelMes: false,
-      ubicacion: { ciudad: 'La Habana', zona: 'Centro Habana', direccion: 'San Lázaro, Centro Habana' },
+      ubicacion: { ciudad: 'La Habana', zona: 'Centro Habana', direccion: 'San LÃ¡zaro, Centro Habana' },
       coordenadas: { lat: 23.1375, lng: -82.3701 },
       rangoPrecio: { min: 350, max: 1500 },
       estrellas: 4.7,
-      totalReseñas: 154,
+      totalResenas: 154,
       portadaUrl: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=1600&q=80',
       logoUrl: 'https://images.unsplash.com/photo-1520975732134-340aee8f36d4?auto=format&fit=crop&w=256&q=80',
       fotos: [
@@ -87,13 +87,13 @@ const MockData = (() => {
         'https://images.unsplash.com/photo-1517832207067-4db24a2ae47c?auto=format&fit=crop&w=900&q=80'
       ],
       whatsapp: '+5355550202',
-      descripcion: 'Cortes clásicos y modernos, ritual de barba y ambiente limpio frente al mar.',
+      descripcion: 'Cortes clÃ¡sicos y modernos, ritual de barba y ambiente limpio frente al mar.',
       categoriasCatalogo: [
         {
           tipo: 'servicios',
           titulo: 'Cortes',
           items: [
-            { nombre: 'Corte clásico', duracionMin: 35, precio: 500, destacado: true },
+            { nombre: 'Corte clÃ¡sico', duracionMin: 35, precio: 500, destacado: true },
             { nombre: 'Fade premium', duracionMin: 45, precio: 700 }
           ]
         },
@@ -106,15 +106,15 @@ const MockData = (() => {
           ]
         }
       ],
-      reseñas: [
-        { id: 'r4', nombre: 'Ernesto', estrellas: 5, verificada: true, texto: 'Profesionales, rápidos y con un estilo bien moderno.', fecha: '2026-03-05' },
-        { id: 'r5', nombre: 'Luis', estrellas: 4, verificada: true, texto: 'Buen trato. El fade quedó perfecto.', fecha: '2026-02-14' }
+      resenas: [
+        { id: 'r4', nombre: 'Ernesto', estrellas: 5, verificada: true, texto: 'Profesionales, rÃ¡pidos y con un estilo bien moderno.', fecha: '2026-03-05' },
+        { id: 'r5', nombre: 'Luis', estrellas: 4, verificada: true, texto: 'Buen trato. El fade quedÃ³ perfecto.', fecha: '2026-02-14' }
       ]
     },
     {
       id: 'roma-003',
       nombre: 'Roma Skin Studio',
-      categoria: 'Estética Facial',
+      categoria: 'EstÃ©tica Facial',
       vip: true,
       verificado: true,
       topRoma: false,
@@ -124,7 +124,7 @@ const MockData = (() => {
       coordenadas: { lat: 23.1100, lng: -82.4370 },
       rangoPrecio: { min: 1200, max: 7500 },
       estrellas: 4.8,
-      totalReseñas: 98,
+      totalResenas: 98,
       portadaUrl: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=1600&q=80',
       logoUrl: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=256&q=60',
       fotos: [
@@ -133,13 +133,13 @@ const MockData = (() => {
         'https://images.unsplash.com/photo-1556228579-0d85b1a4d571?auto=format&fit=crop&w=900&q=70'
       ],
       whatsapp: '+5355550303',
-      descripcion: 'Piel luminosa con protocolos clínicos y un espacio ultra-limpio.',
+      descripcion: 'Piel luminosa con protocolos clÃ­nicos y un espacio ultra-limpio.',
       categoriasCatalogo: [
         {
           tipo: 'servicios',
           titulo: 'Facial',
           items: [
-            { nombre: 'Limpieza profunda + hidratación', duracionMin: 70, precio: 2500, destacado: true },
+            { nombre: 'Limpieza profunda + hidrataciÃ³n', duracionMin: 70, precio: 2500, destacado: true },
             { nombre: 'Peeling suave', duracionMin: 45, precio: 1800 }
           ]
         },
@@ -147,14 +147,14 @@ const MockData = (() => {
           tipo: 'productos',
           titulo: 'Productos',
           items: [
-            { nombre: 'Sérum iluminador', stock: 4, precio: 3200 },
+            { nombre: 'SÃ©rum iluminador', stock: 4, precio: 3200 },
             { nombre: 'Protector solar premium', stock: 9, precio: 2100 }
           ]
         }
       ],
-      reseñas: [
-        { id: 'r6', nombre: 'Melany', estrellas: 5, verificada: true, texto: 'Me dejó la piel increíble y el espacio es súper limpio.', fecha: '2026-03-29' },
-        { id: 'r7', nombre: 'Ana', estrellas: 4, verificada: false, texto: 'Muy buena atención, me gustó el protocolo paso a paso.', fecha: '2026-03-12' }
+      resenas: [
+        { id: 'r6', nombre: 'Melany', estrellas: 5, verificada: true, texto: 'Me dejÃ³ la piel increÃ­ble y el espacio es sÃºper limpio.', fecha: '2026-03-29' },
+        { id: 'r7', nombre: 'Ana', estrellas: 4, verificada: false, texto: 'Muy buena atenciÃ³n, me gustÃ³ el protocolo paso a paso.', fecha: '2026-03-12' }
       ]
     },
     {
@@ -170,7 +170,7 @@ const MockData = (() => {
       coordenadas: { lat: 23.1400, lng: -82.3500 },
       rangoPrecio: { min: 3000, max: 15000 },
       estrellas: 4.5,
-      totalReseñas: 41,
+      totalResenas: 41,
       portadaUrl: 'https://images.unsplash.com/photo-1529390079861-591de354faf5?auto=format&fit=crop&w=1600&q=80',
       logoUrl: 'https://images.unsplash.com/photo-1529390079861-591de354faf5?auto=format&fit=crop&w=256&q=60',
       fotos: [
@@ -179,19 +179,19 @@ const MockData = (() => {
         'https://images.unsplash.com/photo-1529390079861-591de354faf5?auto=format&fit=crop&w=900&q=70'
       ],
       whatsapp: '+5355550404',
-      descripcion: 'Talleres para elevar tu técnica y convertir tu talento en un negocio.',
+      descripcion: 'Talleres para elevar tu tÃ©cnica y convertir tu talento en un negocio.',
       categoriasCatalogo: [
         {
           tipo: 'cursos',
           titulo: 'Cursos y Talleres',
           items: [
-            { nombre: 'Taller: barbería moderna', fecha: '2026-06-06T10:00:00.000Z', ubicacion: 'Habana Vieja', precio: 6000 },
+            { nombre: 'Taller: barberÃ­a moderna', fecha: '2026-06-06T10:00:00.000Z', ubicacion: 'Habana Vieja', precio: 6000 },
             { nombre: 'Curso: manicure profesional', fecha: '2026-06-20T09:00:00.000Z', ubicacion: 'Habana Vieja', precio: 11000 }
           ]
         }
       ],
-      reseñas: [
-        { id: 'r8', nombre: 'Yusniel', estrellas: 5, verificada: false, texto: 'Muy buena explicación y práctica real.', fecha: '2026-01-23' }
+      resenas: [
+        { id: 'r8', nombre: 'Yusniel', estrellas: 5, verificada: false, texto: 'Muy buena explicaciÃ³n y prÃ¡ctica real.', fecha: '2026-01-23' }
       ]
     }
   ];
@@ -428,9 +428,9 @@ const MockData = (() => {
       reservaUrl,
       fotos: fotos.length ? fotos : [logoUrl],
       whatsapp: telefono ? String(telefono).replace(/[^\d+]/g, '') : '',
-      descripcion: valueFrom(row, ['descripcion', 'description', 'mensaje_bienvenida'], 'Negocio disponible para reservas.'),
+      descripcion: valueFrom(row, ['descripcion', 'description', 'mensaje_bienvenida'], 'Negocio disponible para resenas.'),
       categoriasCatalogo: buildCatalogSections({ servicios, productos, cursos }),
-      reseñas: resenas.map((item, index) => ({
+      resenas: resenas.map((item, index) => ({
         id: String(item.id || `${id}-resena-${index}`),
         nombre: valueFrom(item, ['nombre', 'cliente_nombre', 'cliente'], 'Cliente'),
         estrellas: numberFrom(item, ['estrellas', 'rating', 'calificacion'], 5),
@@ -479,7 +479,7 @@ const MockData = (() => {
           .filter((business) => business.id);
         loadedFromSupabase = true;
         loadError = null;
-        console.log(`✅ Marketplace cargó ${businesses.length} negocios desde Supabase`);
+        console.log(`âœ… Marketplace cargÃ³ ${businesses.length} negocios desde Supabase`);
         return businesses.slice();
       } catch (error) {
         businesses = [];
@@ -503,8 +503,8 @@ const MockData = (() => {
   function listTopRated() {
     return businesses
       .slice()
-      .filter((b) => (b.totalResenas || b.totalReseñas || 0) > 0)
-      .sort((a, b) => (b.estrellas - a.estrellas) || ((b.totalResenas || b.totalReseñas || 0) - (a.totalResenas || a.totalReseñas || 0)))
+      .filter((b) => (b.totalResenas || b.totalResenas || 0) > 0)
+      .sort((a, b) => (b.estrellas - a.estrellas) || ((b.totalResenas || b.totalResenas || 0) - (a.totalResenas || a.totalResenas || 0)))
       .slice(0, 8);
   }
 
@@ -522,7 +522,7 @@ const MockData = (() => {
 
   function listRomaReviews() {
     return businesses
-      .flatMap((business) => (business.reseñas || []).map((review) => ({ ...review, negocioNombre: business.nombre })))
+      .flatMap((business) => (business.resenas || []).map((review) => ({ ...review, negocioNombre: business.nombre })))
       .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
       .slice(0, 8);
   }
@@ -540,7 +540,7 @@ const MockData = (() => {
     try {
       inserted = await supabaseInsert('resenas', payload);
     } catch (error) {
-      throw new Error('No se pudo guardar la reseña porque Supabase no tiene disponible la tabla publica resenas para insertar.');
+      throw new Error('No se pudo guardar la reseÃ±a porque Supabase no tiene disponible la tabla publica resenas para insertar.');
     }
     const created = inserted?.[0] || payload;
     const business = businesses.find((b) => b.id === negocioId);
@@ -553,9 +553,9 @@ const MockData = (() => {
         texto: created.texto || payload.texto,
         fecha: created.fecha || created.created_at || payload.fecha
       };
-      business.reseñas = [normalized, ...(business.reseñas || [])];
-      business.totalResenas = business.reseñas.length;
-      business.estrellas = business.reseñas.reduce((sum, item) => sum + Number(item.estrellas || 0), 0) / business.reseñas.length;
+      business.resenas = [normalized, ...(business.resenas || [])];
+      business.totalResenas = business.resenas.length;
+      business.estrellas = business.resenas.reduce((sum, item) => sum + Number(item.estrellas || 0), 0) / business.resenas.length;
     }
     return created;
   }
@@ -596,3 +596,6 @@ const MockData = (() => {
 
   return { listBusinesses, listTopRated, listWeeklyFeatured, listRomaReviews, searchBusinesses, getBusinessById, loadBusinesses, getLoadError, addReview };
 })();
+
+
+

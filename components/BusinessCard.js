@@ -3,7 +3,11 @@
     const b = business;
     const border = active ? 'border-[rgba(216,27,96,0.35)] shadow-[0_16px_40px_rgba(216,27,96,0.10)]' : '';
     const serviceSection = (b.categoriasCatalogo || []).find((section) => section.tipo === 'servicios');
+    const productSection = (b.categoriasCatalogo || []).find((section) => section.tipo === 'productos');
+    const courseSection = (b.categoriasCatalogo || []).find((section) => section.tipo === 'cursos');
     const serviceCount = serviceSection?.items?.length || 0;
+    const productCount = productSection?.items?.length || 0;
+    const courseCount = courseSection?.items?.length || 0;
     const firstService = serviceSection?.items?.[0] || null;
     const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
 
@@ -88,6 +92,8 @@
 
             <div className="mt-3 flex flex-wrap gap-2" data-name="badges" data-file="components/BusinessCard.js">
               {serviceCount ? <span className="chip-rr px-2.5 py-1 text-[11px] text-[var(--text-muted)]" data-name="services-count" data-file="components/BusinessCard.js">{serviceCount} servicios</span> : null}
+              {productCount ? <span className="chip-rr px-2.5 py-1 text-[11px] text-[var(--text-muted)]" data-name="products-count" data-file="components/BusinessCard.js">Tienda</span> : null}
+              {courseCount ? <span className="chip-rr px-2.5 py-1 text-[11px] text-[var(--text-muted)]" data-name="courses-count" data-file="components/BusinessCard.js">Cursos</span> : null}
             </div>
 
             <div className="mt-4 flex items-center justify-between gap-3" data-name="bottom" data-file="components/BusinessCard.js">

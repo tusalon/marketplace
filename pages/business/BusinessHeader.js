@@ -2,7 +2,10 @@
   try {
     const b = business;
     const hasCover = Boolean(b.portadaUrl);
-    const services = (b.categoriasCatalogo || []).find((section) => section.tipo === 'servicios')?.items || [];
+    const catalog = b.categoriasCatalogo || [];
+    const services = catalog.find((section) => section.tipo === 'servicios')?.items || [];
+    const products = catalog.find((section) => section.tipo === 'productos')?.items || [];
+    const courses = catalog.find((section) => section.tipo === 'cursos')?.items || [];
     const firstPrice = services[0] ? Format.formatPrecioCUP(services[0].precio) : Format.formatRangoPrecio(b.rangoPrecio?.min, b.rangoPrecio?.max);
     const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
 
@@ -44,6 +47,8 @@
               ) : null}
               <div className="mt-4 flex flex-wrap gap-2" data-name="quick-facts" data-file="pages/business/BusinessHeader.js">
                 <span className="chip-rr px-3 py-1.5 text-xs text-[var(--text-muted)]" data-name="services-count" data-file="pages/business/BusinessHeader.js">{services.length} servicios</span>
+                {products.length ? <span className="chip-rr px-3 py-1.5 text-xs text-[var(--text-muted)]" data-name="products-count" data-file="pages/business/BusinessHeader.js">{products.length} productos</span> : null}
+                {courses.length ? <span className="chip-rr px-3 py-1.5 text-xs text-[var(--text-muted)]" data-name="courses-count" data-file="pages/business/BusinessHeader.js">{courses.length} cursos</span> : null}
                 <span className="chip-rr px-3 py-1.5 text-xs text-[var(--text-muted)]" data-name="first-price" data-file="pages/business/BusinessHeader.js">Desde {firstPrice}</span>
               </div>
             </div>

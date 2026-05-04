@@ -3,6 +3,8 @@
     const b = business;
     const tier = b.vip ? 'VIP' : 'Free';
     const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
+    const productCount = ((b.categoriasCatalogo || []).find((section) => section.tipo === 'productos')?.items || []).length;
+    const courseCount = ((b.categoriasCatalogo || []).find((section) => section.tipo === 'cursos')?.items || []).length;
 
     return (
       <button
@@ -28,6 +30,12 @@
         <div className="p-4" data-name="logo-card-body" data-file="components/BusinessLogoCard.js">
           <p className="text-sm font-semibold leading-snug" data-name="name" data-file="components/BusinessLogoCard.js">{b.nombre}</p>
           <p className="text-xs text-[var(--text-muted)] mt-1" data-name="category" data-file="components/BusinessLogoCard.js">{b.categoria} Â· {b.ubicacion?.provincia || b.ubicacion?.zona}</p>
+          {(productCount || courseCount) ? (
+            <div className="mt-3 flex flex-wrap gap-2" data-name="store-flags" data-file="components/BusinessLogoCard.js">
+              {productCount ? <span className="chip-rr px-2.5 py-1 text-[11px] text-[var(--text-muted)]" data-name="store-flag" data-file="components/BusinessLogoCard.js">Tienda</span> : null}
+              {courseCount ? <span className="chip-rr px-2.5 py-1 text-[11px] text-[var(--text-muted)]" data-name="course-flag" data-file="components/BusinessLogoCard.js">Cursos</span> : null}
+            </div>
+          ) : null}
 
           <div className="mt-4 flex items-center justify-between gap-3" data-name="logo-card-bottom" data-file="components/BusinessLogoCard.js">
             <div className="flex items-center gap-2" data-name="rating" data-file="components/BusinessLogoCard.js">
