@@ -1,4 +1,4 @@
-function Footer() {
+﻿function Footer() {
   try {
     const year = 2026;
     return (
@@ -8,14 +8,14 @@ function Footer() {
             <div className="space-y-2" data-name="footer-brand" data-file="components/Footer.js">
               <p className="text-sm font-semibold" data-name="footer-title" data-file="components/Footer.js">Rservas.Roma Marketplace</p>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed" data-name="footer-sub" data-file="components/Footer.js">
-                Belleza y servicios en Cuba. Reserva por WhatsApp y descubre negocios VIP con reseñas verificadas.
+                Belleza, cursos y tiendas en Cuba. Descubre negocios verificados y reserva por WhatsApp.
               </p>
             </div>
             <div className="flex items-center gap-2" data-name="footer-legal" data-file="components/Footer.js">
-              <span className="text-xs text-[var(--text-muted)]" data-name="footer-copy" data-file="components/Footer.js">© {year} Rservas.Roma</span>
-              <span className="text-xs text-[var(--text-muted)]" data-name="footer-dot" data-file="components/Footer.js">•</span>
-              <a className="text-xs text-[var(--text-muted)] hover:text-[var(--primary-color)] transition-colors" href="index.html#muro" data-name="footer-muro" data-file="components/Footer.js">
-                Muro de la Intriga
+              <span className="text-xs text-[var(--text-muted)]" data-name="footer-copy" data-file="components/Footer.js">Â© {year} Rservas.Roma</span>
+              <span className="text-xs text-[var(--text-muted)]" data-name="footer-dot" data-file="components/Footer.js">â€¢</span>
+              <a className="text-xs text-[var(--text-muted)] hover:text-[var(--primary-color)] transition-colors" href="search.html" data-name="footer-businesses" data-file="components/Footer.js">
+                Negocios
               </a>
             </div>
           </div>

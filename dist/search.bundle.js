@@ -1029,7 +1029,7 @@ function Footer() {
       className: "text-xs text-[var(--text-muted)] leading-relaxed",
       "data-name": "footer-sub",
       "data-file": "components/Footer.js"
-    }, "Belleza y servicios en Cuba. Reserva por WhatsApp y descubre negocios VIP con rese\xF1as verificadas.")), React.createElement("div", {
+    }, "Belleza, cursos y tiendas en Cuba. Descubre negocios verificados y reserva por WhatsApp.")), React.createElement("div", {
       className: "flex items-center gap-2",
       "data-name": "footer-legal",
       "data-file": "components/Footer.js"
@@ -1037,16 +1037,16 @@ function Footer() {
       className: "text-xs text-[var(--text-muted)]",
       "data-name": "footer-copy",
       "data-file": "components/Footer.js"
-    }, "\xA9 ", year, " Rservas.Roma"), React.createElement("span", {
+    }, "\xC2\xA9 ", year, " Rservas.Roma"), React.createElement("span", {
       className: "text-xs text-[var(--text-muted)]",
       "data-name": "footer-dot",
       "data-file": "components/Footer.js"
-    }, "\u2022"), React.createElement("a", {
+    }, "\xE2\u20AC\xA2"), React.createElement("a", {
       className: "text-xs text-[var(--text-muted)] hover:text-[var(--primary-color)] transition-colors",
-      href: "index.html#muro",
-      "data-name": "footer-muro",
+      href: "search.html",
+      "data-name": "footer-businesses",
       "data-file": "components/Footer.js"
-    }, "Muro de la Intriga")))));
+    }, "Negocios")))));
   } catch (error) {
     console.error('Footer component error:', error);
     return null;

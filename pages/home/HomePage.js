@@ -1,4 +1,4 @@
-function HomePage({ initialParams }) {
+﻿function HomePage({ initialParams }) {
   try {
     const top = MockData.listTopRated();
     const featured = MockData.listWeeklyFeatured();
@@ -15,13 +15,13 @@ function HomePage({ initialParams }) {
           data-name="weekly-featured"
           data-file="pages/home/HomePage.js"
         />
-        <IntrigueWall data-name="intrigue-wall" data-file="pages/home/HomePage.js" />
+        <AllBusinessesSection data-name="all-businesses-section" data-file="pages/home/HomePage.js" />
         <BusinessRail
           title="Mejor valorados"
           subtitle=""
           badge="Clientes felices"
           items={top}
-          emptyText="Aun no hay reseñas publicas."
+          emptyText="Aun no hay reseÃ±as publicas."
           data-name="top-rated"
           data-file="pages/home/HomePage.js"
         />
@@ -34,9 +34,9 @@ function HomePage({ initialParams }) {
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]" data-name="trust-1-iw" data-file="pages/home/HomePage.js">
                   <div className="icon-circle-check text-xl text-[var(--primary-color)]" data-name="trust-1-i" data-file="pages/home/HomePage.js"></div>
                 </div>
-                <p className="mt-4 text-sm font-semibold" data-name="trust-1-t" data-file="pages/home/HomePage.js">Reseña verificada</p>
+                <p className="mt-4 text-sm font-semibold" data-name="trust-1-t" data-file="pages/home/HomePage.js">ReseÃ±a verificada</p>
                 <p className="mt-1 text-sm text-[var(--text-muted)] leading-relaxed" data-name="trust-1-d" data-file="pages/home/HomePage.js">
-                  Cuando ves “Reseña verificada”, significa que el cliente confirmó su cita.
+                  Cuando ves â€œReseÃ±a verificadaâ€, significa que el cliente confirmÃ³ su cita.
                 </p>
               </div>
 
@@ -44,9 +44,9 @@ function HomePage({ initialParams }) {
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]" data-name="trust-2-iw" data-file="pages/home/HomePage.js">
                   <div className="icon-crown text-xl text-[var(--primary-color)]" data-name="trust-2-i" data-file="pages/home/HomePage.js"></div>
                 </div>
-                <p className="mt-4 text-sm font-semibold" data-name="trust-2-t" data-file="pages/home/HomePage.js">Distinción VIP</p>
+                <p className="mt-4 text-sm font-semibold" data-name="trust-2-t" data-file="pages/home/HomePage.js">DistinciÃ³n VIP</p>
                 <p className="mt-1 text-sm text-[var(--text-muted)] leading-relaxed" data-name="trust-2-d" data-file="pages/home/HomePage.js">
-                  Negocios VIP destacan con fotos premium, mejor posicionamiento y respuesta más rápida.
+                  Negocios VIP destacan con fotos premium, mejor posicionamiento y respuesta mÃ¡s rÃ¡pida.
                 </p>
               </div>
 
@@ -69,3 +69,4 @@ function HomePage({ initialParams }) {
     return null;
   }
 }
+

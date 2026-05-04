@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 const babel = require('@babel/core');
 const { execFileSync } = require('child_process');
@@ -22,7 +22,7 @@ const bundles = {
     'components/RomaReviewsRail.js',
     'components/TopRatedCarousel.js',
     'pages/home/HomeHero.js',
-    'pages/home/IntrigueWall.js',
+    'pages/home/AllBusinessesSection.js',
     'pages/home/HomePage.js',
     'app.js'
   ],
@@ -89,3 +89,4 @@ execFileSync(
   [tailwindBin, '-i', 'styles/tailwind-input.css', '-o', 'styles/tailwind.css', '--minify'],
   { cwd: root, stdio: 'inherit' }
 );
+

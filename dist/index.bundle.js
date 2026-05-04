@@ -1029,7 +1029,7 @@ function Footer() {
       className: "text-xs text-[var(--text-muted)] leading-relaxed",
       "data-name": "footer-sub",
       "data-file": "components/Footer.js"
-    }, "Belleza y servicios en Cuba. Reserva por WhatsApp y descubre negocios VIP con rese\xF1as verificadas.")), React.createElement("div", {
+    }, "Belleza, cursos y tiendas en Cuba. Descubre negocios verificados y reserva por WhatsApp.")), React.createElement("div", {
       className: "flex items-center gap-2",
       "data-name": "footer-legal",
       "data-file": "components/Footer.js"
@@ -1037,16 +1037,16 @@ function Footer() {
       className: "text-xs text-[var(--text-muted)]",
       "data-name": "footer-copy",
       "data-file": "components/Footer.js"
-    }, "\xA9 ", year, " Rservas.Roma"), React.createElement("span", {
+    }, "\xC2\xA9 ", year, " Rservas.Roma"), React.createElement("span", {
       className: "text-xs text-[var(--text-muted)]",
       "data-name": "footer-dot",
       "data-file": "components/Footer.js"
-    }, "\u2022"), React.createElement("a", {
+    }, "\xE2\u20AC\xA2"), React.createElement("a", {
       className: "text-xs text-[var(--text-muted)] hover:text-[var(--primary-color)] transition-colors",
-      href: "index.html#muro",
-      "data-name": "footer-muro",
+      href: "search.html",
+      "data-name": "footer-businesses",
       "data-file": "components/Footer.js"
-    }, "Muro de la Intriga")))));
+    }, "Negocios")))));
   } catch (error) {
     console.error('Footer component error:', error);
     return null;
@@ -1955,7 +1955,7 @@ function HomeHero({
     return null;
   }
 }
-function IntrigueWall() {
+function AllBusinessesSection() {
   try {
     const all = MockData.listBusinesses();
     const [active, setActive] = React.useState(null);
@@ -1965,7 +1965,7 @@ function IntrigueWall() {
         setActive(b);
         setOpen(true);
       } catch (error) {
-        console.error('IntrigueWall.openCard error:', error);
+        console.error('AllBusinessesSection.openCard error:', error);
       }
     };
     const closeCard = () => {
@@ -1973,7 +1973,7 @@ function IntrigueWall() {
         setOpen(false);
         window.setTimeout(() => setActive(null), 220);
       } catch (error) {
-        console.error('IntrigueWall.closeCard error:', error);
+        console.error('AllBusinessesSection.closeCard error:', error);
       }
     };
     React.useEffect(() => {
@@ -1984,7 +1984,7 @@ function IntrigueWall() {
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
       } catch (error) {
-        console.error('IntrigueWall useEffect error:', error);
+        console.error('AllBusinessesSection useEffect error:', error);
       }
     }, []);
     const DetailPanel = ({
@@ -1995,227 +1995,227 @@ function IntrigueWall() {
         return React.createElement("div", {
           className: `fixed inset-0 z-[80] ${open ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`,
           "data-name": "intrigue-overlay",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("div", {
           className: "absolute inset-0 bg-black/20",
           onClick: closeCard,
           "data-name": "intrigue-backdrop",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }), React.createElement("div", {
           className: "absolute inset-x-0 bottom-0 md:inset-0 md:flex md:items-center md:justify-center p-4",
           "data-name": "intrigue-modal-wrap",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("div", {
           className: `card-rr w-full md:max-w-[980px] overflow-hidden transform ${open ? 'translate-y-0 md:scale-100' : 'translate-y-4 md:scale-[0.98]'} transition-transform duration-300`,
           "data-name": "intrigue-modal",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("div", {
           className: "grid grid-cols-1 md:grid-cols-[1.2fr_1fr]",
           "data-name": "intrigue-grid",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("div", {
           className: "relative h-[260px] md:h-full bg-[#F9FAFB]",
           "data-name": "intrigue-photo",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("img", {
           src: business.portadaUrl,
           alt: `Portada de ${business.nombre}`,
           className: "w-full h-full object-cover",
           "data-name": "intrigue-photo-img",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }), React.createElement("button", {
           className: "absolute top-4 right-4 w-11 h-11 rounded-2xl bg-white/90 backdrop-blur border border-[var(--border)] flex items-center justify-center hover:bg-white transition-colors",
           onClick: closeCard,
           "data-name": "intrigue-close",
-          "data-file": "pages/home/IntrigueWall.js",
+          "data-file": "pages/home/AllBusinessesSection.js",
           "aria-label": "Cerrar"
         }, React.createElement("div", {
           className: "icon-x text-xl text-[var(--primary-color)]",
           "data-name": "intrigue-close-icon",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }))), React.createElement("div", {
           className: "p-5 md:p-7",
           "data-name": "intrigue-body",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("div", {
           className: "flex items-start gap-4",
           "data-name": "intrigue-head",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("div", {
           className: "w-14 h-14 rounded-3xl border border-[var(--border)] bg-white overflow-hidden shrink-0",
           "data-name": "intrigue-logo",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("img", {
           src: business.logoUrl,
           alt: `Logo de ${business.nombre}`,
           className: "w-full h-full object-cover",
           "data-name": "intrigue-logo-img",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         })), React.createElement("div", {
           className: "min-w-0",
           "data-name": "intrigue-titlewrap",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("p", {
           className: "text-lg md:text-xl font-semibold leading-tight",
           "data-name": "intrigue-name",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, business.nombre), React.createElement("p", {
           className: "text-sm text-[var(--text-muted)] mt-1",
           "data-name": "intrigue-meta",
-          "data-file": "pages/home/IntrigueWall.js"
-        }, business.categoria, " \xB7 ", business.ubicacion?.zona, " \xB7 ", business.ubicacion?.ciudad)), business.vip ? React.createElement("span", {
+          "data-file": "pages/home/AllBusinessesSection.js"
+        }, business.categoria, " \xC2\xB7 ", business.ubicacion?.zona, " \xC2\xB7 ", business.ubicacion?.ciudad)), business.vip ? React.createElement("span", {
           className: "ml-auto inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black text-white text-xs border border-black/30",
           "data-name": "intrigue-vip",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("div", {
           className: "icon-crown text-base text-white",
           "data-name": "intrigue-vip-i",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }), "VIP") : null), React.createElement("div", {
           className: "mt-4",
           "data-name": "intrigue-rating",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement(StarRating, {
           value: business.estrellas,
-          total: business.totalReseñas,
+          total: business.totalResenas || business['totalReseñas'],
           verified: business.verificado,
-          "data-name": "intrigue-stars",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-name": "business-stars",
+          "data-file": "pages/home/AllBusinessesSection.js"
         })), React.createElement("p", {
           className: "mt-4 text-sm text-[var(--text-muted)] leading-relaxed",
           "data-name": "intrigue-desc",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, business.descripcion), React.createElement("div", {
           className: "mt-5 surface-rr p-4",
           "data-name": "intrigue-mini",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("div", {
           className: "flex items-start gap-3",
           "data-name": "intrigue-loc",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("div", {
           className: "w-10 h-10 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]",
           "data-name": "intrigue-loc-iw",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("div", {
           className: "icon-map-pin text-xl text-[var(--primary-color)]",
           "data-name": "intrigue-loc-i",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         })), React.createElement("div", {
           className: "min-w-0",
           "data-name": "intrigue-loc-t",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("p", {
           className: "text-xs text-[var(--text-muted)]",
           "data-name": "intrigue-loc-l",
-          "data-file": "pages/home/IntrigueWall.js"
-        }, "Ubicaci\xF3n"), React.createElement("p", {
+          "data-file": "pages/home/AllBusinessesSection.js"
+        }, "Ubicaci\xC3\xB3n"), React.createElement("p", {
           className: "text-sm font-medium leading-snug",
           "data-name": "intrigue-loc-v",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, business.ubicacion?.direccion))), React.createElement("div", {
           className: "divider-rr my-4",
           "data-name": "intrigue-div",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }), React.createElement("div", {
           className: "flex items-center justify-between gap-3",
           "data-name": "intrigue-price",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("span", {
           className: "text-xs text-[var(--text-muted)]",
           "data-name": "intrigue-price-l",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, "Rango de precio"), React.createElement("span", {
           className: "text-sm font-semibold",
           "data-name": "intrigue-price-v",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, Format.formatRangoPrecio(business.rangoPrecio?.min, business.rangoPrecio?.max)))), React.createElement("div", {
           className: "mt-6 flex flex-col sm:flex-row gap-2",
           "data-name": "intrigue-ctas",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("button", {
           className: "btn-rr btn-primary-rr w-full flex items-center justify-center gap-2",
           onClick: () => Navigation.goToBusiness(business.id),
           "data-name": "intrigue-open",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("span", {
           "data-name": "intrigue-open-t",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, "Ver perfil"), React.createElement("div", {
           className: "icon-arrow-right text-xl text-white",
           "data-name": "intrigue-open-i",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         })), React.createElement("button", {
           className: "btn-rr btn-ghost-rr w-full flex items-center justify-center gap-2",
           onClick: () => Navigation.goToSearch(business.categoria, business.ubicacion?.zona || business.ubicacion?.ciudad || ''),
           "data-name": "intrigue-related",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, React.createElement("div", {
           className: "icon-search text-xl text-[var(--primary-color)]",
           "data-name": "intrigue-related-i",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }), React.createElement("span", {
           "data-name": "intrigue-related-t",
-          "data-file": "pages/home/IntrigueWall.js"
+          "data-file": "pages/home/AllBusinessesSection.js"
         }, "Buscar similares"))))))));
       } catch (error) {
-        console.error('IntrigueWall.DetailPanel error:', error);
+        console.error('AllBusinessesSection.DetailPanel error:', error);
         return null;
       }
     };
     return React.createElement("section", {
       className: "mt-12",
-      id: "muro",
-      "data-name": "intrigue-wall",
-      "data-file": "pages/home/IntrigueWall.js"
+      id: "negocios",
+      "data-name": "all-businesses-section",
+      "data-file": "pages/home/AllBusinessesSection.js"
     }, React.createElement("div", {
       className: "container-rr",
       "data-name": "intrigue-wall-inner",
-      "data-file": "pages/home/IntrigueWall.js"
+      "data-file": "pages/home/AllBusinessesSection.js"
     }, React.createElement("div", {
       className: "flex flex-col md:flex-row md:items-end justify-between gap-4",
       "data-name": "intrigue-wall-head",
-      "data-file": "pages/home/IntrigueWall.js"
+      "data-file": "pages/home/AllBusinessesSection.js"
     }, React.createElement("div", {
       "data-name": "intrigue-wall-titlewrap",
-      "data-file": "pages/home/IntrigueWall.js"
+      "data-file": "pages/home/AllBusinessesSection.js"
     }, React.createElement("h2", {
       className: "text-xl md:text-2xl font-semibold tracking-tight",
       "data-name": "intrigue-wall-title",
-      "data-file": "pages/home/IntrigueWall.js"
+      "data-file": "pages/home/AllBusinessesSection.js"
     }, "Todos los negocios")), React.createElement("a", {
       className: "btn-rr btn-ghost-rr inline-flex items-center justify-center gap-2 w-full md:w-auto",
       href: "search.html",
       "data-name": "intrigue-wall-cta",
-      "data-file": "pages/home/IntrigueWall.js"
+      "data-file": "pages/home/AllBusinessesSection.js"
     }, React.createElement("span", {
       "data-name": "intrigue-wall-cta-t",
-      "data-file": "pages/home/IntrigueWall.js"
+      "data-file": "pages/home/AllBusinessesSection.js"
     }, "Ver todos"), React.createElement("div", {
       className: "icon-arrow-right text-xl text-[var(--primary-color)]",
       "data-name": "intrigue-wall-cta-i",
-      "data-file": "pages/home/IntrigueWall.js"
+      "data-file": "pages/home/AllBusinessesSection.js"
     }))), React.createElement("div", {
       className: "mt-6 flex gap-4 overflow-x-auto no-scrollbar pb-3 snap-x snap-mandatory",
       "data-name": "intrigue-grid",
-      "data-file": "pages/home/IntrigueWall.js"
+      "data-file": "pages/home/AllBusinessesSection.js"
     }, all.map(b => React.createElement("div", {
       key: b.id,
       className: "min-w-[250px] md:min-w-[290px] max-w-[290px] snap-start",
       "data-name": "intrigue-item-wrap",
-      "data-file": "pages/home/IntrigueWall.js"
+      "data-file": "pages/home/AllBusinessesSection.js"
     }, React.createElement(BusinessLogoCard, {
       business: b,
       onOpen: openCard,
       "data-name": "intrigue-item",
-      "data-file": "pages/home/IntrigueWall.js"
+      "data-file": "pages/home/AllBusinessesSection.js"
     }))))), React.createElement(DetailPanel, {
       business: active,
       "data-name": "intrigue-panel",
-      "data-file": "pages/home/IntrigueWall.js"
+      "data-file": "pages/home/AllBusinessesSection.js"
     }));
   } catch (error) {
-    console.error('IntrigueWall component error:', error);
+    console.error('AllBusinessesSection component error:', error);
     return null;
   }
 }
@@ -2240,15 +2240,15 @@ function HomePage({
       items: featured,
       "data-name": "weekly-featured",
       "data-file": "pages/home/HomePage.js"
-    }), React.createElement(IntrigueWall, {
-      "data-name": "intrigue-wall",
+    }), React.createElement(AllBusinessesSection, {
+      "data-name": "all-businesses-section",
       "data-file": "pages/home/HomePage.js"
     }), React.createElement(BusinessRail, {
       title: "Mejor valorados",
       subtitle: "",
       badge: "Clientes felices",
       items: top,
-      emptyText: "Aun no hay rese\xF1as publicas.",
+      emptyText: "Aun no hay rese\xC3\xB1as publicas.",
       "data-name": "top-rated",
       "data-file": "pages/home/HomePage.js"
     }), React.createElement(RomaReviewsRail, {
@@ -2283,11 +2283,11 @@ function HomePage({
       className: "mt-4 text-sm font-semibold",
       "data-name": "trust-1-t",
       "data-file": "pages/home/HomePage.js"
-    }, "Rese\xF1a verificada"), React.createElement("p", {
+    }, "Rese\xC3\xB1a verificada"), React.createElement("p", {
       className: "mt-1 text-sm text-[var(--text-muted)] leading-relaxed",
       "data-name": "trust-1-d",
       "data-file": "pages/home/HomePage.js"
-    }, "Cuando ves \u201CRese\xF1a verificada\u201D, significa que el cliente confirm\xF3 su cita.")), React.createElement("div", {
+    }, "Cuando ves \xE2\u20AC\u0153Rese\xC3\xB1a verificada\xE2\u20AC\x9D, significa que el cliente confirm\xC3\xB3 su cita.")), React.createElement("div", {
       className: "surface-rr p-5",
       "data-name": "trust-2",
       "data-file": "pages/home/HomePage.js"
@@ -2303,11 +2303,11 @@ function HomePage({
       className: "mt-4 text-sm font-semibold",
       "data-name": "trust-2-t",
       "data-file": "pages/home/HomePage.js"
-    }, "Distinci\xF3n VIP"), React.createElement("p", {
+    }, "Distinci\xC3\xB3n VIP"), React.createElement("p", {
       className: "mt-1 text-sm text-[var(--text-muted)] leading-relaxed",
       "data-name": "trust-2-d",
       "data-file": "pages/home/HomePage.js"
-    }, "Negocios VIP destacan con fotos premium, mejor posicionamiento y respuesta m\xE1s r\xE1pida.")), React.createElement("div", {
+    }, "Negocios VIP destacan con fotos premium, mejor posicionamiento y respuesta m\xC3\xA1s r\xC3\xA1pida.")), React.createElement("div", {
       className: "surface-rr p-5",
       "data-name": "trust-3",
       "data-file": "pages/home/HomePage.js"
