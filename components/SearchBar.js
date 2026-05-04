@@ -1,95 +1,69 @@
-function SearchBar({ initialServicio, initialUbicacion, compact }) {
+﻿function SearchBar({ initialServicio, initialUbicacion, compact }) {
   try {
     const toast = useToast();
-    const [servicio, setServicio] = React.useState(initialServicio || '');
-    const [ubicacion, setUbicacion] = React.useState(initialUbicacion || '');
+    const [provincia, setProvincia] = React.useState(initialUbicacion || '');
     const [focus, setFocus] = React.useState(false);
+    const provincias = [
+      'La Habana',
+      'Artemisa',
+      'Mayabeque',
+      'Matanzas',
+      'Villa Clara',
+      'Cienfuegos',
+      'Sancti Spíritus',
+      'Ciego de Ávila',
+      'Camagüey',
+      'Las Tunas',
+      'Holguín',
+      'Granma',
+      'Santiago de Cuba',
+      'Guantánamo',
+      'Pinar del Río',
+      'Isla de la Juventud'
+    ];
 
     React.useEffect(() => {
       try {
-        setServicio(initialServicio || '');
-        setUbicacion(initialUbicacion || '');
+        setProvincia(initialUbicacion || '');
       } catch (error) {
         console.error('SearchBar sync error:', error);
       }
-    }, [initialServicio, initialUbicacion]);
-
-    const sugerenciasServicio = ['Unas', 'Barbería', 'Cejas y pestañas', 'Peinados', 'Maquillaje', 'Masajes'];
-    const sugerenciasUbicacion = ['La Habana', 'Matanzas', 'Villa Clara', 'Camagüey', 'Santiago de Cuba'];
+    }, [initialUbicacion]);
 
     const ejecutarBusqueda = () => {
       try {
-        if (!servicio && !ubicacion) {
-          toast?.push({ title: 'Escribe algo', message: 'Busca por servicio o provincia, por ejemplo La Habana.' });
+        if (!provincia) {
+          toast?.push({ title: 'Selecciona una provincia', message: 'Elige dónde quieres ver negocios activos.' });
           return;
         }
-        Navigation.goToSearch(servicio, ubicacion);
+        Navigation.goToSearch('', provincia);
       } catch (error) {
         console.error('SearchBar.ejecutarBusqueda error:', error);
       }
     };
 
-    const suggestionChips = (items, onPick) => (
-      <div className="flex flex-wrap gap-2 mt-3" data-name="suggestions" data-file="components/SearchBar.js">
-        {items.map((s) => (
-          <button
-            key={s}
-            className="px-3 py-1.5 rounded-full border border-[var(--border)] bg-white text-xs text-[var(--text-muted)] hover:text-[var(--primary-color)] hover:border-[rgba(216,27,96,0.35)] transition-colors"
-            onClick={() => onPick(s)}
-            data-name="suggestion-chip"
-            data-file="components/SearchBar.js"
-          >
-            {s}
-          </button>
-        ))}
-      </div>
-    );
-
     return (
-      <div className={`${compact ? 'w-full' : 'w-full max-w-[900px] mx-auto'}`} data-name="searchbar" data-file="components/SearchBar.js">
+      <div className={`${compact ? 'w-full' : 'w-full max-w-[760px] mx-auto'}`} data-name="searchbar" data-file="components/SearchBar.js">
         <div className={`surface-rr bg-white p-2 md:p-2 ${focus ? 'subtle-glow-rr' : ''} transition-shadow`} data-name="searchbar-surface" data-file="components/SearchBar.js">
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-0 md:gap-2 items-stretch" data-name="searchbar-grid" data-file="components/SearchBar.js">
-            <div className="flex items-center gap-3 px-3 py-3 md:border-r border-[var(--border)]" data-name="field-servicio" data-file="components/SearchBar.js">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[rgba(11,18,32,0.04)]" data-name="field-servicio-icon" data-file="components/SearchBar.js">
-                <div className="icon-search text-xl text-[var(--primary-color)]" data-name="field-servicio-icon-i" data-file="components/SearchBar.js"></div>
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2 items-stretch" data-name="searchbar-grid" data-file="components/SearchBar.js">
+            <div className="flex items-center gap-3 px-3 py-3" data-name="field-provincia" data-file="components/SearchBar.js">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[rgba(11,18,32,0.04)]" data-name="field-provincia-icon" data-file="components/SearchBar.js">
+                <div className="icon-map-pin text-xl text-[var(--primary-color)]" data-name="field-provincia-icon-i" data-file="components/SearchBar.js"></div>
               </div>
-              <div className="min-w-0 flex-1" data-name="field-servicio-input" data-file="components/SearchBar.js">
-                <label className="block text-[11px] text-[var(--text-muted)] mb-1" data-name="label-servicio" data-file="components/SearchBar.js">Servicio</label>
-                <input
+              <div className="min-w-0 flex-1" data-name="field-provincia-input" data-file="components/SearchBar.js">
+                <label className="block text-[11px] text-[var(--text-muted)] mb-1" data-name="label-provincia" data-file="components/SearchBar.js">Provincia</label>
+                <select
                   className="w-full text-sm bg-transparent outline-none"
-                  value={servicio}
-                  onChange={(e) => setServicio(e.target.value)}
-                  placeholder="Uñas, barbería, maquillaje"
+                  value={provincia}
+                  onChange={(e) => setProvincia(e.target.value)}
                   onFocus={() => setFocus(true)}
                   onBlur={() => setFocus(false)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') ejecutarBusqueda();
-                  }}
-                  data-name="input-servicio"
+                  data-name="select-provincia"
                   data-file="components/SearchBar.js"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 px-3 py-3" data-name="field-ubicacion" data-file="components/SearchBar.js">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[rgba(11,18,32,0.04)]" data-name="field-ubicacion-icon" data-file="components/SearchBar.js">
-                <div className="icon-map-pin text-xl text-[var(--primary-color)]" data-name="field-ubicacion-icon-i" data-file="components/SearchBar.js"></div>
-              </div>
-              <div className="min-w-0 flex-1" data-name="field-ubicacion-input" data-file="components/SearchBar.js">
-                <label className="block text-[11px] text-[var(--text-muted)] mb-1" data-name="label-ubicacion" data-file="components/SearchBar.js">Provincia o zona</label>
-                <input
-                  className="w-full text-sm bg-transparent outline-none"
-                  value={ubicacion}
-                  onChange={(e) => setUbicacion(e.target.value)}
-                  placeholder="La Habana, Matanzas, Vedado"
-                  onFocus={() => setFocus(true)}
-                  onBlur={() => setFocus(false)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') ejecutarBusqueda();
-                  }}
-                  data-name="input-ubicacion"
-                  data-file="components/SearchBar.js"
-                />
+                >
+                  <option value="">Selecciona provincia</option>
+                  {provincias.map((item) => <option key={item} value={item}>{item}</option>)}
+                </select>
               </div>
             </div>
 
@@ -99,7 +73,7 @@ function SearchBar({ initialServicio, initialUbicacion, compact }) {
               data-name="btn-buscar"
               data-file="components/SearchBar.js"
             >
-              <span data-name="btn-buscar-text" data-file="components/SearchBar.js">Buscar</span>
+              <span data-name="btn-buscar-text" data-file="components/SearchBar.js">Ver negocios</span>
               <div className="icon-arrow-right text-xl text-white" data-name="btn-buscar-icon" data-file="components/SearchBar.js"></div>
             </button>
           </div>
@@ -107,10 +81,21 @@ function SearchBar({ initialServicio, initialUbicacion, compact }) {
           {!compact ? (
             <div className="mt-4 px-1" data-name="searchbar-suggestions" data-file="components/SearchBar.js">
               <p className="text-xs text-[var(--text-muted)]" data-name="suggestions-title" data-file="components/SearchBar.js">
-                Populares ahora
+                Provincias populares
               </p>
-              {suggestionChips(sugerenciasServicio, (s) => setServicio(s))}
-              {suggestionChips(sugerenciasUbicacion, (s) => setUbicacion(s))}
+              <div className="flex gap-2 mt-3 overflow-x-auto no-scrollbar pb-1" data-name="province-suggestions" data-file="components/SearchBar.js">
+                {provincias.slice(0, 8).map((item) => (
+                  <button
+                    key={item}
+                    className={`px-3 py-1.5 rounded-full border text-xs whitespace-nowrap transition-colors ${provincia === item ? 'bg-[var(--primary-color)] text-white border-[var(--primary-color)]' : 'border-[var(--border)] bg-white text-[var(--text-muted)] hover:text-[var(--primary-color)] hover:border-[rgba(216,27,96,0.35)]'}`}
+                    onClick={() => setProvincia(item)}
+                    data-name="suggestion-chip"
+                    data-file="components/SearchBar.js"
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
             </div>
           ) : null}
         </div>
