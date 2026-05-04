@@ -93,7 +93,7 @@
                           <div className="icon-map-pin text-xl text-[var(--primary-color)]" data-name="intrigue-loc-i" data-file="pages/home/AllBusinessesSection.js"></div>
                         </div>
                         <div className="min-w-0" data-name="intrigue-loc-t" data-file="pages/home/AllBusinessesSection.js">
-                          <p className="text-xs text-[var(--text-muted)]" data-name="intrigue-loc-l" data-file="pages/home/AllBusinessesSection.js">Ubicacion</p>
+                          <p className="text-xs text-[var(--text-muted)]" data-name="intrigue-loc-l" data-file="pages/home/AllBusinessesSection.js">Ubicación</p>
                           <p className="text-sm font-medium leading-snug" data-name="intrigue-loc-v" data-file="pages/home/AllBusinessesSection.js">
                             {business.ubicacion?.direccion}
                           </p>

@@ -2,7 +2,7 @@ function BusinessTabs({ active, onChange }) {
   try {
     const tabs = [
       { key: 'portafolio', label: 'Portafolio', icon: 'icon-image' },
-      { key: 'catalogo', label: 'Servicios y Productos', icon: 'icon-list' },
+      { key: 'catálogo', label: 'Servicios y Productos', icon: 'icon-list' },
       { key: 'cursos', label: 'Cursos y Talleres', icon: 'icon-calendar' },
       { key: 'resenas', label: 'Reseñas', icon: 'icon-message-square' }
     ];

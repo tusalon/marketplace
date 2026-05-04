@@ -39,7 +39,7 @@
           `Total: ${Format.formatPrecioCUP(total)}`,
           '',
           'Mi nombre:',
-          'Direccion o referencia:'
+          'Dirección o referencia:'
         ];
         const wa = String(b.whatsapp || '').replace('+', '').replace(/\D/g, '');
         window.location.href = `https://wa.me/${wa}?text=${encodeURIComponent(lines.join('\n'))}`;

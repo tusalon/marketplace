@@ -14,8 +14,8 @@ function SearchBar({ initialServicio, initialUbicacion, compact }) {
       }
     }, [initialServicio, initialUbicacion]);
 
-    const sugerenciasServicio = ['Unas', 'Barberia', 'Cejas y pestanas', 'Peinados', 'Maquillaje', 'Masajes'];
-    const sugerenciasUbicacion = ['La Habana', 'Matanzas', 'Villa Clara', 'Camaguey', 'Santiago de Cuba'];
+    const sugerenciasServicio = ['Unas', 'Barbería', 'Cejas y pestañas', 'Peinados', 'Maquillaje', 'Masajes'];
+    const sugerenciasUbicacion = ['La Habana', 'Matanzas', 'Villa Clara', 'Camagüey', 'Santiago de Cuba'];
 
     const ejecutarBusqueda = () => {
       try {
@@ -59,7 +59,7 @@ function SearchBar({ initialServicio, initialUbicacion, compact }) {
                   className="w-full text-sm bg-transparent outline-none"
                   value={servicio}
                   onChange={(e) => setServicio(e.target.value)}
-                  placeholder="Unas, barberia, maquillaje"
+                  placeholder="Uñas, barbería, maquillaje"
                   onFocus={() => setFocus(true)}
                   onBlur={() => setFocus(false)}
                   onKeyDown={(e) => {

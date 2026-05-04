@@ -9,7 +9,7 @@ function LoginBusinessPage() {
       try {
         event.preventDefault();
         if (!email.trim() || !password.trim()) {
-          setError('Escribe correo y contrasena para continuar.');
+          setError('Escribe correo y contraseña para continuar.');
           return;
         }
         const params = new URLSearchParams({ plan });
@@ -31,14 +31,14 @@ function LoginBusinessPage() {
                 Gestiona tu espacio en RservasRoma.
               </h1>
               <p className="mt-5 text-base md:text-lg text-[var(--text-muted)] leading-relaxed max-w-[700px]" data-name="login-subtitle" data-file="pages/panel/LoginBusinessPage.js">
-                Esta entrada queda lista para conectar Supabase Auth. Por ahora permite revisar el flujo del panel sin cargar librerias extra.
+                Esta entrada quedó lista para conectar Supabase Auth. Por ahora permite revisar el flujo del panel sin cargar librerias extra.
               </p>
 
               <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3" data-name="login-benefits" data-file="pages/panel/LoginBusinessPage.js">
                 {[
                   ['icon-store', 'Perfil', 'Datos, fotos y contacto.'],
                   ['icon-shopping-bag', 'Tienda', 'Productos, cursos y carrito.'],
-                  ['icon-map-pin', 'Mapa', 'Provincia y ubicacion publica.']
+                  ['icon-map-pin', 'Mapa', 'Provincia y ubicación pública.']
                 ].map((item) => (
                   <div key={item[1]} className="surface-rr p-4" data-name="login-benefit" data-file="pages/panel/LoginBusinessPage.js">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[var(--secondary-color)]" data-name="benefit-icon-wrap" data-file="pages/panel/LoginBusinessPage.js">
@@ -63,13 +63,13 @@ function LoginBusinessPage() {
               </label>
 
               <label className="block mt-4" data-name="password-field" data-file="pages/panel/LoginBusinessPage.js">
-                <span className="text-xs font-semibold text-[var(--text-muted)]">Contrasena</span>
-                <input className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm" type="password" value={password} onChange={(e) => { setPassword(e.target.value); setError(''); }} placeholder="Contrasena del negocio" data-name="password-input" data-file="pages/panel/LoginBusinessPage.js" />
+                <span className="text-xs font-semibold text-[var(--text-muted)]">Contraseña</span>
+                <input className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm" type="password" value={password} onChange={(e) => { setPassword(e.target.value); setError(''); }} placeholder="Contraseña del negocio" data-name="password-input" data-file="pages/panel/LoginBusinessPage.js" />
               </label>
 
               <div className="mt-4 grid grid-cols-2 gap-2" data-name="plan-toggle" data-file="pages/panel/LoginBusinessPage.js">
                 <button type="button" className={`rounded-lg border px-4 py-3 text-sm font-medium ${plan === 'vip' ? 'border-[var(--primary-color)] bg-[var(--secondary-color)] text-[var(--primary-color)]' : 'border-[var(--border)] bg-white'}`} onClick={() => setPlan('vip')} data-name="plan-vip" data-file="pages/panel/LoginBusinessPage.js">VIP</button>
-                <button type="button" className={`rounded-lg border px-4 py-3 text-sm font-medium ${plan === 'basico' ? 'border-[var(--primary-color)] bg-[var(--secondary-color)] text-[var(--primary-color)]' : 'border-[var(--border)] bg-white'}`} onClick={() => setPlan('basico')} data-name="plan-basic" data-file="pages/panel/LoginBusinessPage.js">Basico</button>
+                <button type="button" className={`rounded-lg border px-4 py-3 text-sm font-medium ${plan === 'basico' ? 'border-[var(--primary-color)] bg-[var(--secondary-color)] text-[var(--primary-color)]' : 'border-[var(--border)] bg-white'}`} onClick={() => setPlan('basico')} data-name="plan-basic" data-file="pages/panel/LoginBusinessPage.js">Básico</button>
               </div>
 
               {error ? <p className="mt-3 text-xs text-red-600" data-name="login-error" data-file="pages/panel/LoginBusinessPage.js">{error}</p> : null}

@@ -10,7 +10,7 @@
         <BusinessRail
           title="Destacados"
           subtitle=""
-          badge="Mas reservados esta semana"
+          badge="Más reservados esta semana"
           items={featured}
           data-name="weekly-featured"
           data-file="pages/home/HomePage.js"
@@ -21,7 +21,7 @@
           subtitle=""
           badge="Clientes felices"
           items={top}
-          emptyText="Aun no hay resenas publicas."
+          emptyText="Aun no hay reseñas públicas."
           data-name="top-rated"
           data-file="pages/home/HomePage.js"
         />
@@ -34,9 +34,9 @@
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--secondary-color)]" data-name="trust-1-iw" data-file="pages/home/HomePage.js">
                   <div className="icon-circle-check text-xl text-[var(--primary-color)]" data-name="trust-1-i" data-file="pages/home/HomePage.js"></div>
                 </div>
-                <p className="mt-4 text-sm font-semibold" data-name="trust-1-t" data-file="pages/home/HomePage.js">Resena verificada</p>
+                <p className="mt-4 text-sm font-semibold" data-name="trust-1-t" data-file="pages/home/HomePage.js">Reseña verificada</p>
                 <p className="mt-1 text-sm text-[var(--text-muted)] leading-relaxed" data-name="trust-1-d" data-file="pages/home/HomePage.js">
-                  Cuando ves "Resena verificada", significa que el cliente confirmo su cita.
+                  Cuando ves "Reseña verificada", significa que el cliente confirmó su cita.
                 </p>
               </div>
 
@@ -46,7 +46,7 @@
                 </div>
                 <p className="mt-4 text-sm font-semibold" data-name="trust-2-t" data-file="pages/home/HomePage.js">Distincion VIP</p>
                 <p className="mt-1 text-sm text-[var(--text-muted)] leading-relaxed" data-name="trust-2-d" data-file="pages/home/HomePage.js">
-                  Negocios VIP destacan con fotos premium, mejor posicionamiento y respuesta mas rapida.
+                  Negocios VIP destacan con fotos premium, mejor posicionamiento y respuesta más rápida.
                 </p>
               </div>
 

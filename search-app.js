@@ -74,7 +74,7 @@ function SearchApp() {
           try {
             setQuery(Navigation.getSearchParams());
           } catch (error) {
-            console.error('Error al actualizar búsqueda:', error);
+            console.error('Error al actualizar busqueda:', error);
           }
         };
         window.addEventListener('popstate', onPop);

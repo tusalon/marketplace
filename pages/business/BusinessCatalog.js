@@ -14,7 +14,7 @@ function BusinessCatalog({ business, onAddToCart }) {
       return (
         <div className="surface-rr p-5" data-name="empty" data-file="pages/business/BusinessCatalog.js">
           <p className="text-sm text-[var(--text-muted)]" data-name="empty-t" data-file="pages/business/BusinessCatalog.js">
-            Este negocio aun no publico servicios, productos ni cursos.
+            Este negocio aún no publicó servicios, productos ni cursos.
           </p>
         </div>
       );

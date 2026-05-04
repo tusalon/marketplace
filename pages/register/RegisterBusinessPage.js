@@ -2,21 +2,21 @@ function RegisterBusinessPage() {
   try {
     const ROMA_WHATSAPP = '5354066204';
     const provincias = [
-      'Pinar del Rio',
+      'Pinar del Río',
       'Artemisa',
       'La Habana',
       'Mayabeque',
       'Matanzas',
       'Cienfuegos',
       'Villa Clara',
-      'Sancti Spiritus',
-      'Ciego de Avila',
-      'Camaguey',
+      'Sancti Spíritus',
+      'Ciego de Ávila',
+      'Camagüey',
       'Las Tunas',
-      'Holguin',
+      'Holguín',
       'Granma',
       'Santiago de Cuba',
-      'Guantanamo',
+      'Guantánamo',
       'Isla de la Juventud'
     ];
 
@@ -52,9 +52,9 @@ function RegisterBusinessPage() {
       const next = {};
       if (!form.nombreNegocio.trim()) next.nombreNegocio = 'Escribe el nombre del negocio.';
       if (!form.propietaria.trim()) next.propietaria = 'Escribe el nombre de contacto.';
-      if (!/^[0-9]{8}$/.test(form.whatsapp.trim())) next.whatsapp = 'El WhatsApp debe tener 8 digitos.';
+      if (!/^[0-9]{8}$/.test(form.whatsapp.trim())) next.whatsapp = 'El WhatsApp debe tener 8 dígitos.';
       if (!form.provincia) next.provincia = 'Selecciona una provincia.';
-      if (!form.categoria.trim()) next.categoria = 'Escribe la categoria principal.';
+      if (!form.categoria.trim()) next.categoria = 'Escribe la categoría principal.';
       setErrors(next);
       return Object.keys(next).length === 0;
     };
@@ -71,13 +71,13 @@ function RegisterBusinessPage() {
         `Correo: ${form.email || 'No informado'}`,
         `Provincia: ${form.provincia}`,
         `Municipio o zona: ${form.municipio || 'No informado'}`,
-        `Direccion: ${form.direccion || 'No informada'}`,
-        `Categoria principal: ${form.categoria}`,
+        `Dirección: ${form.direccion || 'No informada'}`,
+        `Categoría principal: ${form.categoria}`,
         `Instagram/Facebook: ${form.instagram || 'No informado'}`,
-        `Quiere tienda: ${form.quiereTienda ? 'Si' : 'No'}`,
-        `Quiere cursos: ${form.quiereCursos ? 'Si' : 'No'}`,
+        `Quiere tienda: ${form.quiereTienda ? 'Sí' : 'No'}`,
+        `Quiere cursos: ${form.quiereCursos ? 'Sí' : 'No'}`,
         '',
-        `Descripcion: ${form.descripcion || 'No informada'}`
+        `Descripción: ${form.descripcion || 'No informada'}`
       ];
       return lines.join('\n');
     };
@@ -148,7 +148,7 @@ function RegisterBusinessPage() {
                   >
                     <p className="text-sm font-semibold" data-name="plan-vip-title" data-file="pages/register/RegisterBusinessPage.js">VIP RservasRoma</p>
                     <p className="mt-1 text-xs text-[var(--text-muted)] leading-relaxed" data-name="plan-vip-desc" data-file="pages/register/RegisterBusinessPage.js">
-                      Perfil completo, reservas, tienda, cursos, resenas y mayor visibilidad.
+                      Perfil completo, reservas, tienda, cursos, reseñas y mayor visibilidad.
                     </p>
                   </button>
                   <button
@@ -160,7 +160,7 @@ function RegisterBusinessPage() {
                   >
                     <p className="text-sm font-semibold" data-name="plan-basic-title" data-file="pages/register/RegisterBusinessPage.js">Tienda + mapa</p>
                     <p className="mt-1 text-xs text-[var(--text-muted)] leading-relaxed" data-name="plan-basic-desc" data-file="pages/register/RegisterBusinessPage.js">
-                      Ubicacion en el mapa, datos de contacto y tienda simple con carrito por WhatsApp.
+                      Ubicación en el mapa, datos de contacto y tienda simple con carrito por WhatsApp.
                     </p>
                   </button>
                 </div>
@@ -202,7 +202,7 @@ function RegisterBusinessPage() {
 
                 <label className="block" data-name="field-whatsapp" data-file="pages/register/RegisterBusinessPage.js">
                   <span className="text-xs font-semibold text-[var(--text-muted)]">WhatsApp del negocio</span>
-                  <input className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm" value={form.whatsapp} onChange={(e) => update('whatsapp', e.target.value.replace(/\D/g, '').slice(0, 8))} placeholder="8 digitos" inputMode="numeric" />
+                  <input className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm" value={form.whatsapp} onChange={(e) => update('whatsapp', e.target.value.replace(/\D/g, '').slice(0, 8))} placeholder="8 dígitos" inputMode="numeric" />
                   <FieldError name="whatsapp" />
                 </label>
 
@@ -226,13 +226,13 @@ function RegisterBusinessPage() {
                 </label>
 
                 <label className="block md:col-span-2" data-name="field-address" data-file="pages/register/RegisterBusinessPage.js">
-                  <span className="text-xs font-semibold text-[var(--text-muted)]">Direccion visible</span>
-                  <input className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm" value={form.direccion} onChange={(e) => update('direccion', e.target.value)} placeholder="Direccion o referencia publica" />
+                  <span className="text-xs font-semibold text-[var(--text-muted)]">Dirección visible</span>
+                  <input className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm" value={form.direccion} onChange={(e) => update('direccion', e.target.value)} placeholder="Dirección o referencia pública" />
                 </label>
 
                 <label className="block" data-name="field-category" data-file="pages/register/RegisterBusinessPage.js">
-                  <span className="text-xs font-semibold text-[var(--text-muted)]">Categoria principal</span>
-                  <input className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm" value={form.categoria} onChange={(e) => update('categoria', e.target.value)} placeholder="Unas, barberia, pestanas, cursos..." />
+                  <span className="text-xs font-semibold text-[var(--text-muted)]">Categoría principal</span>
+                  <input className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm" value={form.categoria} onChange={(e) => update('categoria', e.target.value)} placeholder="Uñas, barbería, pestañas, cursos..." />
                   <FieldError name="categoria" />
                 </label>
 
@@ -242,7 +242,7 @@ function RegisterBusinessPage() {
                 </label>
 
                 <label className="block md:col-span-2" data-name="field-description" data-file="pages/register/RegisterBusinessPage.js">
-                  <span className="text-xs font-semibold text-[var(--text-muted)]">Descripcion corta</span>
+                  <span className="text-xs font-semibold text-[var(--text-muted)]">Descripción corta</span>
                   <textarea className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm min-h-[110px]" value={form.descripcion} onChange={(e) => update('descripcion', e.target.value)} placeholder="Cuenta que ofrece tu negocio y que lo diferencia."></textarea>
                 </label>
               </div>

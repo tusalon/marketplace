@@ -21,7 +21,7 @@
             <div data-name="top-rated-titlewrap" data-file="components/TopRatedCarousel.js">
               <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-balance" data-name="top-rated-title" data-file="components/TopRatedCarousel.js">Mejor calificados</h2>
               <p className="text-sm text-[var(--text-muted)] mt-1" data-name="top-rated-sub" data-file="components/TopRatedCarousel.js">
-                Negocios con resenas consistentes y estilo boutique.
+                Negocios con reseñas consistentes y estilo boutique.
               </p>
             </div>
             <div className="hidden md:flex items-center gap-2" data-name="top-rated-controls" data-file="components/TopRatedCarousel.js">

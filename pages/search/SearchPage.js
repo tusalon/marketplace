@@ -45,7 +45,7 @@
     React.useEffect(() => {
       try {
         if (!results.length) {
-          toast?.push({ title: 'Sin resultados', message: 'Prueba con otra palabra o una ubicacion mas general, por ejemplo La Habana.' });
+          toast?.push({ title: 'Sín resultados', message: 'Prueba con otra palabra o una ubicacion más general, por ejemplo La Habana.' });
         }
       } catch (error) {
         console.error('SearchPage useEffect error:', error);
@@ -71,7 +71,7 @@
           <div data-name="search-titlewrap" data-file="pages/search/SearchPage.js">
             <h1 className="text-xl md:text-2xl font-semibold tracking-tight" data-name="search-title" data-file="pages/search/SearchPage.js">Resultados</h1>
             <p className="text-sm text-[var(--text-muted)] mt-1" data-name="search-sub" data-file="pages/search/SearchPage.js">
-              Desliza los negocios activos y consulta su ubicacion en el mapa.
+              Desliza los negocios activos y consulta su ubicación en el mapa.
             </p>
           </div>
           <div className="hidden md:flex items-center gap-2" data-name="search-meta" data-file="pages/search/SearchPage.js">
@@ -89,7 +89,7 @@
               </div>
               <div className="flex-1" data-name="field-serv-in" data-file="pages/search/SearchPage.js">
                 <label className="block text-[11px] text-[var(--text-muted)] mb-1" data-name="lbl-serv" data-file="pages/search/SearchPage.js">Servicio o curso</label>
-                <input className="input-rr" value={query?.servicio || ''} onChange={(e) => setQueryParam('servicio', e.target.value)} placeholder="Ej: Barberia, unas acrilicas" data-name="inp-serv" data-file="pages/search/SearchPage.js" />
+                <input className="input-rr" value={query?.servicio || ''} onChange={(e) => setQueryParam('servicio', e.target.value)} placeholder="Ej: Barbería, uñas acrílicas" data-name="inp-serv" data-file="pages/search/SearchPage.js" />
               </div>
             </div>
 

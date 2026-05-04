@@ -2,21 +2,21 @@
   try {
     const list = businesses || [];
     const provinces = [
-      { name: 'Pinar del Rio', x: 9, y: 50 },
+      { name: 'Pinar del Río', x: 9, y: 50 },
       { name: 'Artemisa', x: 19, y: 48 },
       { name: 'La Habana', x: 25, y: 44 },
       { name: 'Mayabeque', x: 30, y: 48 },
       { name: 'Matanzas', x: 38, y: 50 },
       { name: 'Cienfuegos', x: 47, y: 59 },
       { name: 'Villa Clara', x: 50, y: 50 },
-      { name: 'Sancti Spiritus', x: 58, y: 56 },
-      { name: 'Ciego de Avila', x: 66, y: 55 },
-      { name: 'Camaguey', x: 74, y: 58 },
+      { name: 'Sancti Spíritus', x: 58, y: 56 },
+      { name: 'Ciego de Ávila', x: 66, y: 55 },
+      { name: 'Camagüey', x: 74, y: 58 },
       { name: 'Las Tunas', x: 83, y: 61 },
-      { name: 'Holguin', x: 89, y: 57 },
+      { name: 'Holguín', x: 89, y: 57 },
       { name: 'Granma', x: 86, y: 70 },
       { name: 'Santiago de Cuba', x: 93, y: 72 },
-      { name: 'Guantanamo', x: 97, y: 68 },
+      { name: 'Guantánamo', x: 97, y: 68 },
       { name: 'Isla de la Juventud', x: 29, y: 72 }
     ];
 
