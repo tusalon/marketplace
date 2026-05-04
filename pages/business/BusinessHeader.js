@@ -1,4 +1,4 @@
-function BusinessHeader({ business }) {
+﻿function BusinessHeader({ business }) {
   try {
     const b = business;
     const hasCover = Boolean(b.portadaUrl);
@@ -12,11 +12,11 @@ function BusinessHeader({ business }) {
           <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_auto] gap-5 items-center" data-name="header-grid" data-file="pages/business/BusinessHeader.js">
             <div className="relative h-[180px] lg:h-[160px] rounded-lg overflow-hidden border border-[var(--border)] bg-[#F9FAFB]" data-name="brand-media" data-file="pages/business/BusinessHeader.js">
               {hasCover ? (
-                <img src={b.portadaUrl} alt={`Imagen de ${b.nombre}`} className="w-full h-full object-cover" data-name="cover-img" data-file="pages/business/BusinessHeader.js" />
+                <img loading="lazy" decoding="async" src={b.portadaUrl} alt={`Imagen de ${b.nombre}`} className="w-full h-full object-cover" data-name="cover-img" data-file="pages/business/BusinessHeader.js" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center p-8" data-name="logo-only" data-file="pages/business/BusinessHeader.js">
                   {b.logoUrl ? (
-                    <img src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="max-w-full max-h-full object-contain" data-name="logo-only-img" data-file="pages/business/BusinessHeader.js" />
+                    <img loading="lazy" decoding="async" src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="max-w-full max-h-full object-contain" data-name="logo-only-img" data-file="pages/business/BusinessHeader.js" />
                   ) : (
                     <div className="text-4xl font-semibold text-[var(--primary-color)]" data-name="logo-only-initials" data-file="pages/business/BusinessHeader.js">{initials}</div>
                   )}
@@ -24,7 +24,7 @@ function BusinessHeader({ business }) {
               )}
               <div className="absolute left-3 bottom-3 w-16 h-16 rounded-lg overflow-hidden bg-white border border-white shadow-sm p-2" data-name="logo" data-file="pages/business/BusinessHeader.js">
                 {b.logoUrl ? (
-                  <img src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="w-full h-full object-contain" data-name="logo-img" data-file="pages/business/BusinessHeader.js" />
+                  <img loading="lazy" decoding="async" src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="w-full h-full object-contain" data-name="logo-img" data-file="pages/business/BusinessHeader.js" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-lg font-semibold text-[var(--primary-color)]" data-name="logo-initials" data-file="pages/business/BusinessHeader.js">{initials}</div>
                 )}
@@ -37,7 +37,7 @@ function BusinessHeader({ business }) {
                 {b.vip ? <Badge type="vip" text="VIP" data-name="vip" data-file="pages/business/BusinessHeader.js" /> : null}
               </div>
               <p className="text-sm text-[var(--text-muted)] mt-2" data-name="meta" data-file="pages/business/BusinessHeader.js">
-                {b.categoria} · {b.ubicacion?.provincia || b.ubicacion?.zona || b.ubicacion?.ciudad}
+                {b.categoria} Â· {b.ubicacion?.provincia || b.ubicacion?.zona || b.ubicacion?.ciudad}
               </p>
               {b.ubicacion?.direccion ? (
                 <p className="text-sm text-[var(--text-muted)] mt-1" data-name="address" data-file="pages/business/BusinessHeader.js">{b.ubicacion.direccion}</p>
@@ -63,3 +63,4 @@ function BusinessHeader({ business }) {
     return null;
   }
 }
+

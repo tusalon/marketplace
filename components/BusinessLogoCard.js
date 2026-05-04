@@ -1,4 +1,4 @@
-function BusinessLogoCard({ business, onOpen }) {
+﻿function BusinessLogoCard({ business, onOpen }) {
   try {
     const b = business;
     const tier = b.vip ? 'VIP' : 'Free';
@@ -13,11 +13,11 @@ function BusinessLogoCard({ business, onOpen }) {
       >
         <div className="relative h-28 bg-[#F9FAFB] flex items-center justify-center p-6" data-name="logo-card-media" data-file="components/BusinessLogoCard.js">
           {b.portadaUrl ? (
-            <img src={b.portadaUrl} alt={`Imagen de ${b.nombre}`} className="absolute inset-0 w-full h-full object-cover opacity-90" data-name="logo-card-cover" data-file="components/BusinessLogoCard.js" />
+            <img loading="lazy" decoding="async" src={b.portadaUrl} alt={`Imagen de ${b.nombre}`} className="absolute inset-0 w-full h-full object-cover opacity-90" data-name="logo-card-cover" data-file="components/BusinessLogoCard.js" />
           ) : null}
           <div className="relative w-16 h-16 rounded-lg border border-[var(--border)] bg-white overflow-hidden p-2 shadow-sm transition-transform duration-300 group-hover:scale-105" data-name="logo" data-file="components/BusinessLogoCard.js">
             {b.logoUrl ? (
-              <img src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="w-full h-full object-contain" data-name="logo-img" data-file="components/BusinessLogoCard.js" />
+              <img loading="lazy" decoding="async" src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="w-full h-full object-contain" data-name="logo-img" data-file="components/BusinessLogoCard.js" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--primary-color)]" data-name="logo-initials" data-file="components/BusinessLogoCard.js">{initials}</div>
             )}
@@ -27,13 +27,13 @@ function BusinessLogoCard({ business, onOpen }) {
 
         <div className="p-4" data-name="logo-card-body" data-file="components/BusinessLogoCard.js">
           <p className="text-sm font-semibold leading-snug" data-name="name" data-file="components/BusinessLogoCard.js">{b.nombre}</p>
-          <p className="text-xs text-[var(--text-muted)] mt-1" data-name="category" data-file="components/BusinessLogoCard.js">{b.categoria} · {b.ubicacion?.provincia || b.ubicacion?.zona}</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1" data-name="category" data-file="components/BusinessLogoCard.js">{b.categoria} Â· {b.ubicacion?.provincia || b.ubicacion?.zona}</p>
 
           <div className="mt-4 flex items-center justify-between gap-3" data-name="logo-card-bottom" data-file="components/BusinessLogoCard.js">
             <div className="flex items-center gap-2" data-name="rating" data-file="components/BusinessLogoCard.js">
               <div className="icon-star text-base text-[var(--primary-color)]" data-name="rating-icon" data-file="components/BusinessLogoCard.js"></div>
               <span className="text-xs font-semibold" data-name="rating-val" data-file="components/BusinessLogoCard.js">{Number(b.estrellas).toFixed(1)}</span>
-              <span className="text-xs text-[var(--text-muted)]" data-name="rating-total" data-file="components/BusinessLogoCard.js">({b.totalReseñas})</span>
+              <span className="text-xs text-[var(--text-muted)]" data-name="rating-total" data-file="components/BusinessLogoCard.js">({b.totalResenas})</span>
             </div>
             <div className="flex items-center gap-1 text-xs text-[var(--text-muted)]" data-name="peek" data-file="components/BusinessLogoCard.js">
               <span data-name="peek-text" data-file="components/BusinessLogoCard.js">{b.reservasSemana || 0} reservas</span>
@@ -48,3 +48,5 @@ function BusinessLogoCard({ business, onOpen }) {
     return null;
   }
 }
+
+

@@ -1,4 +1,4 @@
-function BusinessPage({ business }) {
+﻿function BusinessPage({ business }) {
   try {
     const b = business;
     const initials = String(b.nombre || 'N').trim().slice(0, 2).toUpperCase();
@@ -19,7 +19,7 @@ function BusinessPage({ business }) {
                 <div className="flex items-center gap-3" data-name="contact-top" data-file="pages/business/BusinessPage.js">
                   <div className="w-12 h-12 rounded-lg border border-[var(--border)] bg-white overflow-hidden p-1.5" data-name="contact-logo" data-file="pages/business/BusinessPage.js">
                     {b.logoUrl ? (
-                      <img src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="w-full h-full object-contain" data-name="contact-logo-img" data-file="pages/business/BusinessPage.js" />
+                      <img loading="lazy" decoding="async" src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="w-full h-full object-contain" data-name="contact-logo-img" data-file="pages/business/BusinessPage.js" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--primary-color)]" data-name="contact-logo-initials" data-file="pages/business/BusinessPage.js">{initials}</div>
                     )}
@@ -56,3 +56,4 @@ function BusinessPage({ business }) {
     return null;
   }
 }
+

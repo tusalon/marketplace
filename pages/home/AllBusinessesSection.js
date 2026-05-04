@@ -54,7 +54,7 @@
               >
                 <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr]" data-name="intrigue-grid" data-file="pages/home/AllBusinessesSection.js">
                   <div className="relative h-[260px] md:h-full bg-[#F9FAFB]" data-name="intrigue-photo" data-file="pages/home/AllBusinessesSection.js">
-                    <img src={business.portadaUrl} alt={`Portada de ${business.nombre}`} className="w-full h-full object-cover" data-name="intrigue-photo-img" data-file="pages/home/AllBusinessesSection.js" />
+                    <img loading="lazy" decoding="async" src={business.portadaUrl} alt={`Portada de ${business.nombre}`} className="w-full h-full object-cover" data-name="intrigue-photo-img" data-file="pages/home/AllBusinessesSection.js" />
                     <button className="absolute top-4 right-4 w-11 h-11 rounded-2xl bg-white/90 backdrop-blur border border-[var(--border)] flex items-center justify-center hover:bg-white transition-colors" onClick={closeCard} data-name="intrigue-close" data-file="pages/home/AllBusinessesSection.js" aria-label="Cerrar">
                       <div className="icon-x text-xl text-[var(--primary-color)]" data-name="intrigue-close-icon" data-file="pages/home/AllBusinessesSection.js"></div>
                     </button>
@@ -63,7 +63,7 @@
                   <div className="p-5 md:p-7" data-name="intrigue-body" data-file="pages/home/AllBusinessesSection.js">
                     <div className="flex items-start gap-4" data-name="intrigue-head" data-file="pages/home/AllBusinessesSection.js">
                       <div className="w-14 h-14 rounded-3xl border border-[var(--border)] bg-white overflow-hidden shrink-0" data-name="intrigue-logo" data-file="pages/home/AllBusinessesSection.js">
-                        <img src={business.logoUrl} alt={`Logo de ${business.nombre}`} className="w-full h-full object-cover" data-name="intrigue-logo-img" data-file="pages/home/AllBusinessesSection.js" />
+                        <img loading="lazy" decoding="async" src={business.logoUrl} alt={`Logo de ${business.nombre}`} className="w-full h-full object-cover" data-name="intrigue-logo-img" data-file="pages/home/AllBusinessesSection.js" />
                       </div>
                       <div className="min-w-0" data-name="intrigue-titlewrap" data-file="pages/home/AllBusinessesSection.js">
                         <p className="text-lg md:text-xl font-semibold leading-tight" data-name="intrigue-name" data-file="pages/home/AllBusinessesSection.js">{business.nombre}</p>
@@ -80,7 +80,7 @@
                     </div>
 
                     <div className="mt-4" data-name="intrigue-rating" data-file="pages/home/AllBusinessesSection.js">
-                      <StarRating value={business.estrellas} total={business.totalResenas || business['totalReseñas']} verified={business.verificado} data-name="business-stars" data-file="pages/home/AllBusinessesSection.js" />
+                      <StarRating value={business.estrellas} total={business.totalResenas || business['totalResenas']} verified={business.verificado} data-name="business-stars" data-file="pages/home/AllBusinessesSection.js" />
                     </div>
 
                     <p className="mt-4 text-sm text-[var(--text-muted)] leading-relaxed" data-name="intrigue-desc" data-file="pages/home/AllBusinessesSection.js">
@@ -169,4 +169,6 @@
     return null;
   }
 }
+
+
 

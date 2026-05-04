@@ -83,7 +83,8 @@ for (const [outFile, inputs] of Object.entries(bundles)) {
     configFile: false,
     presets: [['@babel/preset-react', { runtime: 'classic' }]],
     sourceType: 'script',
-    compact: false,
+    compact: true,
+    minified: true,
     comments: false
   });
 

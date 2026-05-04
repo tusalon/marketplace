@@ -1,4 +1,4 @@
-function BusinessCard({ business, onHover, active }) {
+﻿function BusinessCard({ business, onHover, active }) {
   try {
     const b = business;
     const border = active ? 'border-[rgba(216,27,96,0.35)] shadow-[0_16px_40px_rgba(216,27,96,0.10)]' : '';
@@ -55,7 +55,7 @@ function BusinessCard({ business, onHover, active }) {
         <div className="grid grid-cols-[96px_1fr] gap-4 p-3" data-name="business-card-inner" data-file="components/BusinessCard.js">
           <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-white border border-[var(--border)] p-2" data-name="photo" data-file="components/BusinessCard.js">
             {b.logoUrl ? (
-              <img src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="w-full h-full object-contain" data-name="photo-img" data-file="components/BusinessCard.js" />
+              <img loading="lazy" decoding="async" src={b.logoUrl} alt={`Logo de ${b.nombre}`} className="w-full h-full object-contain" data-name="photo-img" data-file="components/BusinessCard.js" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-xl font-semibold text-[var(--primary-color)]" data-name="photo-initials" data-file="components/BusinessCard.js">{initials}</div>
             )}
@@ -74,7 +74,7 @@ function BusinessCard({ business, onHover, active }) {
               <div className="min-w-0" data-name="title" data-file="components/BusinessCard.js">
                 <p className="text-base font-semibold leading-snug truncate" data-name="name" data-file="components/BusinessCard.js">{b.nombre}</p>
                 <p className="text-xs text-[var(--text-muted)] mt-1 truncate" data-name="meta" data-file="components/BusinessCard.js">
-                  {b.categoria} · {b.ubicacion?.provincia || b.ubicacion?.zona}
+                  {b.categoria} Â· {b.ubicacion?.provincia || b.ubicacion?.zona}
                 </p>
               </div>
               <div className="ml-auto hidden sm:flex flex-col items-end gap-1" data-name="top-right" data-file="components/BusinessCard.js">
@@ -82,7 +82,7 @@ function BusinessCard({ business, onHover, active }) {
                   <div className="icon-star text-base text-[#F59E0B]" data-name="star" data-file="components/BusinessCard.js"></div>
                   <span className="text-sm font-semibold" data-name="star-val" data-file="components/BusinessCard.js">{Number(b.estrellas).toFixed(1)}</span>
                 </div>
-                <span className="text-[11px] text-[var(--text-muted)]" data-name="reviews" data-file="components/BusinessCard.js">{b.totalReseñas} reseñas</span>
+                <span className="text-[11px] text-[var(--text-muted)]" data-name="reviews" data-file="components/BusinessCard.js">{b.totalResenas} reseÃ±as</span>
               </div>
             </div>
 
@@ -116,3 +116,5 @@ function BusinessCard({ business, onHover, active }) {
     return null;
   }
 }
+
+

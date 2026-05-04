@@ -1,4 +1,4 @@
-function HomeHero({ initialParams }) {
+﻿function HomeHero({ initialParams }) {
   try {
     const businesses = MockData.listBusinesses();
     const totalBusinesses = businesses.length;
@@ -72,7 +72,7 @@ function HomeHero({ initialParams }) {
                 >
                   <div className="h-[260px] bg-white flex items-center justify-center p-12 border-b border-[var(--border)]" data-name="hero-feature-media" data-file="pages/home/HomeHero.js">
                     {featured.logoUrl ? (
-                      <img src={featured.logoUrl} alt={`Logo de ${featured.nombre}`} className="max-w-full max-h-full object-contain" data-name="hero-feature-logo" data-file="pages/home/HomeHero.js" />
+                      <img loading="lazy" decoding="async" src={featured.logoUrl} alt={`Logo de ${featured.nombre}`} className="max-w-full max-h-full object-contain" data-name="hero-feature-logo" data-file="pages/home/HomeHero.js" />
                     ) : (
                       <div className="text-5xl font-semibold text-[var(--primary-color)]" data-name="hero-feature-initials" data-file="pages/home/HomeHero.js">{String(featured.nombre || 'N').trim().slice(0, 2).toUpperCase()}</div>
                     )}
@@ -80,7 +80,7 @@ function HomeHero({ initialParams }) {
                   <div className="p-5" data-name="hero-feature-body" data-file="pages/home/HomeHero.js">
                     <p className="text-xs uppercase tracking-[0.16em] text-[var(--primary-color)] font-semibold" data-name="hero-feature-kicker" data-file="pages/home/HomeHero.js">Destacado</p>
                     <p className="mt-2 text-xl font-semibold leading-tight" data-name="hero-feature-name" data-file="pages/home/HomeHero.js">{featured.nombre}</p>
-                    <p className="mt-1 text-sm text-[var(--text-muted)]" data-name="hero-feature-meta" data-file="pages/home/HomeHero.js">{featured.categoria} · {featured.ubicacion?.zona || featured.ubicacion?.ciudad}</p>
+                    <p className="mt-1 text-sm text-[var(--text-muted)]" data-name="hero-feature-meta" data-file="pages/home/HomeHero.js">{featured.categoria} Â· {featured.ubicacion?.zona || featured.ubicacion?.ciudad}</p>
                     <div className="mt-5 flex items-center justify-between gap-3" data-name="hero-feature-bottom" data-file="pages/home/HomeHero.js">
                       <span className="text-sm text-[var(--text-muted)]" data-name="hero-feature-services" data-file="pages/home/HomeHero.js">{(featured.categoriasCatalogo?.[0]?.items || []).length} servicios</span>
                       <span className="btn-rr btn-primary-rr py-2 px-4 text-sm" data-name="hero-feature-open" data-file="pages/home/HomeHero.js">Ver perfil</span>
@@ -112,3 +112,4 @@ function HomeHero({ initialParams }) {
     return null;
   }
 }
+
