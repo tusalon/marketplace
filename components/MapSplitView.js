@@ -3,7 +3,7 @@ function MapSplitView({ businesses, selectedProvince, onProvinceSelect }) {
     const mapRef = React.useRef(null);
     const layerRef = React.useRef(null);
     const containerRef = React.useRef(null);
-    const list = businesses || [];
+    const list = (businesses || []).filter((business) => business.ubicacion?.provincia);
 
     const provinceCenters = [
       { name: 'Pinar del Río', lat: 22.42, lng: -83.70 },
@@ -36,7 +36,7 @@ function MapSplitView({ businesses, selectedProvince, onProvinceSelect }) {
     }, {});
 
     const counts = list.reduce((acc, business) => {
-      const province = business.ubicacion?.provincia || business.ubicacion?.ciudad || 'La Habana';
+      const province = business.ubicacion?.provincia;
       const key = normalize(province);
       acc[key] = (acc[key] || 0) + 1;
       return acc;
@@ -62,7 +62,7 @@ function MapSplitView({ businesses, selectedProvince, onProvinceSelect }) {
     const markerPoints = React.useMemo(() => {
       const provinceIndexes = {};
       return list.map((business) => {
-        const provinceName = business.ubicacion?.provincia || business.ubicacion?.ciudad || 'La Habana';
+        const provinceName = business.ubicacion?.provincia;
         const key = normalize(provinceName);
         const fallback = centerByKey[key] || provinceCenters[2];
         const index = provinceIndexes[key] || 0;
@@ -110,9 +110,9 @@ function MapSplitView({ businesses, selectedProvince, onProvinceSelect }) {
           const isSelected = selected && normalize(provinceName) === selected;
           const icon = window.L.divIcon({
             className: `rr-map-pin ${isSelected ? 'is-selected' : ''}`,
-            html: '<span>RR</span>',
-            iconSize: [34, 42],
-            iconAnchor: [17, 42],
+            html: '<span><img src="icons/icon-72x72.png" alt="" /></span>',
+            iconSize: [38, 46],
+            iconAnchor: [19, 46],
             popupAnchor: [0, -38]
           });
           const popup = `
