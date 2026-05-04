@@ -1,23 +1,27 @@
-﻿function MapSplitView({ businesses, selectedProvince, onProvinceSelect }) {
+function MapSplitView({ businesses, selectedProvince, onProvinceSelect }) {
   try {
+    const mapRef = React.useRef(null);
+    const layerRef = React.useRef(null);
+    const containerRef = React.useRef(null);
     const list = businesses || [];
-    const provinces = [
-      { name: 'Pinar del Río', x: 11, y: 45 },
-      { name: 'Artemisa', x: 21, y: 43 },
-      { name: 'La Habana', x: 25, y: 39 },
-      { name: 'Mayabeque', x: 29, y: 44 },
-      { name: 'Matanzas', x: 36, y: 47 },
-      { name: 'Cienfuegos', x: 45, y: 58 },
-      { name: 'Villa Clara', x: 49, y: 47 },
-      { name: 'Sancti Spíritus', x: 57, y: 55 },
-      { name: 'Ciego de Ávila', x: 65, y: 52 },
-      { name: 'Camagüey', x: 72, y: 57 },
-      { name: 'Las Tunas', x: 81, y: 58 },
-      { name: 'Holguín', x: 87, y: 51 },
-      { name: 'Granma', x: 86, y: 70 },
-      { name: 'Santiago de Cuba', x: 92, y: 70 },
-      { name: 'Guantánamo', x: 96, y: 64 },
-      { name: 'Isla de la Juventud', x: 29, y: 74 }
+
+    const provinceCenters = [
+      { name: 'Pinar del Río', lat: 22.42, lng: -83.70 },
+      { name: 'Artemisa', lat: 22.82, lng: -82.76 },
+      { name: 'La Habana', lat: 23.11, lng: -82.36 },
+      { name: 'Mayabeque', lat: 22.96, lng: -82.15 },
+      { name: 'Matanzas', lat: 22.58, lng: -81.34 },
+      { name: 'Cienfuegos', lat: 22.15, lng: -80.44 },
+      { name: 'Villa Clara', lat: 22.49, lng: -79.95 },
+      { name: 'Sancti Spíritus', lat: 21.93, lng: -79.44 },
+      { name: 'Ciego de Ávila', lat: 21.84, lng: -78.76 },
+      { name: 'Camagüey', lat: 21.38, lng: -77.91 },
+      { name: 'Las Tunas', lat: 20.96, lng: -76.95 },
+      { name: 'Holguín', lat: 20.78, lng: -76.26 },
+      { name: 'Granma', lat: 20.30, lng: -76.86 },
+      { name: 'Santiago de Cuba', lat: 20.02, lng: -75.82 },
+      { name: 'Guantánamo', lat: 20.14, lng: -75.21 },
+      { name: 'Isla de la Juventud', lat: 21.75, lng: -82.85 }
     ];
 
     const normalize = (value) => String(value || '')
@@ -26,146 +30,150 @@
       .replace(/[\u0300-\u036f]/g, '');
 
     const selected = normalize(selectedProvince);
-    const provinceByKey = provinces.reduce((acc, province) => {
+    const centerByKey = provinceCenters.reduce((acc, province) => {
       acc[normalize(province.name)] = province;
       return acc;
     }, {});
 
     const counts = list.reduce((acc, business) => {
       const province = business.ubicacion?.provincia || business.ubicacion?.ciudad || 'La Habana';
-      acc[normalize(province)] = (acc[normalize(province)] || 0) + 1;
+      const key = normalize(province);
+      acc[key] = (acc[key] || 0) + 1;
       return acc;
     }, {});
 
-    const activeProvince = provinces.find((province) => normalize(province.name) === selected)
-      || provinces.find((province) => counts[normalize(province.name)] > 0)
-      || provinces[2];
+    const activeProvince = provinceCenters.find((province) => normalize(province.name) === selected)
+      || provinceCenters.find((province) => counts[normalize(province.name)] > 0)
+      || provinceCenters[2];
 
-    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-    const provinceIndexes = {};
-    const markers = list.map((business) => {
-      const provinceName = business.ubicacion?.provincia || business.ubicacion?.ciudad || 'La Habana';
-      const key = normalize(provinceName);
-      const province = provinceByKey[key] || provinces[2];
-      const index = provinceIndexes[key] || 0;
-      provinceIndexes[key] = index + 1;
-      const ring = Math.floor(index / 8);
-      const angle = (index % 8) * 0.785;
-      const radius = index === 0 ? 0 : 2.8 + ring * 1.5;
-      return {
-        business,
-        provinceName,
-        x: clamp(province.x + Math.cos(angle) * radius, 5, 97),
-        y: clamp(province.y + Math.sin(angle) * radius, 18, 80)
-      };
-    });
+    const escapeHtml = (value) => String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+
+    const hasRealCoords = (coords) => {
+      const lat = Number(coords?.lat);
+      const lng = Number(coords?.lng);
+      return Number.isFinite(lat) && Number.isFinite(lng) && lat >= 19.4 && lat <= 23.6 && lng >= -85.5 && lng <= -73.8;
+    };
+
+    const markerPoints = React.useMemo(() => {
+      const provinceIndexes = {};
+      return list.map((business) => {
+        const provinceName = business.ubicacion?.provincia || business.ubicacion?.ciudad || 'La Habana';
+        const key = normalize(provinceName);
+        const fallback = centerByKey[key] || provinceCenters[2];
+        const index = provinceIndexes[key] || 0;
+        provinceIndexes[key] = index + 1;
+        const angle = (index % 10) * 0.628;
+        const ring = Math.floor(index / 10);
+        const radius = index === 0 ? 0 : 0.045 + ring * 0.025;
+        const point = hasRealCoords(business.coordenadas)
+          ? { lat: Number(business.coordenadas.lat), lng: Number(business.coordenadas.lng) }
+          : { lat: fallback.lat + Math.sin(angle) * radius, lng: fallback.lng + Math.cos(angle) * radius };
+        return { business, provinceName, point };
+      });
+    }, [list]);
+
+    React.useEffect(() => {
+      try {
+        if (!containerRef.current || !window.L || mapRef.current) return;
+        const map = window.L.map(containerRef.current, {
+          zoomControl: true,
+          attributionControl: false,
+          scrollWheelZoom: false,
+          zoomSnap: 0.25
+        }).setView([21.75, -79.45], 6.25);
+
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          minZoom: 5
+        }).addTo(map);
+
+        mapRef.current = map;
+        layerRef.current = window.L.layerGroup().addTo(map);
+      } catch (error) {
+        console.error('MapSplitView.init error:', error);
+      }
+    }, []);
+
+    React.useEffect(() => {
+      try {
+        const map = mapRef.current;
+        const layer = layerRef.current;
+        if (!window.L || !map || !layer) return;
+        layer.clearLayers();
+
+        markerPoints.forEach(({ business, provinceName, point }) => {
+          const isSelected = selected && normalize(provinceName) === selected;
+          const icon = window.L.divIcon({
+            className: `rr-map-pin ${isSelected ? 'is-selected' : ''}`,
+            html: '<span>RR</span>',
+            iconSize: [34, 42],
+            iconAnchor: [17, 42],
+            popupAnchor: [0, -38]
+          });
+          const popup = `
+            <div class="rr-map-popup">
+              <strong>${escapeHtml(business.nombre)}</strong>
+              <span>${escapeHtml(provinceName)}</span>
+            </div>
+          `;
+          window.L.marker([point.lat, point.lng], { icon })
+            .addTo(layer)
+            .bindPopup(popup)
+            .on('click', () => onProvinceSelect?.(provinceName));
+        });
+
+        if (selected && activeProvince) {
+          map.setView([activeProvince.lat, activeProvince.lng], 7.25, { animate: true });
+        } else {
+          map.setView([21.75, -79.45], 6.25, { animate: true });
+        }
+      } catch (error) {
+        console.error('MapSplitView.markers error:', error);
+      }
+    }, [markerPoints, selectedProvince]);
+
+    if (!window.L) {
+      return (
+        <div className="relative w-full h-full bg-[#F7FBF8] flex items-center justify-center p-5" data-name="map-fallback" data-file="components/MapSplitView.js">
+          <div className="surface-rr p-5 text-center max-w-[360px]" data-name="map-fallback-card" data-file="components/MapSplitView.js">
+            <p className="text-sm font-semibold" data-name="map-fallback-title" data-file="components/MapSplitView.js">Mapa no disponible</p>
+            <p className="text-xs text-[var(--text-muted)] mt-2" data-name="map-fallback-copy" data-file="components/MapSplitView.js">
+              La conexión no cargó el mapa. Usa los filtros por provincia para explorar negocios.
+            </p>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className="relative w-full h-full overflow-hidden bg-[#F7FBF8]" data-name="map-split-view" data-file="components/MapSplitView.js">
-        <div
-          className="absolute inset-0"
-          data-name="map-gradient"
-          data-file="components/MapSplitView.js"
-          style={{
-            background: 'linear-gradient(145deg, #F9FAFB 0%, #F3FFF8 45%, #FFF7FC 100%)'
-          }}
-        ></div>
-        <div
-          className="absolute inset-0 opacity-70"
-          data-name="map-texture"
-          data-file="components/MapSplitView.js"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(11,18,32,0.09) 1px, transparent 0)',
-            backgroundSize: '26px 26px'
-          }}
-        ></div>
+        <div ref={containerRef} className="absolute inset-0 rr-leaflet-map" data-name="leaflet-map" data-file="components/MapSplitView.js"></div>
 
-        <div className="absolute top-4 left-4 right-4 z-30" data-name="map-hint" data-file="components/MapSplitView.js">
+        <div className="absolute top-4 left-4 right-4 z-[500]" data-name="map-hint" data-file="components/MapSplitView.js">
           <div className="surface-rr p-3 flex items-center gap-3 bg-white/92 backdrop-blur" data-name="map-hint-inner" data-file="components/MapSplitView.js">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--primary-color)] shadow-[0_14px_34px_rgba(216,27,96,0.20)]" data-name="map-hint-iw" data-file="components/MapSplitView.js">
               <span className="text-xs font-bold text-white" data-name="map-hint-logo" data-file="components/MapSplitView.js">RR</span>
             </div>
             <div className="min-w-0" data-name="map-hint-text" data-file="components/MapSplitView.js">
-              <p className="text-sm font-semibold" data-name="map-hint-title" data-file="components/MapSplitView.js">RservasRoma en Cuba</p>
+              <p className="text-sm font-semibold" data-name="map-hint-title" data-file="components/MapSplitView.js">Mapa real de Cuba</p>
               <p className="text-xs text-[var(--text-muted)]" data-name="map-hint-sub" data-file="components/MapSplitView.js">
-                Cada marcador representa un negocio activo.
+                {list.length} negocios activos ubicados por provincia.
               </p>
             </div>
           </div>
         </div>
 
-        <div className="absolute inset-x-3 top-[100px] bottom-[116px] z-10 flex items-center" data-name="real-cuba-map-stage" data-file="components/MapSplitView.js">
-          <div className="relative w-full" style={{ aspectRatio: '1018.2939 / 342.2775' }} data-name="real-cuba-map-frame" data-file="components/MapSplitView.js">
-            <img
-              src="assets/cuba-provinces.svg"
-              alt="Mapa de Cuba dividido por provincias"
-              loading="eager"
-              decoding="async"
-              className="absolute inset-0 w-full h-full object-contain drop-shadow-[0_24px_42px_rgba(11,18,32,0.16)]"
-              data-name="real-cuba-map-image"
-              data-file="components/MapSplitView.js"
-            />
-            <div className="absolute inset-0 rounded-[24px] pointer-events-none" style={{ background: 'linear-gradient(90deg, rgba(216,27,96,0.08), rgba(22,163,106,0.08))', mixBlendMode: 'multiply' }} data-name="real-cuba-map-tint" data-file="components/MapSplitView.js"></div>
-
-            <div className="absolute inset-0 z-20" data-name="business-markers" data-file="components/MapSplitView.js">
-              {markers.map(({ business, provinceName, x, y }, index) => {
-                const isSelected = selected && normalize(provinceName) === selected;
-                return (
-                  <button
-                    key={`${business.id}-${index}`}
-                    className={`absolute -translate-x-1/2 -translate-y-full group transition-transform ${isSelected ? 'scale-110 z-30' : 'z-20 hover:scale-110'}`}
-                    style={{ left: `${x}%`, top: `${y}%` }}
-                    onClick={() => onProvinceSelect?.(provinceName)}
-                    title={`${business.nombre} - ${provinceName}`}
-                    aria-label={`Filtrar por ${provinceName}: ${business.nombre}`}
-                    data-name="business-map-marker"
-                    data-file="components/MapSplitView.js"
-                  >
-                    <span className="relative flex flex-col items-center" data-name="business-marker-wrap" data-file="components/MapSplitView.js">
-                      <span className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white border-2 border-[var(--primary-color)] shadow-[0_12px_26px_rgba(11,18,32,0.22)] flex items-center justify-center overflow-hidden" data-name="business-marker-dot" data-file="components/MapSplitView.js">
-                        {business.logoUrl ? (
-                          <img src={business.logoUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" data-name="business-marker-logo" data-file="components/MapSplitView.js" />
-                        ) : (
-                          <span className="text-[10px] font-bold text-[var(--primary-color)]" data-name="business-marker-rr" data-file="components/MapSplitView.js">RR</span>
-                        )}
-                      </span>
-                      <span className="w-2.5 h-2.5 -mt-1 rotate-45 bg-[var(--primary-color)] border-r border-b border-[var(--primary-color)]" data-name="business-marker-tip" data-file="components/MapSplitView.js"></span>
-                      <span className="pointer-events-none absolute left-1/2 top-[-38px] hidden -translate-x-1/2 whitespace-nowrap rounded-lg bg-white px-2 py-1 text-[10px] font-semibold shadow-lg border border-[var(--border)] group-hover:block" data-name="business-marker-label" data-file="components/MapSplitView.js">
-                        {business.nombre}
-                      </span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="absolute inset-0 z-10" data-name="province-hit-areas" data-file="components/MapSplitView.js">
-              {provinces.map((province) => {
-                const key = normalize(province.name);
-                const count = counts[key] || 0;
-                const isSelected = selected && key === selected;
-                return count ? (
-                  <button
-                    key={province.name}
-                    className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full px-2 py-1 text-[10px] font-semibold border transition-colors ${isSelected ? 'bg-[var(--primary-color)] text-white border-[var(--primary-color)]' : 'bg-white/88 text-[var(--text)] border-white/90'}`}
-                    style={{ left: `${province.x}%`, top: `${province.y + 8}%` }}
-                    onClick={() => onProvinceSelect?.(province.name)}
-                    data-name="province-count-pill"
-                    data-file="components/MapSplitView.js"
-                  >
-                    {province.name} · {count}
-                  </button>
-                ) : null;
-              })}
-            </div>
-          </div>
-        </div>
-        <div className="absolute left-4 right-4 bottom-4 z-30" data-name="province-summary" data-file="components/MapSplitView.js">
+        <div className="absolute left-4 right-4 bottom-4 z-[500]" data-name="province-summary" data-file="components/MapSplitView.js">
           <div className="card-rr p-4 flex items-center justify-between gap-3 bg-white/94 backdrop-blur" data-name="province-summary-card" data-file="components/MapSplitView.js">
             <div className="min-w-0" data-name="province-summary-copy" data-file="components/MapSplitView.js">
               <p className="text-sm font-semibold truncate" data-name="province-summary-title" data-file="components/MapSplitView.js">{selected ? activeProvince.name : 'Negocios activos en Cuba'}</p>
               <p className="text-xs text-[var(--text-muted)] mt-1" data-name="province-summary-sub" data-file="components/MapSplitView.js">
-                {selected ? `${counts[normalize(activeProvince.name)] || 0} negocios activos en esta provincia.` : `${list.length} marcadores de RservasRoma en el mapa.`}
+                {selected ? `${counts[normalize(activeProvince.name)] || 0} negocios activos en esta provincia.` : 'Toca un marcador para filtrar por provincia.'}
               </p>
             </div>
             {selected ? (
@@ -187,4 +195,3 @@
     return null;
   }
 }
-

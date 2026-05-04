@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'rservasroma-marketplace-v11';
+﻿const CACHE_NAME = 'rservasroma-marketplace-v12';
 const APP_SHELL = [
   './index.html',
   './manifest.webmanifest',
@@ -66,5 +66,6 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
 
 
