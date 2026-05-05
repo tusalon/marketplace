@@ -261,6 +261,29 @@
     }
   }
 
+  async function optionalSupabaseCount(path) {
+    try {
+      const config = getSupabaseConfig();
+      if (!config) return 0;
+      const response = await fetch(`${config.url}/rest/v1/${path}`, {
+        headers: {
+          apikey: config.key,
+          Authorization: `Bearer ${config.key}`,
+          Prefer: 'count=exact',
+          Range: '0-0'
+        },
+        cache: 'no-store'
+      });
+      if (!response.ok) return 0;
+      const contentRange = response.headers.get('content-range') || '';
+      const total = Number(contentRange.split('/').pop());
+      return Number.isFinite(total) ? total : 0;
+    } catch (error) {
+      console.warn('Conteo opcional no disponible:', path, error?.message || error);
+      return 0;
+    }
+  }
+
   async function supabaseInsert(path, payload) {
     const config = getSupabaseConfig();
     if (!config) throw new Error('Supabase no configurado');
@@ -480,32 +503,21 @@
       }
 
       try {
-        const rows = await supabaseFetch('negocios?configurado=eq.true&suscripciones.estado=eq.activa&select=id,nombre,telefono,especialidad,slug,logo_url,imagen_fondo_url,mensaje_bienvenida,instagram,facebook,sitio_web,direccion,horario_atencion,configurado,plan,suscripciones!inner(estado)&order=nombre.asc');
-        const serviciosRows = await supabaseFetch('servicios?activo=eq.true&select=id,negocio_id,nombre,duracion,precio,descripcion,activo,imagen,categoria');
-        const provincias = await loadOptionalBusinessProvinces();
-        const resenasRows = await optionalSupabaseFetch('resenas?select=*&limit=500');
-        const productosRows = tiendaTablesEnabled()
-          ? await optionalSupabaseFetch('productos?activo=eq.true&select=id,negocio_id,nombre,descripcion,precio,imagen_url,categoria,stock,activo,destacado,orden&order=destacado.desc,orden.asc,nombre.asc&limit=1000')
-          : [];
-        const cursosRows = tiendaTablesEnabled()
-          ? await optionalSupabaseFetch('cursos?activo=eq.true&select=id,negocio_id,nombre,descripcion,precio,imagen_url,categoria,fecha,ubicacion,duracion,cupos,activo,destacado,orden&order=destacado.desc,orden.asc,fecha.asc,nombre.asc&limit=1000')
-          : [];
-        const reservasRows = await optionalSupabaseFetch('reservas?select=*&limit=2000');
-        const reservasHoyRows = await optionalSupabaseFetch('reservas?created_at=gte.' + encodeURIComponent(getTodayStartIso()) + '&select=created_at,negocio_id&limit=5000');
-        const reservasSemana = countWeeklyReservations(reservasRows);
-        totalReservasHoy = countTodayReservations(reservasHoyRows);
+        const rows = await supabaseFetch('negocios?configurado=eq.true&suscripciones.estado=eq.activa&select=id,nombre,telefono,especialidad,slug,logo_url,imagen_fondo_url,mensaje_bienvenida,instagram,facebook,sitio_web,direccion,horario_atencion,configurado,plan,provincia,suscripciones!inner(estado)&order=nombre.asc');
+        totalReservasHoy = await optionalSupabaseCount('reservas?created_at=gte.' + encodeURIComponent(getTodayStartIso()) + '&select=id');
 
         const relations = {
-          servicios: groupByBusiness(serviciosRows),
-          productos: groupByBusiness(productosRows),
-          cursos: groupByBusiness(cursosRows),
-          resenas: groupByBusiness(resenasRows)
+          servicios: {},
+          productos: {},
+          cursos: {},
+          resenas: {}
         };
 
         businesses = (rows || [])
           .map((row) => {
-            const business = normalizeBusiness({ ...row, provincia: provincias[row.id] || row.provincia }, relations);
-            business.reservasSemana = reservasSemana[business.id] || 0;
+            const business = normalizeBusiness(row, relations);
+            business.reservasSemana = 0;
+            business.detallesCargados = false;
             return business;
           })
           .filter((business) => business.id);
@@ -522,6 +534,45 @@
     })();
 
     return loadPromise;
+  }
+
+  async function loadBusinessDetails(id, forceRefresh = false) {
+    const negocioId = String(id || '');
+    if (!negocioId) return null;
+
+    const current = businesses.find((b) => b.id === negocioId);
+    if (current?.detallesCargados && !forceRefresh) return current;
+
+    const encodedId = encodeURIComponent(negocioId);
+    const rows = await optionalSupabaseFetch(`negocios?id=eq.${encodedId}&configurado=eq.true&suscripciones.estado=eq.activa&select=id,nombre,telefono,especialidad,slug,logo_url,imagen_fondo_url,mensaje_bienvenida,instagram,facebook,sitio_web,direccion,horario_atencion,configurado,plan,provincia,suscripciones!inner(estado)`);
+    const row = rows?.[0] || current || { id: negocioId };
+    if (!rows?.[0] && !current) return null;
+    const serviciosRows = await optionalSupabaseFetch(`servicios?activo=eq.true&negocio_id=eq.${encodedId}&select=id,negocio_id,nombre,duracion,precio,descripcion,activo,imagen,categoria&order=nombre.asc`);
+    const resenasRows = await optionalSupabaseFetch(`resenas?negocio_id=eq.${encodedId}&select=*&order=fecha.desc&limit=50`);
+    const productosRows = tiendaTablesEnabled()
+      ? await optionalSupabaseFetch(`productos?activo=eq.true&negocio_id=eq.${encodedId}&select=id,negocio_id,nombre,descripcion,precio,imagen_url,categoria,stock,activo,destacado,orden&order=destacado.desc,orden.asc,nombre.asc&limit=200`)
+      : [];
+    const cursosRows = tiendaTablesEnabled()
+      ? await optionalSupabaseFetch(`cursos?activo=eq.true&negocio_id=eq.${encodedId}&select=id,negocio_id,nombre,descripcion,precio,imagen_url,categoria,fecha,ubicacion,duracion,cupos,activo,destacado,orden&order=destacado.desc,orden.asc,fecha.asc,nombre.asc&limit=200`)
+      : [];
+
+    const detailed = normalizeBusiness(row, {
+      servicios: groupByBusiness(serviciosRows),
+      productos: groupByBusiness(productosRows),
+      cursos: groupByBusiness(cursosRows),
+      resenas: groupByBusiness(resenasRows)
+    });
+    detailed.reservasSemana = current?.reservasSemana || 0;
+    detailed.detallesCargados = true;
+
+    const index = businesses.findIndex((b) => b.id === negocioId);
+    if (index >= 0) {
+      businesses[index] = detailed;
+    } else {
+      businesses.push(detailed);
+    }
+
+    return detailed;
   }
 
   function listBusinesses() {
@@ -638,7 +689,7 @@
     });
   }
 
-  return { listBusinesses, listTopRated, listWeeklyFeatured, listRomaReviews, searchBusinesses, getBusinessById, loadBusinesses, getLoadError, getTodayReservations, addReview };
+  return { listBusinesses, listTopRated, listWeeklyFeatured, listRomaReviews, searchBusinesses, getBusinessById, loadBusinesses, loadBusinessDetails, getLoadError, getTodayReservations, addReview };
 })();
 
 

@@ -44,6 +44,7 @@ function BusinessApp() {
   try {
     const [dataReady, setDataReady] = React.useState(false);
     const [dataError, setDataError] = React.useState('');
+    const [business, setBusiness] = React.useState(null);
     const businessId = (() => {
       try {
         const url = new URL(window.location.href);
@@ -56,7 +57,10 @@ function BusinessApp() {
 
     React.useEffect(() => {
       let mounted = true;
-      MockData.loadBusinesses()
+      MockData.loadBusinessDetails(businessId)
+        .then((loadedBusiness) => {
+          if (mounted) setBusiness(loadedBusiness);
+        })
         .catch((error) => {
           const message = MockData.getLoadError() || error.message;
           if (!message.includes('SUPABASE_URL')) console.error('BusinessApp.loadBusinesses error:', error);
@@ -68,9 +72,7 @@ function BusinessApp() {
       return () => {
         mounted = false;
       };
-    }, []);
-
-    const business = MockData.getBusinessById(businessId);
+    }, [businessId]);
 
     return (
       <div className="min-h-screen bg-[var(--bg)]" data-name="business-app" data-file="business-app.js">
