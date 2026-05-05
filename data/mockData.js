@@ -349,6 +349,10 @@
     }, {});
   }
 
+  function businessIdSet(rows) {
+    return new Set((rows || []).map((row) => row.negocio_id || row.negocioId || row.business_id).filter(Boolean));
+  }
+
   function getReservationCreatedAt(row) {
     return row.created_at || row.fecha_creacion || row.fecha_registro || row.fecha || row.fecha_reserva || row.inicio;
   }
@@ -505,6 +509,13 @@
       try {
         const rows = await supabaseFetch('negocios?configurado=eq.true&suscripciones.estado=eq.activa&select=id,nombre,telefono,especialidad,slug,logo_url,imagen_fondo_url,mensaje_bienvenida,instagram,facebook,sitio_web,direccion,horario_atencion,configurado,plan,provincia,suscripciones!inner(estado)&order=nombre.asc');
         totalReservasHoy = await optionalSupabaseCount('reservas?created_at=gte.' + encodeURIComponent(getTodayStartIso()) + '&select=id');
+        const productosTiendaRows = tiendaTablesEnabled()
+          ? await optionalSupabaseFetch('productos?activo=eq.true&select=negocio_id&limit=1000')
+          : [];
+        const cursosTiendaRows = tiendaTablesEnabled()
+          ? await optionalSupabaseFetch('cursos?activo=eq.true&select=negocio_id&limit=1000')
+          : [];
+        const tiendasIds = new Set([...businessIdSet(productosTiendaRows), ...businessIdSet(cursosTiendaRows)]);
 
         const relations = {
           servicios: {},
@@ -518,6 +529,7 @@
             const business = normalizeBusiness(row, relations);
             business.reservasSemana = 0;
             business.detallesCargados = false;
+            business.tieneTienda = tiendasIds.has(business.id);
             return business;
           })
           .filter((business) => business.id);
@@ -607,6 +619,18 @@
       .slice(0, 10);
   }
 
+  function listRomaStores() {
+    return businesses
+      .filter((business) => business.tieneTienda)
+      .sort((a, b) => {
+        const gordis = (business) => normalizeText(business.nombre).includes('gordis');
+        if (gordis(a) && !gordis(b)) return -1;
+        if (!gordis(a) && gordis(b)) return 1;
+        return a.nombre.localeCompare(b.nombre);
+      })
+      .slice(0, 12);
+  }
+
   function listRomaReviews() {
     return businesses
       .flatMap((business) => (business.resenas || []).map((review) => ({ ...review, negocioNombre: business.nombre })))
@@ -689,7 +713,7 @@
     });
   }
 
-  return { listBusinesses, listTopRated, listWeeklyFeatured, listRomaReviews, searchBusinesses, getBusinessById, loadBusinesses, loadBusinessDetails, getLoadError, getTodayReservations, addReview };
+  return { listBusinesses, listTopRated, listWeeklyFeatured, listRomaStores, listRomaReviews, searchBusinesses, getBusinessById, loadBusinesses, loadBusinessDetails, getLoadError, getTodayReservations, addReview };
 })();
 
 

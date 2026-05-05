@@ -2,6 +2,7 @@
   try {
     const top = MockData.listTopRated();
     const featured = MockData.listWeeklyFeatured();
+    const stores = MockData.listRomaStores();
     const reviews = MockData.listRomaReviews();
 
     return (
@@ -16,6 +17,15 @@
           data-file="pages/home/HomePage.js"
         />
         <AllBusinessesSection data-name="all-businesses-section" data-file="pages/home/HomePage.js" />
+        <BusinessRail
+          title="Tiendas de Roma"
+          subtitle=""
+          badge="Productos y cursos"
+          items={stores}
+          emptyText="Aun no hay tiendas publicadas."
+          data-name="roma-stores"
+          data-file="pages/home/HomePage.js"
+        />
         <BusinessRail
           title="Mejor valorados"
           subtitle=""
