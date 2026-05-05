@@ -97,44 +97,6 @@
       }
     };
 
-    const CartForm = () => (
-      <div className="space-y-2" data-name="cart-form" data-file="pages/business/BusinessPage.js">
-        <input
-          className="input-rr text-sm"
-          value={customer.nombre}
-          onChange={(e) => updateCustomer('nombre', e.target.value)}
-          placeholder="Tu nombre"
-          data-name="cart-customer-name"
-          data-file="pages/business/BusinessPage.js"
-        />
-        <input
-          className="input-rr text-sm"
-          value={customer.whatsapp}
-          onChange={(e) => updateCustomer('whatsapp', e.target.value)}
-          inputMode="tel"
-          placeholder="Tu WhatsApp"
-          data-name="cart-customer-whatsapp"
-          data-file="pages/business/BusinessPage.js"
-        />
-        <input
-          className="input-rr text-sm"
-          value={customer.direccion}
-          onChange={(e) => updateCustomer('direccion', e.target.value)}
-          placeholder="Direccion o referencia"
-          data-name="cart-customer-address"
-          data-file="pages/business/BusinessPage.js"
-        />
-        <textarea
-          className="input-rr text-sm min-h-[72px] resize-y"
-          value={customer.nota}
-          onChange={(e) => updateCustomer('nota', e.target.value)}
-          placeholder="Nota opcional"
-          data-name="cart-customer-note"
-          data-file="pages/business/BusinessPage.js"
-        />
-      </div>
-    );
-
     const CartCard = () => (
       <div className="surface-rr p-5" data-name="cart-card" data-file="pages/business/BusinessPage.js">
         <div className="flex items-center justify-between gap-3" data-name="cart-head" data-file="pages/business/BusinessPage.js">
@@ -159,7 +121,41 @@
               <span className="text-sm text-[var(--text-muted)]" data-name="cart-total-label" data-file="pages/business/BusinessPage.js">Total</span>
               <span className="text-base font-semibold" data-name="cart-total-value" data-file="pages/business/BusinessPage.js">{Format.formatPrecioCUP(total)}</span>
             </div>
-            <CartForm />
+            <div className="space-y-2" data-name="cart-form" data-file="pages/business/BusinessPage.js">
+              <input
+                className="input-rr text-sm"
+                value={customer.nombre}
+                onChange={(e) => updateCustomer('nombre', e.target.value)}
+                placeholder="Tu nombre"
+                data-name="cart-customer-name"
+                data-file="pages/business/BusinessPage.js"
+              />
+              <input
+                className="input-rr text-sm"
+                value={customer.whatsapp}
+                onChange={(e) => updateCustomer('whatsapp', e.target.value)}
+                inputMode="tel"
+                placeholder="Tu WhatsApp"
+                data-name="cart-customer-whatsapp"
+                data-file="pages/business/BusinessPage.js"
+              />
+              <input
+                className="input-rr text-sm"
+                value={customer.direccion}
+                onChange={(e) => updateCustomer('direccion', e.target.value)}
+                placeholder="Direccion o referencia"
+                data-name="cart-customer-address"
+                data-file="pages/business/BusinessPage.js"
+              />
+              <textarea
+                className="input-rr text-sm min-h-[72px] resize-y"
+                value={customer.nota}
+                onChange={(e) => updateCustomer('nota', e.target.value)}
+                placeholder="Nota opcional"
+                data-name="cart-customer-note"
+                data-file="pages/business/BusinessPage.js"
+              />
+            </div>
             {cartMessage ? <p className="text-xs text-[var(--text-muted)] leading-relaxed" data-name="cart-message" data-file="pages/business/BusinessPage.js">{cartMessage}</p> : null}
             <button type="button" className="btn-rr btn-primary-rr w-full flex items-center justify-center gap-2" onClick={processCart} disabled={sendingOrder} data-name="cart-process" data-file="pages/business/BusinessPage.js">
               {sendingOrder ? 'Preparando...' : 'Procesar por WhatsApp'}
