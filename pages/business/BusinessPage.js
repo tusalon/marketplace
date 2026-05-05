@@ -5,6 +5,9 @@
     const catalog = b.categoriasCatalogo || [];
     const hasStore = Boolean((catalog.find((section) => section.tipo === 'productos')?.items || []).length || (catalog.find((section) => section.tipo === 'cursos')?.items || []).length);
     const [cart, setCart] = React.useState([]);
+    const [customer, setCustomer] = React.useState({ nombre: '', whatsapp: '', direccion: '', nota: '' });
+    const [cartMessage, setCartMessage] = React.useState('');
+    const [sendingOrder, setSendingOrder] = React.useState(false);
     const total = cart.reduce((sum, entry) => sum + (Number(entry.precio || 0) * entry.qty), 0);
 
     const addToCart = (item, type) => {
@@ -28,9 +31,27 @@
       }
     };
 
-    const processCart = () => {
+    const updateCustomer = (field, value) => {
+      try {
+        setCustomer((current) => ({ ...current, [field]: value }));
+      } catch (error) {
+        console.error('BusinessPage.updateCustomer error:', error);
+      }
+    };
+
+    const processCart = async () => {
       try {
         if (!cart.length) return;
+        setCartMessage('');
+        const nombre = customer.nombre.trim();
+        const whatsappCliente = customer.whatsapp.replace(/\D/g, '');
+        const direccion = customer.direccion.trim();
+        const nota = customer.nota.trim();
+        if (!nombre || !whatsappCliente) {
+          setCartMessage('Escribe tu nombre y WhatsApp para procesar el pedido.');
+          return;
+        }
+        setSendingOrder(true);
         const lines = [
           `Hola, quiero hacer un pedido en ${b.nombre}.`,
           '',
@@ -38,15 +59,81 @@
           '',
           `Total: ${Format.formatPrecioCUP(total)}`,
           '',
-          'Mi nombre:',
-          'Dirección o referencia:'
-        ];
+          `Cliente: ${nombre}`,
+          `WhatsApp: ${whatsappCliente}`,
+          direccion ? `Direccion o referencia: ${direccion}` : '',
+          nota ? `Nota: ${nota}` : ''
+        ].filter(Boolean);
+
+        try {
+          await MockData.addOrder(b.id, {
+            cliente_nombre: nombre,
+            cliente_whatsapp: whatsappCliente,
+            items: cart.map((entry) => ({
+              id: entry.id,
+              tipo: entry.type,
+              nombre: entry.nombre,
+              precio: entry.precio,
+              cantidad: entry.qty,
+              subtotal: entry.precio * entry.qty
+            })),
+            total
+          });
+        } catch (error) {
+          console.warn('No se pudo guardar el pedido antes de WhatsApp:', error);
+        }
+
         const wa = String(b.whatsapp || '').replace('+', '').replace(/\D/g, '');
+        if (!wa) {
+          setCartMessage('Este negocio no tiene WhatsApp configurado.');
+          return;
+        }
         window.location.href = `https://wa.me/${wa}?text=${encodeURIComponent(lines.join('\n'))}`;
       } catch (error) {
         console.error('BusinessPage.processCart error:', error);
+        setCartMessage('No se pudo procesar el pedido.');
+      } finally {
+        setSendingOrder(false);
       }
     };
+
+    const CartForm = () => (
+      <div className="space-y-2" data-name="cart-form" data-file="pages/business/BusinessPage.js">
+        <input
+          className="input-rr text-sm"
+          value={customer.nombre}
+          onChange={(e) => updateCustomer('nombre', e.target.value)}
+          placeholder="Tu nombre"
+          data-name="cart-customer-name"
+          data-file="pages/business/BusinessPage.js"
+        />
+        <input
+          className="input-rr text-sm"
+          value={customer.whatsapp}
+          onChange={(e) => updateCustomer('whatsapp', e.target.value)}
+          inputMode="tel"
+          placeholder="Tu WhatsApp"
+          data-name="cart-customer-whatsapp"
+          data-file="pages/business/BusinessPage.js"
+        />
+        <input
+          className="input-rr text-sm"
+          value={customer.direccion}
+          onChange={(e) => updateCustomer('direccion', e.target.value)}
+          placeholder="Direccion o referencia"
+          data-name="cart-customer-address"
+          data-file="pages/business/BusinessPage.js"
+        />
+        <textarea
+          className="input-rr text-sm min-h-[72px] resize-y"
+          value={customer.nota}
+          onChange={(e) => updateCustomer('nota', e.target.value)}
+          placeholder="Nota opcional"
+          data-name="cart-customer-note"
+          data-file="pages/business/BusinessPage.js"
+        />
+      </div>
+    );
 
     const CartCard = () => (
       <div className="surface-rr p-5" data-name="cart-card" data-file="pages/business/BusinessPage.js">
@@ -72,8 +159,10 @@
               <span className="text-sm text-[var(--text-muted)]" data-name="cart-total-label" data-file="pages/business/BusinessPage.js">Total</span>
               <span className="text-base font-semibold" data-name="cart-total-value" data-file="pages/business/BusinessPage.js">{Format.formatPrecioCUP(total)}</span>
             </div>
-            <button type="button" className="btn-rr btn-primary-rr w-full flex items-center justify-center gap-2" onClick={processCart} data-name="cart-process" data-file="pages/business/BusinessPage.js">
-              Procesar por WhatsApp
+            <CartForm />
+            {cartMessage ? <p className="text-xs text-[var(--text-muted)] leading-relaxed" data-name="cart-message" data-file="pages/business/BusinessPage.js">{cartMessage}</p> : null}
+            <button type="button" className="btn-rr btn-primary-rr w-full flex items-center justify-center gap-2" onClick={processCart} disabled={sendingOrder} data-name="cart-process" data-file="pages/business/BusinessPage.js">
+              {sendingOrder ? 'Preparando...' : 'Procesar por WhatsApp'}
               <div className="icon-message-circle text-xl text-white" data-name="cart-process-icon" data-file="pages/business/BusinessPage.js"></div>
             </button>
           </div>

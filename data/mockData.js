@@ -671,6 +671,19 @@
     return created;
   }
 
+  async function addOrder(negocioId, order) {
+    const payload = {
+      negocio_id: negocioId,
+      cliente_nombre: order.cliente_nombre,
+      cliente_whatsapp: order.cliente_whatsapp,
+      items: order.items || [],
+      total: Number(order.total || 0),
+      estado: 'enviado_whatsapp'
+    };
+    const inserted = await supabaseInsert('pedidos_whatsapp', payload);
+    return inserted?.[0] || payload;
+  }
+
   function getBusinessById(id) {
     const found = businesses.find((b) => b.id === id);
     return found || null;
@@ -713,7 +726,7 @@
     });
   }
 
-  return { listBusinesses, listTopRated, listWeeklyFeatured, listRomaStores, listRomaReviews, searchBusinesses, getBusinessById, loadBusinesses, loadBusinessDetails, getLoadError, getTodayReservations, addReview };
+  return { listBusinesses, listTopRated, listWeeklyFeatured, listRomaStores, listRomaReviews, searchBusinesses, getBusinessById, loadBusinesses, loadBusinessDetails, getLoadError, getTodayReservations, addReview, addOrder };
 })();
 
 
