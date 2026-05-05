@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rservasroma-marketplace-v17';
+const CACHE_NAME = 'rservasroma-marketplace-v18';
 const APP_SHELL = [
   './index.html',
   './manifest.webmanifest',

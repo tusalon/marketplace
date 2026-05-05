@@ -97,7 +97,7 @@
       }
     };
 
-    const CartCard = () => (
+    const renderCartCard = () => (
       <div className="surface-rr p-5" data-name="cart-card" data-file="pages/business/BusinessPage.js">
         <div className="flex items-center justify-between gap-3" data-name="cart-head" data-file="pages/business/BusinessPage.js">
           <p className="text-sm font-semibold" data-name="cart-title" data-file="pages/business/BusinessPage.js">Carrito</p>
@@ -179,7 +179,7 @@
             <div data-name="left" data-file="pages/business/BusinessPage.js">
               <BusinessCatalog business={b} onAddToCart={addToCart} data-name="catalog" data-file="pages/business/BusinessPage.js" />
               {hasStore ? <div className="lg:hidden mt-4" data-name="mobile-cart" data-file="pages/business/BusinessPage.js">
-                <CartCard />
+                {renderCartCard()}
               </div> : null}
               <BusinessReviews business={b} data-name="reviews" data-file="pages/business/BusinessPage.js" />
             </div>
@@ -215,7 +215,7 @@
                 </a>
               </div>
               {hasStore ? <div className="mt-4" data-name="desktop-cart" data-file="pages/business/BusinessPage.js">
-                <CartCard />
+                {renderCartCard()}
               </div> : null}
             </aside>
           </div>
